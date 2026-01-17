@@ -1,4 +1,4 @@
-package com.group4.ecommerceplatform.Entity;
+package com.group4.ecommerceplatform.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,7 +10,7 @@ import java.util.UUID;
 @Setter
 
 @Entity
-@Table(name = "users")
+@Table(name = "User")
 public class User {
     @Id
     @GeneratedValue
@@ -29,7 +29,7 @@ public class User {
     @Column(name = "PhoneNumber", nullable = false)
     private String phoneNumber;
 
-    @Column(name = "Address", nullable = false)
+    @Column(name = "Address")
     private String address;
 
     @Column(name = "Role", nullable = false)
@@ -38,21 +38,21 @@ public class User {
     @Column(name = "IsActive", nullable = false)
     private boolean isActive;
 
-    @Column(name = "Create_at", nullable = false)
-    private LocalDateTime created_at;
+    @Column(name = "CreatedAt", nullable = false)
+    private LocalDateTime createdAt;
 
-    @Column(name = "Updated_at", nullable = false)
-    private LocalDateTime updated_at;
+    @Column(name = "UpdatedAt", nullable = false)
+    private LocalDateTime updatedAt;
 
     @PrePersist
     public void onCreate() {
-        created_at = LocalDateTime.now();
-        updated_at = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     public void onUpdate() {
-        updated_at = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
 

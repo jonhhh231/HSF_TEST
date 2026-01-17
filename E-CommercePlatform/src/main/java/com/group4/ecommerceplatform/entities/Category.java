@@ -1,4 +1,4 @@
-package com.group4.ecommerceplatform.Entity;
+package com.group4.ecommerceplatform.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 
 @Entity
-@Table(name="Categories")
+@Table(name="Category")
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -25,12 +25,11 @@ public class Category {
     @Column(name="Description", nullable = false)
     private String description;
 
-    @Column(name="Create_Time", nullable = false)
-    private LocalDateTime created_at;
+    @Column(name="CreateAt", nullable = false)
+    private LocalDateTime createdAt;
 
-    @Column(name="Update_Time", nullable = false)
-    private LocalDateTime updated_at;
-
+    @Column(name="UpdateAt", nullable = false)
+    private LocalDateTime updatedAt;
 
     public Category(String name, String description) {
         this.name = name;
@@ -42,18 +41,18 @@ public class Category {
 
 
     @OneToMany(
-            mappedBy = "category",cascade = CascadeType.ALL,fetch =  FetchType.LAZY
+            mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true,fetch =  FetchType.LAZY
     )
     private List<Product> products = new ArrayList<>();
 
     @PrePersist
     public void onCreate() {
-        created_at = LocalDateTime.now();
-        updated_at = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     public void onUpdate() {
-        updated_at = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 }
