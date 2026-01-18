@@ -1,6 +1,5 @@
 package com.group4.ecommerceplatform.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,12 +39,6 @@ public class User {
     @Column(name = "IsActive", nullable = false)
     private boolean isActive;
 
-    @Column(name = "Create_at", nullable = false)
-    private LocalDateTime created_at;
-
-    @Column(name = "Updated_at", nullable = false)
-    private LocalDateTime updated_at;
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private Cart cart;
@@ -57,16 +50,22 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Review> reviews;
+  
+    @Column(name = "CreatedAt", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "UpdatedAt", nullable = false)
+    private LocalDateTime updatedAt;
 
     @PrePersist
     public void onCreate() {
-        created_at = LocalDateTime.now();
-        updated_at = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     public void onUpdate() {
-        updated_at = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
 

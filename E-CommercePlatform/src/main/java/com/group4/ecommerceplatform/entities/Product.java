@@ -17,20 +17,20 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name="Id")
-    private int id;
+    private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "Name", columnDefinition = "NVARCHAR(255)")
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name="Description", columnDefinition = "NVARCHAR(500)")
     private String description;
 
-    @Column(nullable = false)
-    private double price;
+    @Column(nullable = false, name="Price")
+    private Double price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-            name = "category_id",
+            name = "CategoryId",
             nullable = false
     )
     private Category category;

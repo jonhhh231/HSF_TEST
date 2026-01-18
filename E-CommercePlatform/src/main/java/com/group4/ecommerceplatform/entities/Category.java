@@ -48,12 +48,12 @@ public class Category {
 
     @PrePersist
     public void onCreate() {
-        created_at = LocalDateTime.now();
-        updated_at = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     public void onUpdate() {
-        updated_at = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 }
