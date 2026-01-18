@@ -3,6 +3,7 @@ package com.group4.ecommerceplatform.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @Getter
 @Setter
-
+@NoArgsConstructor
 @Entity
 @Table(name="Products")
 public class Product {
@@ -29,13 +30,14 @@ public class Product {
     @Column(nullable = false, name="Price")
     private Double price;
 
+    @Column(nullable = false, name = "Stock")
+    private Integer stock;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "CategoryId",
             nullable = false
     )
     private Category category;
-
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonIgnore
@@ -58,21 +60,4 @@ public class Product {
     public void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
-    public Product() {
-    }
-
-    public Product(
-            String name,
-            String description,
-            double price,
-            Category category
-    ) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.category = category;
-        this.isActive = true;
-    }
-
 }
