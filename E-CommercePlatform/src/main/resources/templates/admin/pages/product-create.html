@@ -14,30 +14,45 @@
                 <div class="card-header">
                     <div class="row align-items-center">
                         <div class="col">
-                            <h4 class="card-title">Basic Form</h4>
-                        </div><!--end col-->
-                    </div>  <!--end row-->
-                </div><!--end card-header-->
+                            <h4 class="card-title">Tạo sản phẩm</h4>
+                        </div>
+                    </div>
+                </div>
                 <div class="card-body pt-0">
-                    <form id="form-create-product">
+                    <form id="form-create-product" action="/admin/products" method="POST">
                         <div class="mb-3">
-                            <label for="exampleInputEmail1" class="form-label">Email address</label>
-                            <input type="email" class="form-control" id="exampleInputEmail1"
-                                   aria-describedby="emailHelp" placeholder="Enter email">
+                            <label class="form-label">Tên sản phẩm</label>
+                            <input name="name" id="name" class="form-control" placeholder="Nhập tên sản phẩm">
                         </div>
                         <div class="mb-3">
-                            <label for="exampleInputPassword1" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="exampleInputPassword1"
-                                   placeholder="Password">
+                            <label class="form-label">Danh mục</label>
+                            <select name="categoryId" id="categoryId" class="form-control">
+                                <option value="">--Chọn danh mục--</option>
+                            </select>
                         </div>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultdemo">
-                            <label class="form-check-label" for="flexCheckDefaultdemo">
-                                Check me out
-                            </label>
+                        <div class="mb-3">
+                            <label class="form-label">Giá</label>
+                            <input type="number" name="price" id="price" class="form-control" placeholder="Nhập gíá">
                         </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        <button type="button" class="btn btn-danger">Cancel</button>
+                        <div class="mb-3">
+                            <label class="form-label">Số lượng</label>
+                            <input type="number" name="stock" id="stock" class="form-control"
+                                   placeholder="Nhập số lượng">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Trạng thái</label>
+                            <select name="isActive" id="isActive" class="form-control">
+                                <option value="true">Hoạt động</option>
+                                <option value="false">Tạm ngưng</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mô tả</label>
+                            <textarea name="description" id="description" class="form-control"
+                                      placeholder="Mô tả"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Tạo</button>
+                        <button type="button" class="btn btn-danger">Xóa</button>
                     </form>
                 </div>
             </div>
