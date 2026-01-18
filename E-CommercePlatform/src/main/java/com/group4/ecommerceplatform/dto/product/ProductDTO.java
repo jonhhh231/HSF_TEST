@@ -17,7 +17,7 @@ public class ProductDTO {
     @NotNull(message = "Description can not be null")
     private String description;
 
-    private String categoryId;
+    private Long categoryId;
     @NotNull(message = "Price can not be null")
     private Double price;
     @NotNull(message = "Stock can not be null")
