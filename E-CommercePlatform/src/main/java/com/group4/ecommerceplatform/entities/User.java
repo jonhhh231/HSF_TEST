@@ -1,9 +1,11 @@
-package com.group4.ecommerceplatform.Entity;
+package com.group4.ecommerceplatform.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -43,6 +45,18 @@ public class User {
 
     @Column(name = "Updated_at", nullable = false)
     private LocalDateTime updated_at;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Cart cart;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Order> orders;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Review> reviews;
 
     @PrePersist
     public void onCreate() {

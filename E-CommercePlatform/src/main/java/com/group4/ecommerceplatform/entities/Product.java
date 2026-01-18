@@ -1,10 +1,12 @@
-package com.group4.ecommerceplatform.Entity;
+package com.group4.ecommerceplatform.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -33,20 +35,27 @@ public class Product {
     )
     private Category category;
 
-    @Column(nullable = false)
-    private boolean is_active;
-    private LocalDateTime created_at;
-    private LocalDateTime updated_at;
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonIgnore
+    private List<Review> reviews; // chi can truy nguoc ve review chu khong can phai truy ve lai order voi cart product
+
+    @Column(nullable = false, name="IsActive")
+    private Boolean isActive;
+    @Column(nullable = false, name="CreatedAt")
+    private LocalDateTime createdAt;
+    @Column(nullable = false, name="UpdatedAt")
+    private LocalDateTime updatedAt;
 
     @PrePersist
     public void onCreate() {
-        created_at = LocalDateTime.now();
-        updated_at = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     public void onUpdate() {
-        updated_at = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     public Product() {
@@ -62,7 +71,7 @@ public class Product {
         this.description = description;
         this.price = price;
         this.category = category;
-        this.is_active = true;
+        this.isActive = true;
     }
 
 }
