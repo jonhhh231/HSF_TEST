@@ -18,6 +18,7 @@ public class ProductDTOConverter {
     private CategoryRepository categoryRepository;
     public Product toProductEntity(ProductDTO dto)
     {
+        // comment
 //        Optional<Category> categoryOptional = categoryRepository.findById(dto.getCategoryId());
         Product product = modelMapper.map(dto,Product.class);
         return product;
