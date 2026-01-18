@@ -2,6 +2,7 @@ package com.group4.ecommerceplatform.apis;
 
 import com.group4.ecommerceplatform.dto.product.ProductDTO;
 import com.group4.ecommerceplatform.entities.Product;
+import com.group4.ecommerceplatform.responses.SuccessResponse;
 import com.group4.ecommerceplatform.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +15,12 @@ public class ProductAPI {
     @Autowired
     private ProductService productService;
     @PostMapping
-    public ResponseEntity<?> createProduct(@ModelAttribute ProductDTO dto)
+    public ResponseEntity<?> createProduct(@RequestBody @Valid ProductDTO dto)
     {
-        System.out.println(dto.getPrice());
-        return null;
+        productService.createProduct(dto);
+        SuccessResponse successResponse = new SuccessResponse();
+        successResponse.setMessage("Create success");
+        successResponse.setData(null);
+        return ResponseEntity.ok(successResponse);
     }
 }

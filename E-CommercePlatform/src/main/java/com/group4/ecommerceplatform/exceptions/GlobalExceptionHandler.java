@@ -13,7 +13,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex, WebRequest request){
         ErrorResponse error = new ErrorResponse();
-        error.setMessage(ex.getMessage());
+        error.setMessage(ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
     @ExceptionHandler(NotFoundException.class)
