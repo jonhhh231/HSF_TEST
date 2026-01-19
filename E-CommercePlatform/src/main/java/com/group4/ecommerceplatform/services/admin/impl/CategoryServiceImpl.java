@@ -15,8 +15,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
+
+    // gọi hồn REPO lên để sai nó làm việc
     @Autowired
     private CategoryRepository categoryRepository;
+
+
+    // gọi hồn DTO lên để kêu nó lấy thông tin
     @Autowired
     private CategoryDTOConverter categoryDTOConverter;
 
@@ -33,7 +38,6 @@ public class CategoryServiceImpl implements CategoryService {
         Category existingCategory = categoryRepository.findById(dto.getId())
                 .orElseThrow(() -> new NotFoundException("Category Not Found"));
 
-        // Map dữ liệu mới vào entity cũ
         categoryDTOConverter.updateEntity(dto, existingCategory);
         categoryRepository.save(existingCategory);
     }
