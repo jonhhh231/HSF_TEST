@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layouts/default}">
+<head>
+    <title>Tạo danh mục</title>
+</head>
+
+<body>
+
+<div layout:fragment="main">
+    <div class="row">
+        <div class="col-md-12 col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h4 class="card-title">Tạo danh mục</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body pt-0">
+                    <form id="form-save-category"
+                          th:data-api="@{/admin/categories}"
+                          data-method="POST">
+
+                        <div class="mb-3">
+                            <label class="form-label">Tên danh mục</label>
+                            <input name="name" id="name" class="form-control" placeholder="Nhập tên danh mục">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Mô tả</label>
+                            <textarea name="description" id="description" class="form-control"
+                                      placeholder="Nhập mô tả danh mục" rows="4"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Tạo</button>
+                        <a href="/admin/categories" class="btn btn-secondary">Quay lại</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/admin/assets/js/main.js}"></script>
+</div>
+</body>
+</html>
