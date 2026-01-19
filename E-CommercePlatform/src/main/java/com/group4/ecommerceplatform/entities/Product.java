@@ -34,7 +34,8 @@ public class Product {
     private Integer stock;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-            name = "CategoryId"
+            name = "CategoryId",
+            nullable = true
     )
     private Category category;
 
