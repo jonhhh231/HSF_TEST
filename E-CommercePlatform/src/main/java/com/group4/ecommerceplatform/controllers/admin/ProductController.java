@@ -1,4 +1,4 @@
-package com.group4.ecommerceplatform.controllers;
+package com.group4.ecommerceplatform.controllers.admin;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
