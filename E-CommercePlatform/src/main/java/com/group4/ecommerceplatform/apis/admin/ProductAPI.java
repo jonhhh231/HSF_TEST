@@ -14,7 +14,7 @@ public class ProductAPI {
     @Autowired
     private ProductService productService;
     @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody @Valid ProductDTO dto)
+    public ResponseEntity<SuccessResponse> createProduct(@RequestBody @Valid ProductDTO dto)
     {
         productService.createProduct(dto);
         SuccessResponse successResponse = new SuccessResponse();

@@ -18,9 +18,12 @@ public class ProductDTOConverter {
     private CategoryRepository categoryRepository;
     public Product toProductEntity(ProductDTO dto)
     {
-        // comment
-//        Optional<Category> categoryOptional = categoryRepository.findById(dto.getCategoryId());
-        Product product = modelMapper.map(dto,Product.class);
-        return product;
+        return modelMapper.map(dto,Product.class);
+    }
+    public  ProductDTO toProductDTO(Product entity)
+    {
+        ProductDTO productDTO = modelMapper.map(entity,ProductDTO.class);
+        productDTO.setCategoryId(entity.getCategory().getId());
+        return productDTO;
     }
 }

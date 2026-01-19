@@ -3,7 +3,7 @@ const sendProductCreateApi = () => {
     form.addEventListener("submit", (e) => {
         e.preventDefault();
         const name = e.target.name.value;
-        const categoryId = e.target.categoryId.value;
+        const categoryId = e.target.categoryId.value ? e.target.categoryId.value : null;
         const price = e.target.price.value;
         const stock = e.target.stock.value;
         const isActive = e.target.isActive.value;
