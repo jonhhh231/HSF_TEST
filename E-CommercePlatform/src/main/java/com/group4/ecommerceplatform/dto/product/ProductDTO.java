@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class ProductDTO {
-    private String id;
+    private Long id;
     @NotEmpty(message = "Product is required")
     private String name;
     @NotNull(message = "Description can not be null")

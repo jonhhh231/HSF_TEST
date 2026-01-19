@@ -13,12 +13,22 @@ import org.springframework.web.bind.annotation.*;
 public class ProductAPI {
     @Autowired
     private ProductService productService;
+
     @PostMapping
-    public ResponseEntity<SuccessResponse> createProduct(@RequestBody @Valid ProductDTO dto)
-    {
+    public ResponseEntity<SuccessResponse> createProduct(@RequestBody @Valid ProductDTO dto) {
         productService.createProduct(dto);
         SuccessResponse successResponse = new SuccessResponse();
         successResponse.setMessage("Create success");
+        successResponse.setData(null);
+        return ResponseEntity.ok(successResponse);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<SuccessResponse> createProduct(@RequestBody @Valid ProductDTO dto, @PathVariable Long id) {
+        dto.setId(id);
+        productService.updateProduct(dto);
+        SuccessResponse successResponse = new SuccessResponse();
+        successResponse.setMessage("Update success");
         successResponse.setData(null);
         return ResponseEntity.ok(successResponse);
     }

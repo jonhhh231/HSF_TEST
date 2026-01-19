@@ -20,10 +20,14 @@ public class ProductDTOConverter {
     {
         return modelMapper.map(dto,Product.class);
     }
+    public void toProductEntityFromExisting(ProductDTO dto, Product existingProduct)
+    {
+        modelMapper.map(dto,existingProduct);
+    }
     public  ProductDTO toProductDTO(Product entity)
     {
         ProductDTO productDTO = modelMapper.map(entity,ProductDTO.class);
-        productDTO.setCategoryId(entity.getCategory().getId());
+        productDTO.setCategoryId(entity.getCategory() != null ? entity.getCategory().getId() : null);
         return productDTO;
     }
 }
