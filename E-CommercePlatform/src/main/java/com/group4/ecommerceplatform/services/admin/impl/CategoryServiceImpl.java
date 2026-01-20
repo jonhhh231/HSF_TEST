@@ -15,8 +15,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
+
+    // gọi hồn REPO lên để sai nó làm việc
     @Autowired
     private CategoryRepository categoryRepository;
+
+
+    // gọi hồn DTO lên để kêu nó lấy thông tin
     @Autowired
     private CategoryDTOConverter categoryDTOConverter;
 
@@ -33,7 +38,6 @@ public class CategoryServiceImpl implements CategoryService {
         Category existingCategory = categoryRepository.findById(dto.getId())
                 .orElseThrow(() -> new NotFoundException("Category Not Found"));
 
-        // Map dữ liệu mới vào entity cũ
         categoryDTOConverter.updateEntity(dto, existingCategory);
         categoryRepository.save(existingCategory);
     }
@@ -47,8 +51,19 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryDTO> getAllCategories() {
-        return categoryRepository.findAll().stream()
-                .map(categoryDTOConverter::toDTO)
+        // Gọi Repo lấy hết Entity -> Chuyển sang DTO -> Trả về List
+        List<Category> entities = categoryRepository.findAll();
+        return entities.stream()
+                .map(entity -> categoryDTOConverter.toDTO(entity))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteCategoryById(Long id) {
+        if (!categoryRepository.existsById(id)) {
+            throw new NotFoundException("Category not found");
+        }
+        categoryRepository.deleteById(id);
     }
 }

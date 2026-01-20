@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/admin/categories")
 public class CategoryAPI {
+
+
     @Autowired
     private CategoryService categoryService;
 
@@ -28,6 +30,17 @@ public class CategoryAPI {
         categoryService.updateCategory(dto);
         SuccessResponse response = new SuccessResponse();
         response.setMessage("Update category success");
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<SuccessResponse> deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategoryById(id);
+
+        SuccessResponse response = new SuccessResponse();
+        response.setMessage("Xóa danh mục thành công");
+        response.setData(null);
+
         return ResponseEntity.ok(response);
     }
 }
