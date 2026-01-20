@@ -32,4 +32,15 @@ public class CategoryAPI {
         response.setMessage("Update category success");
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<SuccessResponse> deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategoryById(id);
+
+        SuccessResponse response = new SuccessResponse();
+        response.setMessage("Xóa danh mục thành công");
+        response.setData(null);
+
+        return ResponseEntity.ok(response);
+    }
 }

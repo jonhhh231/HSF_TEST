@@ -51,8 +51,19 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryDTO> getAllCategories() {
-        return categoryRepository.findAll().stream()
-                .map(categoryDTOConverter::toDTO)
+        // Gọi Repo lấy hết Entity -> Chuyển sang DTO -> Trả về List
+        List<Category> entities = categoryRepository.findAll();
+        return entities.stream()
+                .map(entity -> categoryDTOConverter.toDTO(entity))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteCategoryById(Long id) {
+        if (!categoryRepository.existsById(id)) {
+            throw new NotFoundException("Category not found");
+        }
+        categoryRepository.deleteById(id);
     }
 }

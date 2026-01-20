@@ -80,4 +80,33 @@ const sendSaveCategoryApi = () => {
 }
 sendSaveCategoryApi();
 
+document.addEventListener("DOMContentLoaded", () => {
+    sendSaveCategoryApi();
+    handleDeleteAction();
+});
 
+const handleDeleteAction = () => {
+    const deleteBtns = document.querySelectorAll(".btn-delete");
+
+    deleteBtns.forEach(btn => {
+        btn.addEventListener("click", function() {
+            const api = this.getAttribute("data-api");
+
+            if (confirm("Bạn có chắc chắn muốn xóa mục này không?")) {
+
+                fetch(api, {
+                    method: "DELETE"
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.message || "Xóa thành công");
+                        window.location.reload();
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Lỗi khi xóa!");
+                    });
+            }
+        });
+    });
+};

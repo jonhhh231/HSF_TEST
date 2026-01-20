@@ -8,5 +8,6 @@ public interface CategoryService {
     void createCategory(CategoryDTO categoryDTO);
     void updateCategory(CategoryDTO categoryDTO);
     CategoryDTO getCategoryById(Long id);
-    List<CategoryDTO> getAllCategories(); // Đơn giản hóa, chưa phân trang
+    List<CategoryDTO> getAllCategories();
+    void deleteCategoryById(Long id);
 }
