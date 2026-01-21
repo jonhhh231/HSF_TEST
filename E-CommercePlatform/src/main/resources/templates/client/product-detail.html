@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.name} + ' - Laptop Store'">Product Detail - Laptop Store</title>
+    <link rel="stylesheet" th:href="@{/client/product-detail.css}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">Laptop Store</a>
+
+            <form class="search-bar" th:action="@{/products}" method="get">
+                <input type="text" name="search" placeholder="Tìm kiếm laptop...">
+                <button type="submit">Tìm Kiếm</button>
+            </form>
+
+            <div class="header-actions">
+                <a href="/cart" class="cart-link">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    Giỏ Hàng
+                </a>
+                <span th:if="${session.user != null}" class="user-greeting">
+                    Xin chào, <strong th:text="${session.user.fullName}">User</strong>
+                </span>
+                <a th:if="${session.user == null}" href="/auth/login">Đăng Nhập</a>
+                <a th:if="${session.user != null}" href="/auth/logout">Đăng Xuất</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="container">
+            <a href="/">Trang chủ</a>
+            <span>/</span>
+            <a href="/products">Sản phẩm</a>
+            <span>/</span>
+            <span th:text="${product.category?.name}">Laptop</span>
+            <span>/</span>
+            <span th:text="${product.name}">Product Name</span>
+        </div>
+    </div>
+
+    <!-- Product Detail -->
+    <div class="container">
+        <div class="product-detail">
+            <!-- Product Images -->
+            <div class="product-images">
+                <div class="main-image">
+                    <img th:if="${product.url != null && !product.url.isEmpty()}"
+                         th:src="${product.url}"
+                         th:alt="${product.name}"
+                         class="product-img">
+                    <div th:if="${product.url == null || product.url.isEmpty()}"
+                         class="no-image">
+                        <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#ccc">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                        <p>Không có hình ảnh</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="product-info">
+                <h1 class="product-name" th:text="${product.name}">Product Name</h1>
+
+                <div class="product-meta">
+                    <span class="category" th:text="${product.category?.name}">Category</span>
+                    <span class="product-id">Mã SP: <span th:text="${product.id}">123</span></span>
+                </div>
+
+                <div class="product-price">
+                    <span class="price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' VND'">0 VND</span>
+                </div>
+
+                <div class="product-stock">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span th:if="${product.stockQuantity > 10}" class="in-stock">
+                        Còn hàng: <strong th:text="${product.stockQuantity}">0</strong> sản phẩm
+                    </span>
+                    <span th:if="${product.stockQuantity > 0 && product.stockQuantity <= 10}" class="low-stock">
+                        Chỉ còn <strong th:text="${product.stockQuantity}">0</strong> sản phẩm
+                    </span>
+                    <span th:if="${product.stockQuantity <= 0}" class="out-of-stock">
+                        Hết hàng
+                    </span>
+                </div>
+
+                <div class="product-description">
+                    <h3>Mô tả sản phẩm</h3>
+                    <p th:text="${product.description}" th:if="${product.description != null && !product.description.isEmpty()}">
+                        Product description here
+                    </p>
+                    <p th:if="${product.description == null || product.description.isEmpty()}" class="no-description">
+                        Chưa có mô tả cho sản phẩm này.
+                    </p>
+                </div>
+
+                <!-- Login Required Message -->
+                <div th:if="${session.user == null}" class="login-required-message">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>Vui lòng <a href="/auth/login">đăng nhập</a> để thêm sản phẩm vào giỏ hàng</span>
+                </div>
+
+                <!-- Add to Cart Form -->
+                <form th:action="@{/cart/add}" method="post" class="add-to-cart-form">
+                    <input type="hidden" name="productId" th:value="${product.id}">
+
+                    <div class="quantity-selector">
+                        <label for="quantity">Số lượng:</label>
+                        <div class="quantity-input">
+                            <input type="number" id="quantity" name="quantity" value="1" min="1"
+                                   th:max="${product.stockQuantity}">
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-primary"
+                                th:disabled="${product.stockQuantity <= 0 || currentUser == null}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                            <span th:if="${product.stockQuantity > 0 && currentUser != null}">Thêm Vào Giỏ Hàng</span>
+                            <span th:if="${product.stockQuantity <= 0}">Hết Hàng</span>
+                            <span th:if="${product.stockQuantity > 0 && currentUser == null}">Đăng Nhập Để Mua</span>
+                        </button>
+
+                        <a href="/products" class="btn btn-secondary">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                            Tiếp Tục Mua Sắm
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Related Products Section -->
+        <div class="related-products" th:if="${relatedProducts != null && !relatedProducts.isEmpty()}">
+            <h2>Sản Phẩm Liên Quan</h2>
+            <div class="product-grid">
+                <div class="product-card" th:each="related : ${relatedProducts}">
+                    <a th:href="@{/products/{id}(id=${related.id})}" class="product-link">
+                        <div class="product-image">
+                            <img th:if="${related.url != null}" th:src="${related.url}" th:alt="${related.name}">
+                            <div th:if="${related.url == null}" class="no-image-small">No Image</div>
+                        </div>
+                        <div class="product-info-card">
+                            <h3 class="product-name-card" th:text="${related.name}">Product Name</h3>
+                            <p class="product-price-card" th:text="${#numbers.formatDecimal(related.price, 0, 'COMMA', 0, 'POINT')} + ' VND'">0 VND</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Về Chúng Tôi</h4>
+                <p>Cung cấp laptop chất lượng cao với giá tốt nhất</p>
+            </div>
+            <div class="footer-section">
+                <h4>Liên Hệ</h4>
+                <p>Email: support@laptopstore.com</p>
+                <p>Phone: 1900 xxxx</p>
+            </div>
+            <div class="footer-section">
+                <h4>Chính Sách</h4>
+                <a href="/policy">Chính sách bảo hành</a>
+                <a href="/return">Chính sách đổi trả</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Laptop Store. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

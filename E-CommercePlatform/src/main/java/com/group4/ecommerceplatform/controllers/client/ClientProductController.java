@@ -2,6 +2,7 @@ package com.group4.ecommerceplatform.controllers.client;
 
 import com.group4.ecommerceplatform.entities.Product;
 import com.group4.ecommerceplatform.services.client.ProductService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -27,10 +28,17 @@ public class ClientProductController {
 
     @GetMapping("/products")
     public String showProducts(Model model,
+                              HttpSession session,
                               @RequestParam(value = "page", defaultValue = "1") int page,
                               @RequestParam(value = "size", defaultValue = "12") int size,
                               @RequestParam(value = "category", required = false) Integer categoryId,
                               @RequestParam(value = "search", required = false) String search) {
+
+        // Add user to model for template access
+        Object user = session.getAttribute("user");
+        if (user != null) {
+            model.addAttribute("currentUser", user);
+        }
 
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<Product> productPage;
@@ -54,9 +62,35 @@ public class ClientProductController {
     }
 
     @GetMapping("/products/{id}")
-    public String showProductDetail(Model model, @PathVariable("id") Integer id) {
+    public String showProductDetail(Model model,
+                                   HttpSession session,
+                                   @PathVariable("id") Integer id) {
+
+        // Add user to model for template access
+        Object user = session.getAttribute("user");
+        if (user != null) {
+            model.addAttribute("currentUser", user);
+        }
+
         Product product = productService.getProductById(id);
         model.addAttribute("product", product);
+
+        // Get related products from same category
+        if (product.getCategory() != null) {
+            Pageable pageable = PageRequest.of(0, 4); // Get 4 related products
+            Page<Product> relatedPage = productService.getProductsByCategory(
+                product.getCategory().getId(),
+                pageable
+            );
+            // Filter out current product from related products
+            model.addAttribute("relatedProducts",
+                relatedPage.getContent().stream()
+                    .filter(p -> !p.getId().equals(id))
+                    .limit(4)
+                    .toList()
+            );
+        }
+
         return "client/product-detail";
     }
 }
