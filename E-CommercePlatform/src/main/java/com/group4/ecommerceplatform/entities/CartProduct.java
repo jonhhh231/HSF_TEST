@@ -1,44 +1,42 @@
 package com.group4.ecommerceplatform.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
+
+import java.io.Serializable;
 
 @Entity
 @Table(name = "cart_products")
 @Getter
 @Setter
 @NoArgsConstructor
+@IdClass(CartProduct.CartProductId.class)
 public class CartProduct {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;// check lai database xem co can id hay khong
+    @Column(name = "cart_id")
+    private Integer cartId;
+
+    @Id
+    @Column(name = "product_id")
+    private Integer productId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart_id", nullable = false)
-    @ToString.Exclude // tranh StackOverFlow
-    @JsonIgnore // tranh StackOverFlow
+    @JoinColumn(name = "cart_id", insertable = false, updatable = false)
     private Cart cart;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "product_id", insertable = false, updatable = false)
     private Product product;
 
-    @Column(nullable = false)
-    private int quantity;
+    @Column(name = "quantity")
+    private Integer quantity;
 
-    @Column(nullable = false)
-    private Double price;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() { createdAt = LocalDateTime.now(); updatedAt = LocalDateTime.now(); }
-    @PreUpdate
-    protected void onUpdate() { updatedAt = LocalDateTime.now(); }
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CartProductId implements Serializable {
+        private Integer cartId;
+        private Integer productId;
+    }
 }

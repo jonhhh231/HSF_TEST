@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laptop Store - Premium Laptops</title>
+    <link rel="stylesheet" th:href="@{/client/products.css}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">Laptop Store</a>
+
+            <form class="search-bar" th:action="@{/products}" method="get">
+                <input type="text" name="search" th:value="${search}" placeholder="Tìm kiếm laptop...">
+                <button type="submit">Tìm Kiếm</button>
+            </form>
+
+            <div class="header-actions">
+                <a href="/cart">Giỏ Hàng</a>
+                <!-- Hiển thị tên user nếu đã đăng nhập -->
+                <a th:if="${session.userName != null}" th:href="@{/auth/logout}">
+                    <span th:text="${session.userName}"></span> (Đăng Xuất)
+                </a>
+                <a th:if="${session.userName == null}" href="/auth/login">Đăng Nhập</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h3>Danh Mục</h3>
+            <div class="filter-buttons">
+                <a href="/products" class="filter-btn" th:classappend="${categoryId == null ? 'active' : ''}">
+                    Tất Cả Sản Phẩm
+                </a>
+                <a href="/products?category=1" class="filter-btn" th:classappend="${categoryId == 1 ? 'active' : ''}">
+                    Laptop Gaming
+                </a>
+                <a href="/products?category=2" class="filter-btn" th:classappend="${categoryId == 2 ? 'active' : ''}">
+                    Laptop Văn Phòng
+                </a>
+                <a href="/products?category=3" class="filter-btn" th:classappend="${categoryId == 3 ? 'active' : ''}">
+                    Laptop Mỏng Nhẹ
+                </a>
+            </div>
+        </div>
+
+        <!-- Results Header -->
+        <div class="results-header">
+            <div class="results-info">
+                <span th:if="${totalItems > 0}">
+                    Hiển thị <strong th:text="${products.size()}"></strong> trong số
+                    <strong th:text="${totalItems}"></strong> sản phẩm
+                </span>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="product-grid" th:if="${!products.empty}">
+            <a th:each="product : ${products}"
+               th:href="@{/products/{id}(id=${product.id})}"
+               class="product-card">
+                <div class="product-image">
+                    <img th:if="${product.url != null && !product.url.isEmpty()}"
+                         th:src="${product.url}"
+                         th:alt="${product.name}">
+                    <span th:if="${product.url == null || product.url.isEmpty()}">Chưa có hình ảnh</span>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-name" th:text="${product.name}"></h3>
+                    <div class="product-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' đ'}"></div>
+                    <div class="product-stock"
+                         th:classappend="${product.stockQuantity > 10 ? 'in-stock' : (product.stockQuantity > 0 ? 'low-stock' : 'out-of-stock')}">
+                        <span th:if="${product.stockQuantity > 10}">Còn Hàng</span>
+                        <span th:if="${product.stockQuantity > 0 && product.stockQuantity <= 10}">Chỉ còn [[${product.stockQuantity}]] sản phẩm</span>
+                        <span th:if="${product.stockQuantity == 0}">Hết Hàng</span>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn btn-primary" th:disabled="${product.stockQuantity == 0}">
+                            <span th:if="${product.stockQuantity > 0}">Thêm Vào Giỏ</span>
+                            <span th:if="${product.stockQuantity == 0}">Không Khả Dụng</span>
+                        </button>
+                        <button class="btn btn-secondary">Xem Chi Tiết</button>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- No Products -->
+        <div class="no-products" th:if="${products.empty}">
+            <h2>Không tìm thấy sản phẩm</h2>
+            <p>Vui lòng thử điều chỉnh tiêu chí tìm kiếm hoặc bộ lọc</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" th:if="${totalPages > 1}">
+            <a th:if="${currentPage > 1}"
+               th:href="@{/products(page=${currentPage - 1}, category=${categoryId}, search=${search})}">
+                « Trước
+            </a>
+
+            <span th:each="i : ${#numbers.sequence(1, totalPages)}"
+                  th:classappend="${i == currentPage ? 'active' : ''}">
+                <a th:if="${i != currentPage}"
+                   th:href="@{/products(page=${i}, category=${categoryId}, search=${search})}"
+                   th:text="${i}"></a>
+                <span th:if="${i == currentPage}" th:text="${i}"></span>
+            </span>
+
+            <a th:if="${currentPage < totalPages}"
+               th:href="@{/products(page=${currentPage + 1}, category=${categoryId}, search=${search})}">
+                Sau »
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div>
+                <h4>Về Chúng Tôi</h4>
+                <p>Cửa hàng laptop cao cấp với giá tốt nhất cho laptop gaming, văn phòng và mỏng nhẹ.</p>
+            </div>
+            <div>
+                <h4>Liên Kết Nhanh</h4>
+                <a href="/products">Tất Cả Sản Phẩm</a>
+                <a href="/about">Giới Thiệu</a>
+                <a href="/contact">Liên Hệ</a>
+            </div>
+            <div>
+                <h4>Dịch Vụ Khách Hàng</h4>
+                <a href="/help">Trung Tâm Trợ Giúp</a>
+                <a href="/shipping">Thông Tin Vận Chuyển</a>
+                <a href="/returns">Đổi Trả Hàng</a>
+            </div>
+            <div>
+                <h4>Liên Hệ</h4>
+                <p>Email: support@laptopstore.com</p>
+                <p>Điện thoại: +84 234 567 8900</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Cửa Hàng Laptop. Tất cả quyền được bảo lưu.</p>
+        </div>
+    </footer>
+</body>
+</html>
