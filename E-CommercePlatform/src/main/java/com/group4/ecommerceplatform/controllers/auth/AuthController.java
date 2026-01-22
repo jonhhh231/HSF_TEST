@@ -31,7 +31,8 @@ public class AuthController {
             User user = authService.login(email, password);
             if (user != null) {
                 // Lưu user vào session
-                session.setAttribute("loggedInUser", user);
+                session.setAttribute("user", user);
+                session.setAttribute("userId", user.getId());
                 session.setAttribute("userName", user.getFullName());
                 session.setAttribute("userEmail", user.getEmail());
                 session.setAttribute("userRole", user.getRole());
