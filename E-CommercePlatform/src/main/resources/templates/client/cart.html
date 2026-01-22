@@ -20,6 +20,12 @@
             </form>
 
             <div class="header-actions">
+                <a href="/orders" class="cart-link">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    Đơn Hàng
+                </a>
                 <a href="/cart" class="cart-link active">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path
@@ -123,25 +129,10 @@
                             <form th:action="@{/cart/update}" method="post" class="quantity-form">
                                 <input type="hidden" name="productId" th:value="${item.product.id}">
                                 <div class="quantity-control">
-                                    <button type="button" class="qty-btn minus"
-                                        th:onclick="'updateQuantity(this, -1, ' + ${item.product.stockQuantity} + ')'">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor">
-                                            <line x1="5" y1="12" x2="19" y2="12" />
-                                        </svg>
-                                    </button>
                                     <input type="number" name="quantity" th:value="${item.quantity}" min="1"
-                                        th:max="${item.product.stockQuantity}" class="qty-input" readonly>
-                                    <button type="button" class="qty-btn plus"
-                                        th:onclick="'updateQuantity(this, 1, ' + ${item.product.stockQuantity} + ')'">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor">
-                                            <line x1="12" y1="5" x2="12" y2="19" />
-                                            <line x1="5" y1="12" x2="19" y2="12" />
-                                        </svg>
-                                    </button>
+                                        th:max="${item.product.stockQuantity}" class="qty-input">
+                                    <button type="submit" class="update-btn">Cập nhật</button>
                                 </div>
-                                <button type="submit" class="update-btn">Cập nhật</button>
                             </form>
                         </div>
 
@@ -213,13 +204,15 @@
                         th:text="${#numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
                 </div>
 
-                <button class="btn btn-checkout">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M9 11l3 3L22 4" />
-                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
-                    </svg>
-                    Tiến Hành Thanh Toán
-                </button>
+                <form th:action="@{/cart/checkout}" method="post">
+                    <button type="submit" class="btn btn-checkout">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M9 11l3 3L22 4" />
+                            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                        </svg>
+                        Tiến Hành Thanh Toán
+                    </button>
+                </form>
 
                 <div class="checkout-benefits">
                     <div class="benefit">
@@ -279,24 +272,6 @@
     </footer>
 
     <script>
-        // Update quantity with buttons
-        function updateQuantity(button, change, maxStock) {
-            const form = button.closest('.quantity-form');
-            const input = form.querySelector('.qty-input');
-            let currentValue = parseInt(input.value);
-            let newValue = currentValue + change;
-
-            // Validate bounds
-            if (newValue < 1) newValue = 1;
-            if (newValue > maxStock) newValue = maxStock;
-
-            input.value = newValue;
-
-            // Auto submit if value changed
-            if (newValue !== currentValue) {
-                form.submit();
-            }
-        }
 
         // Auto-hide alerts after 5 seconds
         setTimeout(() => {

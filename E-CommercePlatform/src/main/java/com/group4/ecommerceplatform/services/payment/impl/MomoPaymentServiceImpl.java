@@ -104,11 +104,8 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
                 momoResponse.getResultCode(), momoResponse.getMessage());
 
             if (momoResponse.getResultCode() == 0) {
-                // Cập nhật order status
-                order.setPaymentMethod("MOMO");
-                order.setPaymentStatus("PENDING");
-                orderRepository.save(order);
-
+                // KHÔNG lưu order vào DB - sẽ lưu sau khi thanh toán thành công
+                log.info("MoMo payment URL created successfully for order: {}", orderId);
                 return momoResponse.getPayUrl();
             } else {
                 throw new RuntimeException("Lỗi từ MoMo: " + momoResponse.getMessage());
@@ -148,23 +145,29 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
                 return false;
             }
 
-            // Update order
-            Order order = orderRepository.findByOrderCode(ipnRequest.getOrderId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+            // Tìm order (có thể có hoặc không - nếu user vừa thanh toán xong)
+            var orderOpt = orderRepository.findByOrderCode(ipnRequest.getOrderId());
 
-            if (ipnRequest.getResultCode() == 0) {
-                // Thanh toán thành công
-                order.setPaymentStatus("PAID");
-                order.setPaidAt(LocalDateTime.now());
-                log.info("Payment successful for order: {}", ipnRequest.getOrderId());
+            if (orderOpt.isPresent()) {
+                Order order = orderOpt.get();
+
+                if (ipnRequest.getResultCode() == 0) {
+                    // Thanh toán thành công
+                    order.setPaymentStatus("PAID");
+                    order.setPaidAt(LocalDateTime.now());
+                    log.info("Payment successful for order: {}", ipnRequest.getOrderId());
+                } else {
+                    // Thanh toán thất bại
+                    order.setPaymentStatus("FAILED");
+                    log.warn("Payment failed for order: {}, code: {}",
+                        ipnRequest.getOrderId(), ipnRequest.getResultCode());
+                }
+
+                orderRepository.save(order);
             } else {
-                // Thanh toán thất bại
-                order.setPaymentStatus("FAILED");
-                log.warn("Payment failed for order: {}, code: {}",
-                    ipnRequest.getOrderId(), ipnRequest.getResultCode());
+                log.info("Order not found in DB (may be created later): {}", ipnRequest.getOrderId());
             }
 
-            orderRepository.save(order);
             return true;
 
         } catch (Exception e) {
@@ -176,21 +179,28 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
     @Override
     public Order handleReturnUrl(String orderId, Integer resultCode) {
         try {
-            Order order = orderRepository.findByOrderCode(orderId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+            // Tìm order nếu đã tạo (có thể có hoặc không)
+            var orderOpt = orderRepository.findByOrderCode(orderId);
 
-            if (resultCode == 0) {
-                // Thanh toán thành công (sẽ được confirm bởi IPN)
-                log.info("User returned from MoMo payment - Success for order: {}", orderId);
+            if (orderOpt.isPresent()) {
+                Order order = orderOpt.get();
+
+                if (resultCode == 0) {
+                    log.info("User returned from MoMo payment - Success for order: {}", orderId);
+                } else {
+                    // Thanh toán thất bại
+                    order.setPaymentStatus("FAILED");
+                    orderRepository.save(order);
+                    log.warn("User returned from MoMo payment - Failed for order: {}, code: {}",
+                        orderId, resultCode);
+                }
+
+                return order;
             } else {
-                // Thanh toán thất bại
-                order.setPaymentStatus("FAILED");
-                orderRepository.save(order);
-                log.warn("User returned from MoMo payment - Failed for order: {}, code: {}",
-                    orderId, resultCode);
+                log.info("Order not found - will be created in controller: {}", orderId);
+                // Return null - controller sẽ tạo order mới
+                return null;
             }
-
-            return order;
 
         } catch (Exception e) {
             log.error("Error handling return URL: ", e);

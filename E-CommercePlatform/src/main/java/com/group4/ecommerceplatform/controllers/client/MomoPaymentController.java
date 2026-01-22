@@ -1,14 +1,28 @@
 package com.group4.ecommerceplatform.controllers.client;
 
 import com.group4.ecommerceplatform.dto.MomoIPNRequest;
+import com.group4.ecommerceplatform.entities.CartProduct;
 import com.group4.ecommerceplatform.entities.Order;
+import com.group4.ecommerceplatform.entities.OrderDetail;
+import com.group4.ecommerceplatform.entities.User;
+import com.group4.ecommerceplatform.repositories.OrderDetailRepository;
+import com.group4.ecommerceplatform.repositories.OrderRepository;
+import com.group4.ecommerceplatform.repositories.UserRepository;
+import com.group4.ecommerceplatform.services.client.CartService;
 import com.group4.ecommerceplatform.services.payment.MomoPaymentService;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controller xử lý thanh toán MoMo
@@ -20,6 +34,19 @@ public class MomoPaymentController {
 
     @Autowired
     private MomoPaymentService momoPaymentService;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    @Qualifier("clientCartService")
+    private CartService cartService;
 
     /**
      * Endpoint để nhận IPN callback từ MoMo (server-to-server)
@@ -48,6 +75,7 @@ public class MomoPaymentController {
             @RequestParam(required = false) String orderId,
             @RequestParam(required = false) Integer resultCode,
             @RequestParam(required = false) String message,
+            HttpSession session,
             Model model) {
 
         log.info("User returned from MoMo payment - orderId: {}, resultCode: {}", orderId, resultCode);
@@ -58,16 +86,71 @@ public class MomoPaymentController {
                 return "client/payment-failed";
             }
 
-            Order order = momoPaymentService.handleReturnUrl(orderId, resultCode);
-
             if (resultCode == 0) {
-                // Thanh toán thành công
+                // Thanh toán thành công - TẠO ĐơN HÀNG THỰC
+                Integer userId = (Integer) session.getAttribute("userId");
+                String pendingOrderCode = (String) session.getAttribute("pendingOrderCode");
+                @SuppressWarnings("unchecked")
+                List<CartProduct> cartItems = (List<CartProduct>) session.getAttribute("pendingCartItems");
+                Long cartTotal = (Long) session.getAttribute("pendingCartTotal");
+
+                if (userId == null || cartItems == null || cartTotal == null) {
+                    model.addAttribute("error", "Không tìm thấy thông tin giỏ hàng");
+                    return "client/payment-failed";
+                }
+
+                // Tạo Order thực sự vào database
+                User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+                Order order = new Order();
+                order.setUser(user);
+                order.setOrderCode(pendingOrderCode);
+                order.setFinalPrice(BigDecimal.valueOf(cartTotal));
+                order.setPaymentMethod("MOMO");
+                order.setPaymentStatus("PAID");
+                order.setPaidAt(LocalDateTime.now());
+                order.setCreatedAt(LocalDateTime.now());
+                order.setUpdatedAt(LocalDateTime.now());
+
+                // Lưu đơn hàng
+                order = orderRepository.save(order);
+
+                // Tạo OrderDetails
+                List<OrderDetail> orderDetails = new ArrayList<>();
+                for (CartProduct cartItem : cartItems) {
+                    OrderDetail orderDetail = new OrderDetail();
+                    orderDetail.setOrderId(order.getId());
+                    orderDetail.setProductId(cartItem.getProduct().getId());
+                    orderDetail.setQuantity(cartItem.getQuantity());
+                    orderDetail.setPrice(cartItem.getProduct().getPrice());
+                    orderDetails.add(orderDetail);
+                }
+
+                // Lưu OrderDetails
+                orderDetailRepository.saveAll(orderDetails);
+
+                // Xóa giỏ hàng
+                cartService.clearCart(userId);
+
+                // Xóa session data
+                session.removeAttribute("pendingOrderCode");
+                session.removeAttribute("pendingCartItems");
+                session.removeAttribute("pendingCartTotal");
+
+                log.info("Order created successfully: {}", order.getOrderCode());
+
                 model.addAttribute("order", order);
                 model.addAttribute("message", "Thanh toán thành công!");
                 return "client/payment-success";
             } else {
-                // Thanh toán thất bại
-                model.addAttribute("order", order);
+                // Thanh toán thất bại - KHÔNG tạo Order
+                String pendingOrderCode = (String) session.getAttribute("pendingOrderCode");
+
+                Order tempOrder = new Order();
+                tempOrder.setOrderCode(pendingOrderCode);
+
+                model.addAttribute("order", tempOrder);
                 model.addAttribute("message", message != null ? message : "Giao dịch đã bị hủy hoặc không thành công");
                 return "client/payment-failed";
             }
