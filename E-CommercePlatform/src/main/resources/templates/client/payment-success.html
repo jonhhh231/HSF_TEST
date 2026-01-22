@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh Toán Thành Công</title>
+    <link rel="stylesheet" th:href="@{/client/payment-success.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="success-card">
+            <!-- Animated Success Icon -->
+            <div class="success-icon">
+                <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                    <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+            </div>
+
+            <!-- Success Message -->
+            <h1>Thanh Toán Thành Công!</h1>
+            <p class="subtitle">Cảm ơn bạn đã mua hàng. Đơn hàng của bạn đã được xác nhận.</p>
+
+            <!-- Order Details -->
+            <div class="order-details" th:if="${order}">
+                <h2>Thông Tin Đơn Hàng</h2>
+
+                <div class="detail-box">
+                    <div class="detail-row">
+                        <span class="label">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                            Mã đơn hàng
+                        </span>
+                        <span class="value" th:text="${order.orderCode}">ORD123456</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="label">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Tổng tiền
+                        </span>
+                        <span class="value price" th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'">500,000 VND</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="label">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3v-8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                            </svg>
+                            Phương thức thanh toán
+                        </span>
+                        <span class="value">
+                            <img src="https://developers.momo.vn/v3/assets/images/square-logo-9bcf1c7d6be8eed7a594e8e0333e3b2a.png"
+                                 alt="MoMo" class="momo-logo"> MoMo Wallet
+                        </span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="label">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Trạng thái
+                        </span>
+                        <span class="value status-paid">Đã thanh toán</span>
+                    </div>
+
+                    <div class="detail-row" th:if="${order.paidAt}">
+                        <span class="label">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Thời gian thanh toán
+                        </span>
+                        <span class="value" th:text="${#temporals.format(order.paidAt, 'dd/MM/yyyy HH:mm')}">22/01/2026 14:30</span>
+                    </div>
+                </div>
+
+                <!-- Delivery Info -->
+                <div class="info-box" th:if="${order.address}">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        Địa chỉ giao hàng
+                    </h3>
+                    <p th:text="${order.address}">123 Đường ABC, Quận 1, TP.HCM</p>
+                </div>
+            </div>
+
+            <!-- Success Message Box -->
+            <div class="message-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <p>Chúng tôi đã gửi email xác nhận đơn hàng đến địa chỉ email của bạn.</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="actions">
+                <a href="/orders" class="btn btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                    </svg>
+                    Xem Đơn Hàng Của Tôi
+                </a>
+                <a href="/products" class="btn btn-secondary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    Tiếp Tục Mua Sắm
+                </a>
+            </div>
+
+            <!-- Support -->
+            <div class="support-box">
+                <p>Cần hỗ trợ? <a href="/contact">Liên hệ với chúng tôi</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
