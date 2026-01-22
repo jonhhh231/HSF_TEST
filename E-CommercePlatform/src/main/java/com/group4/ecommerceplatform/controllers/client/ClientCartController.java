@@ -1,7 +1,6 @@
 package com.group4.ecommerceplatform.controllers.client;
 
 import com.group4.ecommerceplatform.entities.CartProduct;
-import com.group4.ecommerceplatform.entities.User;
 import com.group4.ecommerceplatform.services.client.CartService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,20 +153,6 @@ public class ClientCartController {
     // ==================== Private Helper Methods ====================
 
     private Integer getCurrentUserId(HttpSession session) {
-        // Kiểm tra xem có userId trong session không
-        Object userIdObj = session.getAttribute("userId");
-        if (userIdObj != null) {
-            return (Integer) userIdObj;
-        }
-
-        // Nếu không có, kiểm tra xem có user object không
-        Object userObj = session.getAttribute("user");
-        if (userObj != null) {
-            // TODO: Cast về User entity và lấy ID
-             User user = (User) userObj;
-             return user.getId();
-        }
-
-        return null;
+        return (Integer) session.getAttribute("userId");
     }
 }
