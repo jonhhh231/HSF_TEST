@@ -25,7 +25,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void createProduct(Product product) {
         validateProduct(product);
-
+        //
         if(product.getCategory() != null && product.getCategory().getId() != null){
             Category category = categoryRepository.findById(product.getCategory().getId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy danh mục"));
