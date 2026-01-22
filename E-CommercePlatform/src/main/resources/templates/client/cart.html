@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ Hàng - Laptop Store</title>
+    <link rel="stylesheet" th:href="@{/client/cart.css}">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">Laptop Store</a>
+
+            <form class="search-bar" th:action="@{/products}" method="get">
+                <input type="text" name="search" placeholder="Tìm kiếm laptop...">
+                <button type="submit">Tìm Kiếm</button>
+            </form>
+
+            <div class="header-actions">
+                <a href="/cart" class="cart-link active">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path
+                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Giỏ Hàng
+                </a>
+                <span th:if="${session.user != null}" class="user-greeting">
+                    Xin chào, <strong th:text="${session.user.fullName}">User</strong>
+                </span>
+                <a th:if="${session.user == null}" href="/auth/login">Đăng Nhập</a>
+                <a th:if="${session.user != null}" href="/auth/logout">Đăng Xuất</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="container">
+            <a href="/">Trang chủ</a>
+            <span>/</span>
+            <span>Giỏ hàng</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Success/Error Messages -->
+        <div th:if="${successMessage}" class="alert alert-success">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <div th:if="${errorMessage}" class="alert alert-error">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <!-- Empty Cart State -->
+        <div th:if="${cartItems == null || cartItems.isEmpty()}" class="empty-cart">
+            <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1">
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="20" cy="21" r="1" />
+                <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
+            </svg>
+            <h2>Giỏ hàng trống</h2>
+            <p>Bạn chưa có sản phẩm nào trong giỏ hàng</p>
+            <a href="/products" class="btn btn-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M15 19l-7-7 7-7" />
+                </svg>
+                Tiếp Tục Mua Sắm
+            </a>
+        </div>
+
+        <!-- Cart with Items -->
+        <div th:if="${cartItems != null && !cartItems.isEmpty()}" class="cart-content">
+            <div class="cart-main">
+                <div class="cart-header">
+                    <h1>Giỏ Hàng Của Bạn</h1>
+                    <span class="item-count" th:text="${itemCount} + ' sản phẩm'">0 sản phẩm</span>
+                </div>
+
+                <!-- Cart Items -->
+                <div class="cart-items">
+                    <div th:each="item : ${cartItems}" class="cart-item">
+                        <div class="item-image">
+                            <img th:if="${item.product.url != null && !item.product.url.isEmpty()}"
+                                th:src="${item.product.url}" th:alt="${item.product.name}">
+                            <div th:if="${item.product.url == null || item.product.url.isEmpty()}" class="no-image">
+                                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#ccc">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                    <polyline points="21 15 16 10 5 21" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="item-details">
+                            <h3 class="item-name">
+                                <a th:href="@{/products/{id}(id=${item.product.id})}"
+                                    th:text="${item.product.name}">Product Name</a>
+                            </h3>
+                            <p class="item-category" th:if="${item.product.category != null}"
+                                th:text="${item.product.category.name}">Category</p>
+                            <div class="item-stock">
+                                <span th:if="${item.product.stockQuantity > 10}" class="in-stock">Còn hàng</span>
+                                <span th:if="${item.product.stockQuantity > 0 && item.product.stockQuantity <= 10}"
+                                    class="low-stock">
+                                    Chỉ còn [[${item.product.stockQuantity}]] sản phẩm
+                                </span>
+                                <span th:if="${item.product.stockQuantity <= 0}" class="out-of-stock">Hết hàng</span>
+                            </div>
+                        </div>
+
+                        <div class="item-quantity">
+                            <form th:action="@{/cart/update}" method="post" class="quantity-form">
+                                <input type="hidden" name="productId" th:value="${item.product.id}">
+                                <div class="quantity-control">
+                                    <button type="button" class="qty-btn minus"
+                                        th:onclick="'updateQuantity(this, -1, ' + ${item.product.stockQuantity} + ')'">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor">
+                                            <line x1="5" y1="12" x2="19" y2="12" />
+                                        </svg>
+                                    </button>
+                                    <input type="number" name="quantity" th:value="${item.quantity}" min="1"
+                                        th:max="${item.product.stockQuantity}" class="qty-input" readonly>
+                                    <button type="button" class="qty-btn plus"
+                                        th:onclick="'updateQuantity(this, 1, ' + ${item.product.stockQuantity} + ')'">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor">
+                                            <line x1="12" y1="5" x2="12" y2="19" />
+                                            <line x1="5" y1="12" x2="19" y2="12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <button type="submit" class="update-btn">Cập nhật</button>
+                            </form>
+                        </div>
+
+                        <div class="item-price">
+                            <div class="unit-price"
+                                th:text="${#numbers.formatDecimal(item.product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">0
+                                đ</div>
+                            <div class="total-price"
+                                th:text="${#numbers.formatDecimal(item.product.price * item.quantity, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                                0 đ</div>
+                        </div>
+
+                        <form th:action="@{/cart/remove/{productId}(productId=${item.product.id})}" method="post"
+                            class="remove-form">
+                            <button type="submit" class="remove-btn" title="Xóa sản phẩm">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <polyline points="3 6 5 6 21 6" />
+                                    <path
+                                        d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                    <line x1="10" y1="11" x2="10" y2="17" />
+                                    <line x1="14" y1="11" x2="14" y2="17" />
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Cart Actions -->
+                <div class="cart-actions">
+                    <a href="/products" class="btn btn-secondary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Tiếp Tục Mua Sắm
+                    </a>
+                    <form th:action="@{/cart/clear}" method="post"
+                        onsubmit="return confirm('Bạn có chắc muốn xóa tất cả sản phẩm?')">
+                        <button type="submit" class="btn btn-danger">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            </svg>
+                            Xóa Tất Cả
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="cart-summary">
+                <h2>Tóm Tắt Đơn Hàng</h2>
+
+                <div class="summary-row">
+                    <span>Tạm tính:</span>
+                    <span class="amount" th:text="${#numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT')} + ' đ'">0
+                        đ</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Phí vận chuyển:</span>
+                    <span class="amount shipping-fee">Miễn phí</span>
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <div class="summary-row total">
+                    <span>Tổng cộng:</span>
+                    <span class="amount total-amount"
+                        th:text="${#numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                </div>
+
+                <button class="btn btn-checkout">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M9 11l3 3L22 4" />
+                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                    </svg>
+                    Tiến Hành Thanh Toán
+                </button>
+
+                <div class="checkout-benefits">
+                    <div class="benefit">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#27ae60">
+                            <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                            <polyline points="22 4 12 14.01 9 11.01" />
+                        </svg>
+                        <span>Miễn phí vận chuyển</span>
+                    </div>
+                    <div class="benefit">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#27ae60">
+                            <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                            <polyline points="22 4 12 14.01 9 11.01" />
+                        </svg>
+                        <span>Bảo hành chính hãng</span>
+                    </div>
+                    <div class="benefit">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#27ae60">
+                            <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                            <polyline points="22 4 12 14.01 9 11.01" />
+                        </svg>
+                        <span>Đổi trả trong 7 ngày</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Về Chúng Tôi</h4>
+                <p>Cửa hàng laptop cao cấp với giá tốt nhất cho laptop gaming, văn phòng và mỏng nhẹ.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Liên Kết Nhanh</h4>
+                <a href="/products">Tất Cả Sản Phẩm</a>
+                <a href="/about">Giới Thiệu</a>
+                <a href="/contact">Liên Hệ</a>
+            </div>
+            <div class="footer-section">
+                <h4>Dịch Vụ Khách Hàng</h4>
+                <a href="/help">Trung Tâm Trợ Giúp</a>
+                <a href="/shipping">Thông Tin Vận Chuyển</a>
+                <a href="/returns">Đổi Trả Hàng</a>
+            </div>
+            <div class="footer-section">
+                <h4>Liên Hệ</h4>
+                <p>Email: support@laptopstore.com</p>
+                <p>Điện thoại: +84 234 567 8900</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Laptop Store. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Update quantity with buttons
+        function updateQuantity(button, change, maxStock) {
+            const form = button.closest('.quantity-form');
+            const input = form.querySelector('.qty-input');
+            let currentValue = parseInt(input.value);
+            let newValue = currentValue + change;
+
+            // Validate bounds
+            if (newValue < 1) newValue = 1;
+            if (newValue > maxStock) newValue = maxStock;
+
+            input.value = newValue;
+
+            // Auto submit if value changed
+            if (newValue !== currentValue) {
+                form.submit();
+            }
+        }
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+    </script>
+</body>
+
+</html>
