@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
-@Service
+@Service("adminProductService")
 public class ProductServiceImpl implements ProductService {
     @Autowired
     private CategoryRepository categoryRepository;
@@ -23,9 +23,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
-    public void createProduct(Product product) {
+    public void saveProduct(Product product) {
         validateProduct(product);
-        //
         if(product.getCategory() != null && product.getCategory().getId() != null){
             Category category = categoryRepository.findById(product.getCategory().getId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy danh mục"));
@@ -33,13 +32,6 @@ public class ProductServiceImpl implements ProductService {
         }
         productRepository.save(product);
     }
-
-//    @Transactional
-//    @Override
-//    public void updateProduct(Product product) {
-//
-//    }
-
     @Override
     public Product getProductById(Integer id) {
         if (id == null || id <= 0) {

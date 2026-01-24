@@ -5,7 +5,8 @@ import com.group4.ecommerceplatform.entities.Category;
 import java.util.List;
 
 public interface CategoryService {
-    void createCategory(Category category);
+    void saveCategory(Category category);
     void updateCategory(Category category);
     List<Category> getAllCategories();
+    Category getCategoryById(Integer id);
 }

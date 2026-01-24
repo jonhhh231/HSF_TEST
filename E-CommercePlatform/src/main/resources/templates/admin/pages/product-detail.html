@@ -19,41 +19,50 @@
                     </div>
                 </div>
                 <div class="card-body pt-0">
-                    <form id="form-save-product" th:object="${product}" th:data-api="'/admin/products/' + ${product.id}" data-method="PATCH">
+                    <form id="form-create-product" th:action="'/admin/products/update/' + ${product.id}" method="POST" th:object="${product}">
                         <div class="mb-3">
                             <label class="form-label">Tên sản phẩm</label>
-                            <input th:field="*{name}" id="name" class="form-control" placeholder="Nhập tên sản phẩm">
+                            <input th:field="*{name}" class="form-control" placeholder="Nhập tên sản phẩm">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Link ảnh sản phẩm</label>
+                            <input th:field="*{url}" class="form-control" placeholder="Nhập url">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Danh mục</label>
-                            <select name="categoryId" id="categoryId" class="form-control">
-                                <option value="">--Chọn danh mục--</option>
+                            <select th:field="*{category}" class="form-control">
+                                <option th:each="cate : ${categoryList}"
+                                        th:value="${cate.id}"
+                                        th:text="${cate.name}"
+                                        th:selected="${cate.id} == ${product.category.id}"
+                                >
+                                </option>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Giá</label>
-                            <input type="number" th:field="*{price}" id="price" class="form-control" placeholder="Nhập gíá">
+                            <input type="number" th:field="*{price}" class="form-control" placeholder="Nhập gíá">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Số lượng</label>
-                            <input type="number" th:field="*{stock}" id="stock" class="form-control"
+                            <input type="number" th:field="*{stockQuantity}" class="form-control"
                                    placeholder="Nhập số lượng">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Trạng thái</label>
-                            <select th:field="*{isActive}" id="isActive" class="form-control">
-                                <option th:value="true">Hoạt động</option>
-                                <option th:value="false">Tạm ngưng</option>
+                            <select th:field="*{isActive}" class="form-control">
+                                <option value="true" th:selected="${product.isActive == true}">Hoạt động</option>
+                                <option value="false" th:selected="${product.isActive == false}">Tạm ngưng</option>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Mô tả</label>
-                            <textarea th:field="*{description}" id="description" class="form-control"
+                            <textarea th:field="*{description}"  class="form-control"
                                       placeholder="Mô tả"></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary">Tạo</button>
+                        <button type="submit" class="btn btn-primary">Cập nhật</button>
                         <a href="/admin/products">
-                            <button type="button" class="btn btn-danger" >Thoát</button>
+                            <button type="button" class="btn btn-danger">Thoát</button>
                         </a>
                     </form>
                 </div>

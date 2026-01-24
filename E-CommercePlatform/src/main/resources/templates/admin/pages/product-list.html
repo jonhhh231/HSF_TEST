@@ -73,7 +73,7 @@
                                         <td class="ps-0">
                                             <img th:src="${product.url}" alt="" height="40">
                                             <p class="d-inline-block align-middle mb-0">
-                                                <a th:href="@{/admin/products/details/{id}(id=${product.id})}"
+                                                <a th:href="@{/admin/products/detail/{id}(id=${product.id})}"
                                                    class="d-inline-block align-middle mb-0 product-name"
                                                    th:text="${product.name}"></a>
                                             </p>
@@ -92,7 +92,7 @@
                                             </span>
                                         </td>
                                         <td class="text-end">
-                                            <a th:href="@{/admin/products/details/{id}(id=${product.id})}">
+                                            <a th:href="@{/admin/products/detail/{id}(id=${product.id})}">
                                                 <i class="las la-pen text-secondary fs-18"></i>
                                             </a>
 <!--                                            <a href="#"><i class="las la-trash-alt text-secondary fs-18"></i></a>-->

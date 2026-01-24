@@ -22,10 +22,12 @@
                     <form id="form-create-product" th:action="@{/admin/categories}" method="POST">
                         <div class="mb-3">
                             <label class="form-label">Tên danh mục</label>
-                            <input name="name" id="name" class="form-control" placeholder="Nhập tên sản phẩm">
+                            <input name="name" id="name" class="form-control" placeholder="Nhập tên danh mục">
                         </div>
                         <button type="submit" class="btn btn-primary">Tạo</button>
-                        <button type="button" class="btn btn-danger">Xóa</button>
+                        <a href="/admin/category-list">
+                            <button type="button" class="btn btn-danger">Quay lại</button>
+                        </a>
                     </form>
                 </div>
             </div>

@@ -17,26 +17,22 @@
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Tên</th>
-                    <th>Mô tả</th>
                     <th>Hành động</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="item : ${categoryList}">
-                    <td th:text="${item.id}"></td>
                     <td th:text="${item.name}"></td>
-                    <td th:text="${item.description}"></td>
                     <td>
                         <a th:href="@{/admin/categories/detail/{id}(id=${item.id})}"
                            class="btn btn-warning btn-sm">Sửa</a>
 
-                        <button class="btn btn-danger btn-sm btn-delete"
-                                th:data-id="${item.id}"
-                                th:data-api="@{/admin/categories/{id}(id=${item.id})}">
-                            Xóa
-                        </button>
+<!--                        <button class="btn btn-danger btn-sm btn-delete"-->
+<!--                                th:data-id="${item.id}"-->
+<!--                                th:data-api="@{/admin/categories/{id}(id=${item.id})}">-->
+<!--                            Xóa-->
+<!--                        </button>-->
                     </td>
                 </tr>
                 </tbody>

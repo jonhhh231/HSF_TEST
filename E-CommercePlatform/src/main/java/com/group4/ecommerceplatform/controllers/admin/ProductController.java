@@ -5,6 +5,7 @@ import com.group4.ecommerceplatform.entities.Product;
 import com.group4.ecommerceplatform.services.admin.CategoryService;
 import com.group4.ecommerceplatform.services.admin.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,8 +19,10 @@ import java.util.List;
 @RequestMapping("/admin/products")
 public class ProductController {
     @Autowired
+    @Qualifier("adminProductService")
     private ProductService productService;
     @Autowired
+    @Qualifier("adminCategoryService")
     private CategoryService categoryService;
     @GetMapping
     public String getProductListPage(Model model,
@@ -50,13 +53,15 @@ public class ProductController {
 
     @PostMapping
     public String createProduct(@ModelAttribute Product product){
-        productService.createProduct(product);
+        productService.saveProduct(product);
         return "redirect:/admin/products/create";
     }
 
     @GetMapping("/detail/{id}")
     public String getProductUpdatePage(Model model, @PathVariable("id") Integer id){
         Product product = productService.getProductById(id);
+        List<Category> categoryList = categoryService.getAllCategories();
+        model.addAttribute("categoryList", categoryList);
         model.addAttribute("product", product);
         return "admin/pages/product-detail";
     }
@@ -64,7 +69,7 @@ public class ProductController {
     @PostMapping("/update/{id}")
     public String updateProduct(@PathVariable("id") Integer id, @ModelAttribute Product product){
         product.setId(id);
-        productService.createProduct(product);
+        productService.saveProduct(product);
         return "redirect:/admin/products";
     }
 }
