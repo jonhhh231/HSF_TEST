@@ -123,31 +123,5 @@ public class MomoPaymentController {
         }
     }
 
-    /**
-     * Test endpoint để kiểm tra tạo thanh toán MoMo
-     * Chỉ dùng cho testing - xóa đi trong production
-     */
-    @GetMapping("/test")
-    @ResponseBody
-    public String testPayment() {
-        try {
-            // Tạo một đơn hàng test
-            Order testOrder = new Order();
-            testOrder.setOrderCode("TEST_" + System.currentTimeMillis());
-            testOrder.setFinalPrice(new java.math.BigDecimal("50000")); // 50,000 VND
 
-            String paymentUrl = momoPaymentService.createPaymentUrl(testOrder);
-
-            return "<html><body>" +
-                   "<h2>Test MoMo Payment</h2>" +
-                   "<p>Order Code: " + testOrder.getOrderCode() + "</p>" +
-                   "<p>Amount: " + testOrder.getFinalPrice() + " VND</p>" +
-                   "<a href='" + paymentUrl + "'>Click here to pay with MoMo</a>" +
-                   "</body></html>";
-
-        } catch (Exception e) {
-            log.error("Test payment error: ", e);
-            return "<html><body><h2>Error</h2><p>" + e.getMessage() + "</p></body></html>";
-        }
-    }
 }
