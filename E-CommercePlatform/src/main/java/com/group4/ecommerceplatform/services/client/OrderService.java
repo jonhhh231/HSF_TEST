@@ -13,18 +13,21 @@ public interface OrderService {
 
     /**
      * Tạo đơn hàng từ giỏ hàng
-     * @param user Người dùng
-     * @param orderCode Mã đơn hàng
-     * @param cartItems Danh sách sản phẩm trong giỏ
-     * @param cartTotal Tổng tiền
+     * 
+     * @param user          Người dùng
+     * @param orderCode     Mã đơn hàng
+     * @param cartItems     Danh sách sản phẩm trong giỏ
+     * @param cartTotal     Tổng tiền
      * @param paymentMethod Phương thức thanh toán
+     * @param address       Địa chỉ giao hàng
      * @return Order đã được lưu
      */
     Order createOrderFromCart(User user, String orderCode, List<CartProduct> cartItems,
-                              Long cartTotal, String paymentMethod);
+            Long cartTotal, String paymentMethod, String address);
 
     /**
      * Tìm user theo ID
+     * 
      * @param userId ID người dùng
      * @return User
      */
@@ -32,6 +35,7 @@ public interface OrderService {
 
     /**
      * Lấy danh sách đơn hàng của user
+     * 
      * @param userId ID người dùng
      * @return Danh sách đơn hàng
      */
@@ -39,8 +43,9 @@ public interface OrderService {
 
     /**
      * Lấy chi tiết đơn hàng và kiểm tra quyền truy cập
+     * 
      * @param orderId ID đơn hàng
-     * @param userId ID người dùng
+     * @param userId  ID người dùng
      * @return Order nếu hợp lệ
      */
     Order getOrderDetail(Integer orderId, Integer userId);

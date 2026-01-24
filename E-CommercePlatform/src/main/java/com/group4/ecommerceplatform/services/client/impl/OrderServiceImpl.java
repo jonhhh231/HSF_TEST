@@ -37,13 +37,14 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Order createOrderFromCart(User user, String orderCode, List<CartProduct> cartItems,
-                                     Long cartTotal, String paymentMethod) {
+            Long cartTotal, String paymentMethod, String address) {
         log.info("Creating order for user: {}, orderCode: {}", user.getId(), orderCode);
 
         // Tạo Order
         Order order = new Order();
         order.setUser(user);
         order.setOrderCode(orderCode);
+        order.setAddress(address);
         order.setFinalPrice(BigDecimal.valueOf(cartTotal));
         order.setPaymentMethod(paymentMethod);
         order.setPaymentStatus("PAID");
