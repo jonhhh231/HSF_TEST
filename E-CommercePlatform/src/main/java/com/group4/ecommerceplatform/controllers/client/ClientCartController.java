@@ -26,7 +26,6 @@ public class ClientCartController {
     @Autowired
     private MomoPaymentService momoPaymentService;
 
-
     @GetMapping
     public String viewCart(Model model, HttpSession session) {
         Integer userId = getCurrentUserId(session);
@@ -154,6 +153,120 @@ public class ClientCartController {
             return 0;
         }
         return cartService.getCartItemCount(userId);
+    }
+
+    /**
+     * Hiển thị trang thông tin đặt hàng
+     */
+    @GetMapping("/checkout")
+    public String showCheckoutPage(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        Integer userId = getCurrentUserId(session);
+
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+
+        List<CartProduct> cartItems = cartService.getCartItems(userId);
+
+        if (cartItems == null || cartItems.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Giỏ hàng trống");
+            return "redirect:/cart";
+        }
+
+        Long cartTotal = cartService.calculateCartTotal(userId);
+        int itemCount = cartService.getCartItemCount(userId);
+
+        model.addAttribute("cartItems", cartItems);
+        model.addAttribute("cartTotal", cartTotal);
+        model.addAttribute("itemCount", itemCount);
+
+        return "client/checkout";
+    }
+
+    /**
+     * API endpoint để lưu địa chỉ vào session (được gọi bởi AJAX)
+     */
+    @PostMapping("/checkout/save-address")
+    @ResponseBody
+    public java.util.Map<String, Object> saveAddress(@RequestParam("address") String address, HttpSession session) {
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+
+        try {
+            session.setAttribute("pendingAddress", address);
+            response.put("success", true);
+            response.put("message", "Đã lưu địa chỉ");
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Lỗi khi lưu địa chỉ");
+        }
+
+        return response;
+    }
+
+    /**
+     * Xử lý đặt hàng với thông tin địa chỉ
+     */
+    @PostMapping("/checkout/proceed")
+    public String proceedCheckout(
+            @RequestParam("address") String address,
+            @RequestParam(value = "phone", required = false) String phone,
+            @RequestParam(value = "note", required = false) String note,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        Integer userId = getCurrentUserId(session);
+
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+
+        // Validate address
+        if (address == null || address.trim().length() < 10) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng nhập địa chỉ giao hàng đầy đủ");
+            return "redirect:/cart/checkout";
+        }
+
+        try {
+            // Lấy thông tin giỏ hàng
+            List<CartProduct> cartItems = cartService.getCartItems(userId);
+
+            if (cartItems == null || cartItems.isEmpty()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Giỏ hàng trống");
+                return "redirect:/cart";
+            }
+
+            // Tính tổng tiền
+            Long cartTotal = cartService.calculateCartTotal(userId);
+
+            // Lưu thông tin vào session
+            session.setAttribute("pendingCartItems", cartItems);
+            session.setAttribute("pendingCartTotal", cartTotal);
+            session.setAttribute("pendingAddress", address.trim());
+            session.setAttribute("pendingPhone", phone);
+            session.setAttribute("pendingNote", note);
+
+            // Tạo mã đơn hàng tạm thời
+            String tempOrderCode = "ORD_" + System.currentTimeMillis();
+
+            // Tạo temporary order object chỉ để gửi cho MoMo
+            Order tempOrder = new Order();
+            tempOrder.setOrderCode(tempOrderCode);
+            tempOrder.setFinalPrice(BigDecimal.valueOf(cartTotal));
+            tempOrder.setAddress(address.trim());
+
+            // Lưu orderCode vào session
+            session.setAttribute("pendingOrderCode", tempOrderCode);
+
+            // Tạo URL thanh toán MoMo
+            String paymentUrl = momoPaymentService.createPaymentUrl(tempOrder);
+
+            // Redirect đến trang thanh toán MoMo
+            return "redirect:" + paymentUrl;
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
+            return "redirect:/cart/checkout";
+        }
     }
 
     @PostMapping("/checkout")

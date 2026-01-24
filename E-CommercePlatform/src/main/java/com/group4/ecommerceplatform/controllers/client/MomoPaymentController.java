@@ -87,9 +87,13 @@ public class MomoPaymentController {
                     return "client/payment-failed";
                 }
 
+                // Lấy địa chỉ giao hàng từ session
+                String pendingAddress = (String) session.getAttribute("pendingAddress");
+
                 // Lấy thông tin user và tạo Order thông qua service
                 User user = orderService.findUserById(userId);
-                Order order = orderService.createOrderFromCart(user, pendingOrderCode, cartItems, cartTotal, "MOMO");
+                Order order = orderService.createOrderFromCart(user, pendingOrderCode, cartItems, cartTotal, "MOMO",
+                        pendingAddress);
 
                 // Xóa giỏ hàng
                 cartService.clearCart(userId);
@@ -98,6 +102,9 @@ public class MomoPaymentController {
                 session.removeAttribute("pendingOrderCode");
                 session.removeAttribute("pendingCartItems");
                 session.removeAttribute("pendingCartTotal");
+                session.removeAttribute("pendingAddress");
+                session.removeAttribute("pendingPhone");
+                session.removeAttribute("pendingNote");
 
                 log.info("Order created successfully: {}", order.getOrderCode());
 
@@ -122,6 +129,5 @@ public class MomoPaymentController {
             return "client/payment-failed";
         }
     }
-
 
 }
