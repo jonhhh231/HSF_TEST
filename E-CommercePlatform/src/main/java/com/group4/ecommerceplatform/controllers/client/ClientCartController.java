@@ -2,11 +2,6 @@ package com.group4.ecommerceplatform.controllers.client;
 
 import com.group4.ecommerceplatform.entities.CartProduct;
 import com.group4.ecommerceplatform.entities.Order;
-import com.group4.ecommerceplatform.entities.OrderDetail;
-import com.group4.ecommerceplatform.entities.User;
-import com.group4.ecommerceplatform.repositories.OrderDetailRepository;
-import com.group4.ecommerceplatform.repositories.OrderRepository;
-import com.group4.ecommerceplatform.repositories.UserRepository;
 import com.group4.ecommerceplatform.services.client.CartService;
 import com.group4.ecommerceplatform.services.payment.MomoPaymentService;
 import jakarta.servlet.http.HttpSession;
@@ -18,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -32,15 +25,6 @@ public class ClientCartController {
 
     @Autowired
     private MomoPaymentService momoPaymentService;
-
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private OrderDetailRepository orderDetailRepository;
-
-    @Autowired
-    private UserRepository userRepository;
 
 
     @GetMapping
