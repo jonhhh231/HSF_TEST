@@ -22,7 +22,8 @@
             <div class="header-actions">
                 <a href="/orders" class="cart-link">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        <path
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                     Đơn Hàng
                 </a>
@@ -204,15 +205,13 @@
                         th:text="${#numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
                 </div>
 
-                <form th:action="@{/cart/checkout}" method="post">
-                    <button type="submit" class="btn btn-checkout">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M9 11l3 3L22 4" />
-                            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
-                        </svg>
-                        Tiến Hành Thanh Toán
-                    </button>
-                </form>
+                <a href="/cart/checkout" class="btn btn-checkout">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M9 11l3 3L22 4" />
+                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                    </svg>
+                    Tiến Hành Thanh Toán
+                </a>
 
                 <div class="checkout-benefits">
                     <div class="benefit">
