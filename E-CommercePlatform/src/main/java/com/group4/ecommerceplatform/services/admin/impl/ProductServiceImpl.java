@@ -34,21 +34,21 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
     }
 
-    @Transactional
-    @Override
-    public void updateProduct(ProductDTO productDTO) {
-        // check productId exist
-        Product existingProduct = productRepository.findById(productDTO.getId()).orElseThrow(() -> new NotFoundException("Product Not Found"));
-        // convert
-        productDTOConverter.toProductEntityFromExisting(productDTO, existingProduct);
-        // check category exist
-        if(productDTO.getCategoryId() != null){
-            Category category = categoryRepository.findById(productDTO.getCategoryId()).orElseThrow(() -> new NotFoundException("Category Not Found"));
-            existingProduct.setCategory(category);
-        }
-        // save to db
-        productRepository.save(existingProduct);
-    }
+//    @Transactional
+//    @Override
+//    public void updateProduct(ProductDTO productDTO) {
+//        // check productId exist
+//        Product existingProduct = productRepository.findById(productDTO.getId()).orElseThrow(() -> new NotFoundException("Product Not Found"));
+//        // convert
+//        productDTOConverter.toProductEntityFromExisting(productDTO, existingProduct);
+//        // check category exist
+//        if(productDTO.getCategoryId() != null){
+//            Category category = categoryRepository.findById(productDTO.getCategoryId()).orElseThrow(() -> new NotFoundException("Category Not Found"));
+//            existingProduct.setCategory(category);
+//        }
+//        // save to db
+//        productRepository.save(existingProduct);
+//    }
 
     @Override
     public Product getProductById(Integer id) {
