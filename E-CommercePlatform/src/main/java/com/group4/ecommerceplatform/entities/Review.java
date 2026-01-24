@@ -2,8 +2,6 @@ package com.group4.ecommerceplatform.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reviews")
@@ -12,30 +10,22 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Review {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
-    @JsonIgnore
-    private Order order;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "product_id")
     private Product product;
 
+    @Column(name = "rating")
     private Integer rating;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "comment", columnDefinition = "NVARCHAR(MAX)")
     private String comment;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() { createdAt = LocalDateTime.now(); }
 }
+

@@ -1,59 +1,34 @@
 package com.group4.ecommerceplatform.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Setter
 @Getter
-
+@Setter
+@NoArgsConstructor
 @Entity
-@Table(name="Categories")
+@Table(name = "categories")
 public class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name="Id")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
 
-    @Column(name="Name", nullable = false)
+    @NotBlank(message = "Tên danh mục không được để trống")
+    @Size(min = 2, max = 255, message = "Tên danh mục phải có từ 2 đến 255 ký tự")
+    @Column(name = "name", columnDefinition = "NVARCHAR(255)")
     private String name;
 
-    @Column(name="Description", nullable = false)
-    private String description;
-
-    @Column(name="CreateAt", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name="UpdatedAt", nullable = false)
-    private LocalDateTime updatedAt;
-
-
-    public Category(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
-
-    public Category(){
-    }
-
-
-    @OneToMany(
-            mappedBy = "category",cascade = CascadeType.ALL,fetch =  FetchType.LAZY
-    )
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();
 
-    @PrePersist
-    public void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void onUpdate() {
-        updatedAt = LocalDateTime.now();
+    public Category(String name) {
+        this.name = name;
     }
 }

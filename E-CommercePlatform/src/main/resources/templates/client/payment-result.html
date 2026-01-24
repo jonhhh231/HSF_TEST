@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết Quả Thanh Toán</title>
+    <link rel="stylesheet" th:href="@{/client/payment-result.css}">
+</head>
+<body>
+    <div class="container">
+        <!-- Success Result -->
+        <div th:if="${success}" class="result-card success">
+            <div class="icon-wrapper">
+                <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                    <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+            </div>
+
+            <h1>Thanh Toán Thành Công!</h1>
+            <p class="message" th:text="${message}">Đơn hàng của bạn đã được thanh toán thành công</p>
+
+            <div class="order-info" th:if="${order}">
+                <h3>Thông Tin Đơn Hàng</h3>
+                <div class="info-row">
+                    <span class="label">Mã đơn hàng:</span>
+                    <span class="value" th:text="${order.orderCode}">ORD123456</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Tổng tiền:</span>
+                    <span class="value price" th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'">500,000 VND</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Phương thức:</span>
+                    <span class="value">MoMo</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Trạng thái:</span>
+                    <span class="value success-text">Đã thanh toán</span>
+                </div>
+            </div>
+
+            <div class="actions">
+                <a href="/products" class="btn btn-primary">Tiếp Tục Mua Sắm</a>
+                <a href="/orders" class="btn btn-secondary">Xem Đơn Hàng</a>
+            </div>
+        </div>
+
+        <!-- Failed Result -->
+        <div th:if="${success == false}" class="result-card failed">
+            <div class="icon-wrapper">
+                <svg class="cross" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                    <circle class="cross-circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="cross-line" fill="none" d="M16 16 36 36 M36 16 16 36"/>
+                </svg>
+            </div>
+
+            <h1>Thanh Toán Thất Bại</h1>
+            <p class="message" th:text="${message}">Đã có lỗi xảy ra trong quá trình thanh toán</p>
+
+            <div class="order-info" th:if="${order}">
+                <h3>Thông Tin Đơn Hàng</h3>
+                <div class="info-row">
+                    <span class="label">Mã đơn hàng:</span>
+                    <span class="value" th:text="${order.orderCode}">ORD123456</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Tổng tiền:</span>
+                    <span class="value price" th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'">500,000 VND</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Trạng thái:</span>
+                    <span class="value failed-text">Thanh toán thất bại</span>
+                </div>
+            </div>
+
+            <div class="actions">
+                <a th:if="${order}" th:href="@{/payment/retry/{orderCode}(orderCode=${order.orderCode})}" class="btn btn-primary">Thử Lại</a>
+                <a href="/products" class="btn btn-secondary">Về Trang Chủ</a>
+            </div>
+        </div>
+
+        <!-- Error (no data) -->
+        <div th:if="${error}" class="result-card failed">
+            <div class="icon-wrapper">
+                <svg class="cross" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                    <circle class="cross-circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="cross-line" fill="none" d="M16 16 36 36 M36 16 16 36"/>
+                </svg>
+            </div>
+
+            <h1>Có Lỗi Xảy Ra</h1>
+            <p class="message" th:text="${error}">Không thể xử lý kết quả thanh toán</p>
+
+            <div class="actions">
+                <a href="/products" class="btn btn-primary">Về Trang Chủ</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

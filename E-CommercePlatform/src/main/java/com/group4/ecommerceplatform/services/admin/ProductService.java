@@ -1,14 +1,11 @@
 package com.group4.ecommerceplatform.services.admin;
 
-import com.group4.ecommerceplatform.dto.product.ProductDTO;
-import com.group4.ecommerceplatform.responses.admin.PageDataResponse;
-import com.group4.ecommerceplatform.responses.admin.ProductSearchResponse;
+import com.group4.ecommerceplatform.entities.Product;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-
 public interface ProductService {
-    public void createProduct(ProductDTO productDTO);
-    public void updateProduct(ProductDTO productDTO);
-    public ProductDTO getProductById(Long id);
-    public PageDataResponse<ProductSearchResponse> getProductList(Pageable pageable);
+    void createProduct(Product product);
+    Product getProductById(Integer id);
+    Page<Product> getProductList(Pageable pageable);
 }

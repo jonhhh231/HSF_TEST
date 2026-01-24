@@ -2,44 +2,42 @@ package com.group4.ecommerceplatform.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
-
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue
-    @Column(name = "Id", columnDefinition = "uniqueidentifier")
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
 
-    @Column(name = "FullName", nullable = false)
+    @NotBlank(message = "Họ tên không được để trống")
+    @Size(min = 2, max = 255, message = "Họ tên phải có từ 2 đến 255 ký tự")
+    @Column(name = "full_name", columnDefinition = "NVARCHAR(255)")
     private String fullName;
 
-    @Column(name = "Email", nullable = false, unique = true)
+    @NotBlank(message = "Email không được để trống")
+    @Email(message = "Email không hợp lệ")
+    @Column(name = "email", unique = true)
     private String email;
 
-    @Column(name = "Password", nullable = false)
+    @NotBlank(message = "Mật khẩu không được để trống")
+    @Size(min = 6, message = "Mật khẩu phải có ít nhất 6 ký tự")
+    @Column(name = "password")
     private String password;
 
-    @Column(name = "PhoneNumber", nullable = false)
-    private String phoneNumber;
-
-    @Column(name = "Address", nullable = false)
-    private String address;
-
-    @Column(name = "Role", nullable = false)
+    @Column(name = "role", length = 50)
     private String role;
 
-    @Column(name = "IsActive", nullable = false)
-    private boolean isActive;
+    @Column(name = "is_active")
+    private Boolean isActive = true;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -52,43 +50,5 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Review> reviews;
-  
-    @Column(name = "CreatedAt", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "UpdatedAt", nullable = false)
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    public void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
-
-
-    public User() {
-    }
-
-    public User(
-            String fullName,
-            String email,
-            String password,
-            String phone_number,
-            String address,
-            String role
-    ) {
-        this.fullName = fullName;
-        this.email = email;
-        this.password = password;
-        this.phoneNumber = phone_number;
-        this.address = address;
-        this.role = role;
-        this.isActive = true;
-    }
 
 }
