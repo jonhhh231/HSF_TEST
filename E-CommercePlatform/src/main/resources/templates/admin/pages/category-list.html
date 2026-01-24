@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layouts/default}">
+<head>
+    <title>Danh sách danh mục</title>
+</head>
+<body>
+
+<div layout:fragment="main">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title">Danh sách danh mục</h4>
+            <a href="/admin/categories/create" class="btn btn-primary">Tạo mới</a>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên</th>
+                    <th>Mô tả</th>
+                    <th>Hành động</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${categoryList}">
+                    <td th:text="${item.id}"></td>
+                    <td th:text="${item.name}"></td>
+                    <td th:text="${item.description}"></td>
+                    <td>
+                        <a th:href="@{/admin/categories/detail/{id}(id=${item.id})}"
+                           class="btn btn-warning btn-sm">Sửa</a>
+
+                        <button class="btn btn-danger btn-sm btn-delete"
+                                th:data-id="${item.id}"
+                                th:data-api="@{/admin/categories/{id}(id=${item.id})}">
+                            Xóa
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script th:src="@{/admin/assets/js/main.js}"></script>
+</div>
+
+</body>
+</html>

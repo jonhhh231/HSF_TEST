@@ -1,9 +1,7 @@
 package com.group4.ecommerceplatform.controllers.client;
 
 import com.group4.ecommerceplatform.entities.Order;
-import com.group4.ecommerceplatform.entities.User;
-import com.group4.ecommerceplatform.repositories.OrderRepository;
-import com.group4.ecommerceplatform.repositories.UserRepository;
+import com.group4.ecommerceplatform.services.client.OrderService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,10 +17,7 @@ import java.util.List;
 public class ClientOrderController {
 
     @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    private OrderService orderService;
 
     /**
      * Hiển thị danh sách đơn hàng của user
@@ -35,10 +30,7 @@ public class ClientOrderController {
             return "redirect:/auth/login";
         }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
-
-        List<Order> orders = orderRepository.findByUserOrderByCreatedAtDesc(user);
+        List<Order> orders = orderService.getOrdersByUserId(userId);
 
         model.addAttribute("orders", orders);
         return "client/orders";
@@ -55,16 +47,13 @@ public class ClientOrderController {
             return "redirect:/auth/login";
         }
 
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
-
-        // Kiểm tra đơn hàng có thuộc về user này không
-        if (!order.getUser().getId().equals(userId)) {
+        try {
+            Order order = orderService.getOrderDetail(id, userId);
+            model.addAttribute("order", order);
+            return "client/order-detail";
+        } catch (RuntimeException e) {
             return "redirect:/orders";
         }
-
-        model.addAttribute("order", order);
-        return "client/order-detail";
     }
 
     private Integer getCurrentUserId(HttpSession session) {

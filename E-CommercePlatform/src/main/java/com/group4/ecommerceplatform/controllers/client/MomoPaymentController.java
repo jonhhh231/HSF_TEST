@@ -3,12 +3,9 @@ package com.group4.ecommerceplatform.controllers.client;
 import com.group4.ecommerceplatform.dto.MomoIPNRequest;
 import com.group4.ecommerceplatform.entities.CartProduct;
 import com.group4.ecommerceplatform.entities.Order;
-import com.group4.ecommerceplatform.entities.OrderDetail;
 import com.group4.ecommerceplatform.entities.User;
-import com.group4.ecommerceplatform.repositories.OrderDetailRepository;
-import com.group4.ecommerceplatform.repositories.OrderRepository;
-import com.group4.ecommerceplatform.repositories.UserRepository;
 import com.group4.ecommerceplatform.services.client.CartService;
+import com.group4.ecommerceplatform.services.client.OrderService;
 import com.group4.ecommerceplatform.services.payment.MomoPaymentService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,13 +30,7 @@ public class MomoPaymentController {
     private MomoPaymentService momoPaymentService;
 
     @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private OrderDetailRepository orderDetailRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    private OrderService orderService;
 
     @Autowired
     @Qualifier("clientCartService")
@@ -99,36 +87,9 @@ public class MomoPaymentController {
                     return "client/payment-failed";
                 }
 
-                // Tạo Order thực sự vào database
-                User user = userRepository.findById(userId)
-                        .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
-
-                Order order = new Order();
-                order.setUser(user);
-                order.setOrderCode(pendingOrderCode);
-                order.setFinalPrice(BigDecimal.valueOf(cartTotal));
-                order.setPaymentMethod("MOMO");
-                order.setPaymentStatus("PAID");
-                order.setPaidAt(LocalDateTime.now());
-                order.setCreatedAt(LocalDateTime.now());
-                order.setUpdatedAt(LocalDateTime.now());
-
-                // Lưu đơn hàng
-                order = orderRepository.save(order);
-
-                // Tạo OrderDetails
-                List<OrderDetail> orderDetails = new ArrayList<>();
-                for (CartProduct cartItem : cartItems) {
-                    OrderDetail orderDetail = new OrderDetail();
-                    orderDetail.setOrderId(order.getId());
-                    orderDetail.setProductId(cartItem.getProduct().getId());
-                    orderDetail.setQuantity(cartItem.getQuantity());
-                    orderDetail.setPrice(cartItem.getProduct().getPrice());
-                    orderDetails.add(orderDetail);
-                }
-
-                // Lưu OrderDetails
-                orderDetailRepository.saveAll(orderDetails);
+                // Lấy thông tin user và tạo Order thông qua service
+                User user = orderService.findUserById(userId);
+                Order order = orderService.createOrderFromCart(user, pendingOrderCode, cartItems, cartTotal, "MOMO");
 
                 // Xóa giỏ hàng
                 cartService.clearCart(userId);
@@ -162,31 +123,5 @@ public class MomoPaymentController {
         }
     }
 
-    /**
-     * Test endpoint để kiểm tra tạo thanh toán MoMo
-     * Chỉ dùng cho testing - xóa đi trong production
-     */
-    @GetMapping("/test")
-    @ResponseBody
-    public String testPayment() {
-        try {
-            // Tạo một đơn hàng test
-            Order testOrder = new Order();
-            testOrder.setOrderCode("TEST_" + System.currentTimeMillis());
-            testOrder.setFinalPrice(new java.math.BigDecimal("50000")); // 50,000 VND
 
-            String paymentUrl = momoPaymentService.createPaymentUrl(testOrder);
-
-            return "<html><body>" +
-                   "<h2>Test MoMo Payment</h2>" +
-                   "<p>Order Code: " + testOrder.getOrderCode() + "</p>" +
-                   "<p>Amount: " + testOrder.getFinalPrice() + " VND</p>" +
-                   "<a href='" + paymentUrl + "'>Click here to pay with MoMo</a>" +
-                   "</body></html>";
-
-        } catch (Exception e) {
-            log.error("Test payment error: ", e);
-            return "<html><body><h2>Error</h2><p>" + e.getMessage() + "</p></body></html>";
-        }
-    }
 }

@@ -19,7 +19,7 @@
                     </div>
                 </div>
                 <div class="card-body pt-0">
-                    <form id="form-update-product" th:object="${product}">
+                    <form id="form-save-product" th:object="${product}" th:data-api="'/admin/products/' + ${product.id}" data-method="PATCH">
                         <div class="mb-3">
                             <label class="form-label">Tên sản phẩm</label>
                             <input th:field="*{name}" id="name" class="form-control" placeholder="Nhập tên sản phẩm">
@@ -36,7 +36,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Số lượng</label>
-                            <input type="number" name="stock" id="stock" class="form-control"
+                            <input type="number" th:field="*{stock}" id="stock" class="form-control"
                                    placeholder="Nhập số lượng">
                         </div>
                         <div class="mb-3">
