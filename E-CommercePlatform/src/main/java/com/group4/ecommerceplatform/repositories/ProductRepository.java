@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductRepository extends JpaRepository<Product, Integer>, ProductRepositoryCustom {
+    Page<Product> findByNameContaining(String name, Pageable pageable);
     Page<Product> findByIsActiveTrue(Pageable pageable);
     Page<Product> findByCategoryIdAndIsActiveTrue(Integer categoryId, Pageable pageable);
     Page<Product> findByNameContainingIgnoreCaseAndIsActiveTrue(String name, Pageable pageable);
