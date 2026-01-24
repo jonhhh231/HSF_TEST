@@ -29,7 +29,7 @@
                         <div class="dataTable-wrapper dataTable-loading no-footer sortable searchable fixed-columns">
                             <div class="row">
                                 <div class="col-lg-12 mb-3">
-                                    <form class="input-group">
+                                    <form class="input-group" id="form-search">
                                         <button id="#button-addon1" class="btn btn-secondary" type="submit">
                                             Tìm kiếm
                                         </button>
@@ -39,8 +39,8 @@
                                                aria-label="Example text with button addon"
                                                placeholder="Nhập từ khóa cần tìm kiếm"
                                                type="text"
+                                               th:value="${keyword != null ? keyword : ''}"
                                         />
-
                                     </form>
 
                                 </div>
@@ -63,9 +63,6 @@
                                         <th data-sortable="" style="width: 12.7394%;">
                                             Trạng thái
                                         </th>
-                                        <th data-sortable="" style="width: 21.7223%;">
-                                            Tạo lúc
-                                        </th>
                                         <th class="text-end" data-sortable="" style="width: 8.41128%;">
                                             Hành dộng
                                         </th>
@@ -74,29 +71,31 @@
                                     <tbody>
                                     <tr th:each="product : ${productList}">
                                         <td class="ps-0">
-                                            <img src="assets/images/products/04.png" alt="" height="40">
+                                            <img th:src="${product.url}" alt="" height="40">
                                             <p class="d-inline-block align-middle mb-0">
                                                 <a th:href="@{/admin/products/details/{id}(id=${product.id})}"
-                                                   class="d-inline-block align-middle mb-0 product-name" th:text="${product.name}"></a>
+                                                   class="d-inline-block align-middle mb-0 product-name"
+                                                   th:text="${product.name}"></a>
                                             </p>
                                         </td>
-                                        <td th:text="${product.categoryName}"></td>
-                                        <td th:text="${product.stock}"></td>
+                                        <td th:text="${product.category.name}"></td>
+                                        <td th:text="${product.stockQuantity}"></td>
                                         <td th:text="${product.price}">VND</td>
                                         <td>
-                                            <span th:if="${product.isActive}" class="badge bg-success-subtle text-success">
-                <i class="fas fa-check me-1"></i> Hoạt động
-            </span>
-                                            <span th:unless="${product.isActive}" class="badge bg-danger-subtle text-danger">
-                <i class="fas fa-xmark me-1"></i> Dừng hoạt động
-            </span>
-                                        </td>
-                                        <td>
-                                            <span th:text="${product.createdAt}"></span>
+                                            <span th:if="${product.isActive}"
+                                                  class="badge bg-success-subtle text-success">
+                                                <i class="fas fa-check me-1"></i> Hoạt động
+                                            </span>
+                                            <span th:unless="${product.isActive}"
+                                                  class="badge bg-danger-subtle text-danger">
+                                                <i class="fas fa-xmark me-1"></i> Dừng hoạt động
+                                            </span>
                                         </td>
                                         <td class="text-end">
-                                            <a href="#"><i class="las la-pen text-secondary fs-18"></i></a>
-                                            <a href="#"><i class="las la-trash-alt text-secondary fs-18"></i></a>
+                                            <a th:href="@{/admin/products/details/{id}(id=${product.id})}">
+                                                <i class="las la-pen text-secondary fs-18"></i>
+                                            </a>
+<!--                                            <a href="#"><i class="las la-trash-alt text-secondary fs-18"></i></a>-->
                                         </td>
                                     </tr>
                                     </tbody>
@@ -106,12 +105,15 @@
                     </div>
                     <div class="row.mt-3">
                         <div class="col-lg-2 col-md-3 col-6">
-                            <select class="form-select">
-                                <option value="1">Trang 1</option>
+                            <select class="form-select" pagination>
+                                <option th:each="i : ${#numbers.sequence(1, totalPages)}"
+                                        th:value="${i}"
+                                        th:selected="${i == currentPage}"
+                                        th:text="'Trang ' + ${i}">
+                                </option>
                             </select>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

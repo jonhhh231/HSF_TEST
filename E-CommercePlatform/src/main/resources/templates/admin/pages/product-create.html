@@ -19,15 +19,22 @@
                     </div>
                 </div>
                 <div class="card-body pt-0">
-                    <form id="form-create-product">
+                    <form id="form-create-product" th:action="@{/admin/products}" method="POST">
                         <div class="mb-3">
                             <label class="form-label">Tên sản phẩm</label>
                             <input name="name" id="name" class="form-control" placeholder="Nhập tên sản phẩm">
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Link ảnh sản phẩm</label>
+                            <input name="url" id="url" class="form-control" placeholder="Nhập url">
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Danh mục</label>
-                            <select name="categoryId" id="categoryId" class="form-control">
-                                <option value="">--Chọn danh mục--</option>
+                            <select name="category" id="category" class="form-control">
+                                <option th:each="cate : ${categoryList}"
+                                        th:value="${cate.id}"
+                                        th:text="${cate.name}">
+                                </option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -36,7 +43,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Số lượng</label>
-                            <input type="number" name="stock" id="stock" class="form-control"
+                            <input type="number" name="stockQuantity" id="stockQuantity" class="form-control"
                                    placeholder="Nhập số lượng">
                         </div>
                         <div class="mb-3">
