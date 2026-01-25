@@ -1,45 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thông Tin Đặt Hàng - Laptop Store</title>
+    <link rel="stylesheet" th:href="@{/client/products.css}">
+    <link rel="stylesheet" th:href="@{/client/icons.css}">
     <link rel="stylesheet" th:href="@{/client/checkout.css}">
 </head>
 
 <body>
     <!-- Header -->
-    <header class="header">
-        <div class="header-container">
-            <a href="/" class="logo">Laptop Store</a>
-
-            <form class="search-bar" th:action="@{/products}" method="get">
-                <input type="text" name="search" placeholder="Tìm kiếm laptop...">
-                <button type="submit">Tìm Kiếm</button>
-            </form>
-
-            <div class="header-actions">
-                <a href="/orders" class="cart-link">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
-                    Đơn Hàng
-                </a>
-                <a href="/cart" class="cart-link">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    Giỏ Hàng
-                </a>
-                <span th:if="${session.user != null}" class="user-greeting">
-                    Xin chào, <strong th:text="${session.user.fullName}">User</strong>
-                </span>
-                <a th:if="${session.user == null}" href="/auth/login">Đăng Nhập</a>
-                <a th:if="${session.user != null}" href="/auth/logout">Đăng Xuất</a>
-            </div>
-        </div>
-    </header>
+    <div th:replace="~{client/fragments/header :: header}"></div>
 
     <!-- Breadcrumb -->
     <div class="breadcrumb">
@@ -56,9 +29,7 @@
     <div class="container">
         <!-- Error Message -->
         <div th:if="${errorMessage}" class="alert alert-error">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <span class="icon icon-md icon-error icon-inline"></span>
             <span th:text="${errorMessage}"></span>
         </div>
 
@@ -87,12 +58,31 @@
 
                 <form id="checkoutForm" th:action="@{/cart/checkout/proceed}" method="post">
                     <div class="form-group">
-                        <label for="address">Địa chỉ giao hàng <span class="required">*</span></label>
-                        <textarea id="address" name="address" class="form-control" rows="3" 
-                            placeholder="Nhập địa chỉ giao hàng đầy đủ (Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố)"
-                            required></textarea>
-                        <div class="address-status" id="addressStatus"></div>
+                        <label for="houseNumber">Số nhà, tên đường <span class="required">*</span></label>
+                        <input type="text" id="houseNumber" name="houseNumber" class="form-control"
+                            placeholder="Nhập số nhà, tên đường" required>
                     </div>
+
+                    <div class="form-group">
+                        <label for="ward">Phường/Xã <span class="required">*</span></label>
+                        <input type="text" id="ward" name="ward" class="form-control"
+                            placeholder="Nhập phường/xã" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="district">Quận/Huyện <span class="required">*</span></label>
+                        <input type="text" id="district" name="district" class="form-control"
+                            placeholder="Nhập quận/huyện" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="province">Tỉnh/Thành phố <span class="required">*</span></label>
+                        <input type="text" id="province" name="province" class="form-control"
+                            placeholder="Nhập tỉnh/thành phố" required>
+                    </div>
+
+                    <!-- Hidden field to combine full address -->
+                    <input type="hidden" id="address" name="address">
 
                     <div class="form-group">
                         <label for="phone">Số điện thoại <span class="required">*</span></label>
@@ -107,10 +97,8 @@
                     </div>
 
                     <button type="submit" class="btn btn-checkout" id="proceedBtn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
-                        Tiến Hành Thanh Toán MoMo
+                        <span class="icon icon-md icon-arrow-right icon-inline"></span>
+                        <span id="btnText">Tiến Hành Thanh Toán MoMo</span>
                     </button>
                 </form>
             </div>
@@ -125,11 +113,7 @@
                             <img th:if="${item.product.url != null && !item.product.url.isEmpty()}"
                                 th:src="${item.product.url}" th:alt="${item.product.name}">
                             <div th:if="${item.product.url == null || item.product.url.isEmpty()}" class="no-image">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                                    <circle cx="8.5" cy="8.5" r="1.5" />
-                                    <polyline points="21 15 16 10 5 21" />
-                                </svg>
+                                <span class="icon icon-lg icon-no-image icon-centered"></span>
                             </div>
                         </div>
                         <div class="item-info">
@@ -164,40 +148,44 @@
 
                 <div class="payment-method">
                     <h3>Phương thức thanh toán</h3>
-                    <div class="payment-option selected">
-                        <img src="https://developers.momo.vn/v3/vi/assets/images/icon-52bd5808cecdb1970e1aeec3c31a3ee1.png" alt="MoMo" class="payment-logo">
-                        <span>Ví MoMo</span>
+                    <div class="payment-options">
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="MOMO" form="checkoutForm" checked>
+                            <div class="payment-content">
+                                <img src="https://developers.momo.vn/v3/vi/assets/images/icon-52bd5808cecdb1970e1aeec3c31a3ee1.png" alt="MoMo" class="payment-logo">
+                                <span>Ví MoMo</span>
+                            </div>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="CASH" form="checkoutForm">
+                            <div class="payment-content">
+                                <svg class="payment-logo-svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                                </svg>
+                                <span>Tiền mặt</span>
+                            </div>
+                        </label>
                     </div>
                 </div>
 
                 <div class="checkout-benefits">
                     <div class="benefit">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#27ae60">
-                            <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                            <polyline points="22 4 12 14.01 9 11.01" />
-                        </svg>
+                        <span class="icon icon-sm icon-check-green"></span>
                         <span>Miễn phí vận chuyển</span>
                     </div>
                     <div class="benefit">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#27ae60">
-                            <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                            <polyline points="22 4 12 14.01 9 11.01" />
-                        </svg>
+                        <span class="icon icon-sm icon-check-green"></span>
                         <span>Bảo hành chính hãng</span>
                     </div>
                     <div class="benefit">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#27ae60">
-                            <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                            <polyline points="22 4 12 14.01 9 11.01" />
-                        </svg>
+                        <span class="icon icon-sm icon-check-green"></span>
                         <span>Đổi trả trong 7 ngày</span>
                     </div>
                 </div>
 
                 <a href="/cart" class="btn btn-back">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
+                    <span class="icon icon-md icon-back-arrow icon-inline"></span>
                     Quay lại giỏ hàng
                 </a>
             </div>
@@ -205,93 +193,42 @@
     </div>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-section">
-                <h4>Về Chúng Tôi</h4>
-                <p>Cửa hàng laptop cao cấp với giá tốt nhất cho laptop gaming, văn phòng và mỏng nhẹ.</p>
-            </div>
-            <div class="footer-section">
-                <h4>Liên Kết Nhanh</h4>
-                <a href="/products">Tất Cả Sản Phẩm</a>
-                <a href="/about">Giới Thiệu</a>
-                <a href="/contact">Liên Hệ</a>
-            </div>
-            <div class="footer-section">
-                <h4>Dịch Vụ Khách Hàng</h4>
-                <a href="/help">Trung Tâm Trợ Giúp</a>
-                <a href="/shipping">Thông Tin Vận Chuyển</a>
-                <a href="/returns">Đổi Trả Hàng</a>
-            </div>
-            <div class="footer-section">
-                <h4>Liên Hệ</h4>
-                <p>Email: support@laptopstore.com</p>
-                <p>Điện thoại: +84 234 567 8900</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Laptop Store. All rights reserved.</p>
-        </div>
-    </footer>
+    <div th:replace="~{client/fragments/footer :: footer}"></div>
 
     <script>
-        // Save address to session when user types
-        let addressTimeout;
-        const addressInput = document.getElementById('address');
-        const addressStatus = document.getElementById('addressStatus');
-        
-        addressInput.addEventListener('input', function() {
-            clearTimeout(addressTimeout);
-            
-            if (this.value.trim().length > 10) {
-                addressStatus.textContent = 'Đang lưu...';
-                addressStatus.className = 'address-status saving';
-                
-                addressTimeout = setTimeout(() => {
-                    // Save address to session via AJAX
-                    fetch('/cart/checkout/save-address', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: 'address=' + encodeURIComponent(this.value)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            addressStatus.textContent = '✓ Đã lưu địa chỉ';
-                            addressStatus.className = 'address-status saved';
-                        } else {
-                            addressStatus.textContent = '✗ Lỗi khi lưu';
-                            addressStatus.className = 'address-status error';
-                        }
-                    })
-                    .catch(error => {
-                        addressStatus.textContent = '✗ Lỗi kết nối';
-                        addressStatus.className = 'address-status error';
-                    });
-                }, 800);
-            } else {
-                addressStatus.textContent = '';
+        // Handle payment method selection
+        const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
+        const btnText = document.getElementById('btnText');
+
+        paymentRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Update button text based on selected payment method
+                if (this.value === 'MOMO') {
+                    btnText.textContent = 'Tiến Hành Thanh Toán MoMo';
+                } else if (this.value === 'CASH') {
+                    btnText.textContent = 'Đặt Hàng (Thanh Toán Khi Nhận)';
+                }
+
+                // Update selected style
+                document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+                this.closest('.payment-option').classList.add('selected');
+            });
+
+            // Set initial selected state
+            if (radio.checked) {
+                radio.closest('.payment-option').classList.add('selected');
             }
         });
 
-        // Form validation
-        document.getElementById('checkoutForm').addEventListener('submit', function(e) {
-            const address = document.getElementById('address').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            
-            if (address.length < 10) {
-                e.preventDefault();
-                alert('Vui lòng nhập địa chỉ giao hàng đầy đủ (ít nhất 10 ký tự)');
-                return false;
-            }
-            
-            if (!/^[0-9]{10,11}$/.test(phone)) {
-                e.preventDefault();
-                alert('Vui lòng nhập số điện thoại hợp lệ (10-11 số)');
-                return false;
-            }
+        // Auto-combine address fields when form is submitted
+        document.getElementById('checkoutForm').addEventListener('submit', function() {
+            const houseNumber = document.getElementById('houseNumber').value.trim();
+            const ward = document.getElementById('ward').value.trim();
+            const district = document.getElementById('district').value.trim();
+            const province = document.getElementById('province').value.trim();
+
+            // Combine all fields into full address
+            document.getElementById('address').value = [houseNumber, ward, district, province].filter(Boolean).join(', ');
         });
     </script>
 </body>

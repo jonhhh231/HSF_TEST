@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thanh Toán Thất Bại</title>
+    <link rel="stylesheet" th:href="@{/client/icons.css}">
     <link rel="stylesheet" th:href="@{/client/payment-failed.css}">
 </head>
 <body>
@@ -30,9 +31,7 @@
                 <div class="detail-box">
                     <div class="detail-row">
                         <span class="label">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                            </svg>
+                            <span class="icon icon-md icon-order icon-inline"></span>
                             Mã đơn hàng
                         </span>
                         <span class="value" th:text="${order.orderCode}">ORD123456</span>
@@ -40,9 +39,7 @@
 
                     <div class="detail-row">
                         <span class="label">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
+                            <span class="icon icon-md icon-money icon-inline"></span>
                             Tổng tiền
                         </span>
                         <span class="value price" th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'">500,000 VND</span>
@@ -50,9 +47,7 @@
 
                     <div class="detail-row">
                         <span class="label">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                            </svg>
+                            <span class="icon icon-md icon-warning icon-inline"></span>
                             Trạng thái
                         </span>
                         <span class="value status-failed">Thanh toán thất bại</span>
@@ -62,10 +57,7 @@
                 <!-- Delivery Info -->
                 <div class="info-box" th:if="${order.address}">
                     <h3>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                            <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
+                        <span class="icon icon-md icon-location icon-inline"></span>
                         Địa chỉ giao hàng
                     </h3>
                     <p th:text="${order.address}">123 Đường ABC, Quận 1, TP.HCM</p>
@@ -74,9 +66,7 @@
 
             <!-- Error Message Box -->
             <div class="message-box error">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                </svg>
+                <span class="icon icon-lg icon-warning icon-inline"></span>
                 <div>
                     <h4>Tại sao thanh toán thất bại?</h4>
                     <ul>
@@ -91,30 +81,22 @@
             <!-- Action Buttons -->
             <div class="actions">
                 <a th:if="${order}" th:href="@{/payment/momo/retry/{orderCode}(orderCode=${order.orderCode})}" class="btn btn-primary">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                    </svg>
+                    <span class="icon icon-md icon-retry icon-inline"></span>
                     Thử Lại Thanh Toán
                 </a>
                 <a href="/payment/methods" class="btn btn-secondary">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3v-8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                    </svg>
+                    <span class="icon icon-md icon-payment icon-inline"></span>
                     Chọn Phương Thức Khác
                 </a>
                 <a href="/products" class="btn btn-outline">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
+                    <span class="icon icon-md icon-back-arrow icon-inline"></span>
                     Quay Lại Trang Chủ
                 </a>
             </div>
 
             <!-- Support -->
             <div class="support-box">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
-                </svg>
+                <span class="icon icon-lg icon-info icon-inline"></span>
                 <div>
                     <h4>Cần hỗ trợ?</h4>
                     <p>Liên hệ với chúng tôi qua <a href="tel:1900xxxx">1900 xxxx</a> hoặc <a href="/contact">gửi yêu cầu hỗ trợ</a></p>

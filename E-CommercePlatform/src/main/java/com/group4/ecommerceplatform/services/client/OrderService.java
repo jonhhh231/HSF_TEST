@@ -49,4 +49,20 @@ public interface OrderService {
      * @return Order nếu hợp lệ
      */
     Order getOrderDetail(Integer orderId, Integer userId);
+
+    /**
+     * Tìm đơn hàng theo orderCode (không check userId)
+     * Dùng cho trường hợp check order đã tồn tại chưa
+     *
+     * @param orderCode Mã đơn hàng
+     * @return Order nếu tìm thấy, null nếu không
+     */
+    Order findByOrderCode(String orderCode);
+
+    /**
+     * Hủy đơn hàng
+     *
+     * @param orderId ID đơn hàng
+     */
+    void cancelOrder(Integer orderId);
 }

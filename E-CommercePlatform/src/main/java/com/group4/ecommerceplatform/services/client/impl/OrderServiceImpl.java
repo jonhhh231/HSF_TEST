@@ -47,8 +47,18 @@ public class OrderServiceImpl implements OrderService {
         order.setAddress(address);
         order.setFinalPrice(BigDecimal.valueOf(cartTotal));
         order.setPaymentMethod(paymentMethod);
-        order.setPaymentStatus("PAID");
-        order.setPaidAt(LocalDateTime.now());
+
+        // Xử lý paymentStatus dựa trên paymentMethod
+        if ("CASH".equalsIgnoreCase(paymentMethod)) {
+            // Thanh toán tiền mặt - chưa thanh toán
+            order.setPaymentStatus("PENDING");
+            order.setPaidAt(null);
+        } else {
+            // Thanh toán online (MoMo, etc.) - đã thanh toán
+            order.setPaymentStatus("PAID");
+            order.setPaidAt(LocalDateTime.now());
+        }
+
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
 
@@ -96,5 +106,29 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return order;
+    }
+
+    @Override
+    public Order findByOrderCode(String orderCode) {
+        return orderRepository.findByOrderCode(orderCode).orElse(null);
+    }
+
+    @Override
+    @Transactional
+    public void cancelOrder(Integer orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+
+        // Chỉ cho phép hủy đơn hàng đang chờ thanh toán
+        if (!"PENDING".equals(order.getPaymentStatus())) {
+            throw new RuntimeException("Chỉ có thể hủy đơn hàng đang chờ thanh toán");
+        }
+
+        // Cập nhật trạng thái thành CANCELLED
+        order.setPaymentStatus("CANCELLED");
+        order.setUpdatedAt(java.time.LocalDateTime.now());
+        orderRepository.save(order);
+
+        log.info("Order {} has been cancelled", orderId);
     }
 }

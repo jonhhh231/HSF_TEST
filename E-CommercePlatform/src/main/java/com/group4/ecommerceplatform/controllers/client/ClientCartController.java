@@ -2,7 +2,9 @@ package com.group4.ecommerceplatform.controllers.client;
 
 import com.group4.ecommerceplatform.entities.CartProduct;
 import com.group4.ecommerceplatform.entities.Order;
+import com.group4.ecommerceplatform.entities.User;
 import com.group4.ecommerceplatform.services.client.CartService;
+import com.group4.ecommerceplatform.services.client.OrderService;
 import com.group4.ecommerceplatform.services.payment.MomoPaymentService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,9 @@ public class ClientCartController {
 
     @Autowired
     private MomoPaymentService momoPaymentService;
+
+    @Autowired
+    private OrderService orderService;
 
     @GetMapping
     public String viewCart(Model model, HttpSession session) {
@@ -211,6 +216,7 @@ public class ClientCartController {
             @RequestParam("address") String address,
             @RequestParam(value = "phone", required = false) String phone,
             @RequestParam(value = "note", required = false) String note,
+            @RequestParam(value = "paymentMethod", defaultValue = "MOMO") String paymentMethod,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
@@ -244,27 +250,83 @@ public class ClientCartController {
             session.setAttribute("pendingAddress", address.trim());
             session.setAttribute("pendingPhone", phone);
             session.setAttribute("pendingNote", note);
+            session.setAttribute("pendingPaymentMethod", paymentMethod);
 
             // Tạo mã đơn hàng tạm thời
             String tempOrderCode = "ORD_" + System.currentTimeMillis();
 
-            // Tạo temporary order object chỉ để gửi cho MoMo
-            Order tempOrder = new Order();
-            tempOrder.setOrderCode(tempOrderCode);
-            tempOrder.setFinalPrice(BigDecimal.valueOf(cartTotal));
-            tempOrder.setAddress(address.trim());
-
             // Lưu orderCode vào session
             session.setAttribute("pendingOrderCode", tempOrderCode);
 
-            // Tạo URL thanh toán MoMo
-            String paymentUrl = momoPaymentService.createPaymentUrl(tempOrder);
+            // Xử lý theo phương thức thanh toán
+            if ("CASH".equalsIgnoreCase(paymentMethod)) {
+                // Thanh toán tiền mặt - tạo đơn hàng ngay
+                return processCODOrder(session, redirectAttributes, userId, cartItems, cartTotal,
+                                      address.trim(), phone, note, tempOrderCode);
+            } else {
+                // Thanh toán MoMo
+                Order tempOrder = new Order();
+                tempOrder.setOrderCode(tempOrderCode);
+                tempOrder.setFinalPrice(BigDecimal.valueOf(cartTotal));
+                tempOrder.setAddress(address.trim());
 
-            // Redirect đến trang thanh toán MoMo
-            return "redirect:" + paymentUrl;
+                // Tạo URL thanh toán MoMo
+                String paymentUrl = momoPaymentService.createPaymentUrl(tempOrder);
+
+                // Redirect đến trang thanh toán MoMo
+                return "redirect:" + paymentUrl;
+            }
 
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
+            return "redirect:/cart/checkout";
+        }
+    }
+
+    /**
+     * Xử lý đơn hàng thanh toán tiền mặt (COD)
+     */
+    private String processCODOrder(HttpSession session, RedirectAttributes redirectAttributes,
+                                   Integer userId, List<CartProduct> cartItems, Long cartTotal,
+                                   String address, String phone, String note, String orderCode) {
+        try {
+            User user = (User) session.getAttribute("user");
+            if (user == null) {
+                return "redirect:/auth/login";
+            }
+
+            // Kết hợp địa chỉ với phone và note
+            String fullAddress = address;
+            if (phone != null && !phone.isEmpty()) {
+                fullAddress += " - SĐT: " + phone;
+            }
+            if (note != null && !note.isEmpty()) {
+                fullAddress += " - Ghi chú: " + note;
+            }
+
+            // Tạo đơn hàng sử dụng service có sẵn (CASH = chưa thanh toán)
+            orderService.createOrderFromCart(user, orderCode, cartItems, cartTotal, "CASH", fullAddress);
+
+            // Xóa giỏ hàng
+            cartService.clearCart(userId);
+
+            // Xóa session pending
+            session.removeAttribute("pendingCartItems");
+            session.removeAttribute("pendingCartTotal");
+            session.removeAttribute("pendingAddress");
+            session.removeAttribute("pendingPhone");
+            session.removeAttribute("pendingNote");
+            session.removeAttribute("pendingOrderCode");
+            session.removeAttribute("pendingPaymentMethod");
+
+            // Redirect đến trang thành công
+            redirectAttributes.addFlashAttribute("successMessage", "Đặt hàng thành công! Mã đơn hàng: " + orderCode);
+            redirectAttributes.addFlashAttribute("orderCode", orderCode);
+            redirectAttributes.addFlashAttribute("paymentMethod", "CASH");
+            return "redirect:/orders?success=true&orderCode=" + orderCode;
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra khi tạo đơn hàng: " + e.getMessage());
             return "redirect:/cart/checkout";
         }
     }
