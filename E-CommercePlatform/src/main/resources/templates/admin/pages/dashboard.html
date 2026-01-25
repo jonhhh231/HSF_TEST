@@ -1,13 +1,132 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{admin/layouts/default}"> <head>
+      layout:decorate="~{admin/layouts/default}">
+<head>
+    <meta charset="UTF-8">
+    <title>Thống kê bán hàng</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card { border: 1px solid #e0e0e0; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; background: white; }
+        .summary-box { background: #f8f9fa; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: #2c3e50; }
+        .chart-row { display: flex; gap: 20px; flex-wrap: wrap; }
+        .chart-col { flex: 1; min-width: 400px; }
+
+        .filter-bar { margin-bottom: 20px; display: flex; align-items: center; gap: 15px; background: #fff; }
+        .filter-group { display: flex; align-items: center; gap: 5px; }
+
+        select { padding: 8px 12px; font-size: 16px; border-radius: 4px; border: 1px solid #ccc; outline: none; }
+        select:focus { border-color: #007bff; }
+
+        button { padding: 8px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; transition: background 0.2s; }
+        button:hover { background-color: #0056b3; }
+    </style>
 </head>
-
 <body>
-
 <div layout:fragment="main">
-    <h1>Hello world</h1>
+    <div class="container">
+        <h1 style="margin-bottom: 20px; color: #333;">Dashboard Quản Lý</h1>
+
+        <div class="card">
+            <form th:action="@{/admin/dashboard}" method="get" style="display: flex; align-items: center; gap: 15px;">
+                <div class="filter-group">
+                    <label for="monthFilter">Tháng:</label>
+                    <select name="month" id="monthFilter">
+                        <option th:each="m : ${#numbers.sequence(1,12)}"
+                                th:value="${m}"
+                                th:text="'Tháng ' + ${m}"
+                                th:selected="${m == selectedMonth}"></option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="yearFilter">Năm:</label>
+                    <select name="year" id="yearFilter">
+                        <option th:each="y : ${#numbers.sequence(2020, 2026)}"
+                                th:value="${y}"
+                                th:text="${y}"
+                                th:selected="${y == selectedYear}"></option>
+                    </select>
+                </div>
+
+                <button type="submit">Xem thống kê</button>
+            </form>
+        </div>
+
+        <div class="card summary-box">
+            Tổng số đơn hàng:
+            <span style="color: #dc3545;" th:text="${totalOrders}">0</span>
+        </div>
+
+        <div class="chart-row">
+            <div class="card chart-col">
+                <h3 style="text-align: center; margin-bottom: 15px;">Dòng tiền theo ngày</h3>
+                <canvas id="lineChartRevenue"></canvas>
+            </div>
+
+            <div class="card chart-col">
+                <h3 style="text-align: center; margin-bottom: 15px;">Top Sản phẩm bán chạy</h3>
+                <canvas id="barChartTopProducts"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /* Lấy dữ liệu từ Model do Spring boot gửi xuống */
+        const revenueData = [[${revenueData}]];
+        const topProducts = [[${topProducts}]];
+
+        document.addEventListener("DOMContentLoaded", function() {
+            renderRevenueChart(revenueData);
+            renderTopProductsChart(topProducts);
+        });
+
+        function renderRevenueChart(data) {
+            const labels = data.map(item => item.label);
+            const values = data.map(item => item.value);
+
+            const ctx = document.getElementById('lineChartRevenue').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Doanh thu (VNĐ)',
+                        data: values,
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: { responsive: true }
+            });
+        }
+
+        function renderTopProductsChart(data) {
+            const labels = data.map(item => item.label);
+            const values = data.map(item => item.value);
+
+            const ctx = document.getElementById('barChartTopProducts').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Số lượng bán',
+                        data: values,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+    </script>
 </div>
 </body>
 </html>

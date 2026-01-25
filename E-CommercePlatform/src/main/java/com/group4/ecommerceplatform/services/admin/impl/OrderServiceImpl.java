@@ -24,6 +24,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<Order> getOrderList(String keyword, Pageable pageable) {
-        return orderRepository.findByOrderCodeContaining(keyword, pageable);
+        return orderRepository.findByOrderCodeContainingOrderByCreatedAtDesc(keyword, pageable);
     }
 }

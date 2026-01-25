@@ -25,5 +25,5 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     Optional<Order> findByIdAndPaymentMethod(Integer id, String paymentMethod);
 
-    Page<Order> findByOrderCodeContaining(String orderCode, Pageable pageable);
+    Page<Order> findByOrderCodeContainingOrderByCreatedAtDesc(String orderCode, Pageable pageable);
 }

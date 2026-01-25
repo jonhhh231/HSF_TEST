@@ -13,7 +13,7 @@ public interface StatsRepository extends JpaRepository<Order, Long> {
 
     @Query(value = "SELECT FORMAT(created_at, 'dd-MM') as label, SUM(final_price) as value " +
             "FROM orders " +
-            "WHERE MONTH(created_at) = :month AND YEAR(created_at) = :year " +
+            "WHERE MONTH(created_at) = :month AND YEAR(created_at) = :year " + " AND payment_status = 'PAID' " +
             "GROUP BY FORMAT(created_at, 'dd-MM') " +
             "ORDER BY MIN(created_at)", nativeQuery = true)
     List<Object[]> getMonthlyRevenueRaw(@Param("month") int month, @Param("year") int year);
