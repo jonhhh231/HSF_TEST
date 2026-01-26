@@ -57,59 +57,45 @@
                     <div class="product-info">
                         <h3 class="product-name" th:text="${product.name}">Laptop gaming</h3>
 
-                        <!-- Specs displayed directly in HTML -->
+                        <!-- Specs from database -->
                         <div class="product-specs">
-                            <!-- CPU -->
-                            <span class="spec-item" th:if="${product.description != null and product.description.toLowerCase().contains('ryzen')}">
+                            <!-- CPU/Processor -->
+                            <span class="spec-item" th:if="${product.processor != null and !product.processor.isEmpty()}">
                                 <span class="icon icon-cpu"></span>
-                                <span th:text="${#strings.substring(product.description, #strings.indexOf(product.description.toLowerCase(), 'ryzen'), #strings.indexOf(product.description.toLowerCase(), 'ryzen') + 15)}"></span>
-                            </span>
-                            <span class="spec-item" th:if="${product.description != null and (product.description.toLowerCase().contains('i5') or product.description.toLowerCase().contains('i7') or product.description.toLowerCase().contains('i3') or product.description.toLowerCase().contains('i9'))}">
-                                <span class="icon icon-cpu"></span>
-                                <span th:if="${product.description.toLowerCase().contains('i5')}" th:text="'Intel i5'"></span>
-                                <span th:if="${product.description.toLowerCase().contains('i7')}" th:text="'Intel i7'"></span>
-                                <span th:if="${product.description.toLowerCase().contains('i3')}" th:text="'Intel i3'"></span>
-                                <span th:if="${product.description.toLowerCase().contains('i9')}" th:text="'Intel i9'"></span>
-                            </span>
-                            <span class="spec-item" th:if="${product.description != null and (product.description.toLowerCase().contains('m1') or product.description.toLowerCase().contains('m2') or product.description.toLowerCase().contains('m3'))}">
-                                <span class="icon icon-cpu"></span>
-                                <span th:if="${product.description.toLowerCase().contains('m1')}" th:text="'Apple M1'"></span>
-                                <span th:if="${product.description.toLowerCase().contains('m2')}" th:text="'Apple M2'"></span>
-                                <span th:if="${product.description.toLowerCase().contains('m3')}" th:text="'Apple M3'"></span>
+                                <span th:text="${product.processor}">Intel i5</span>
                             </span>
 
-                            <!-- GPU -->
-                            <span class="spec-item" th:if="${product.description != null and (product.description.toLowerCase().contains('rtx') or product.description.toLowerCase().contains('gtx'))}">
+                            <!-- GPU/Graphics -->
+                            <span class="spec-item" th:if="${product.graphics != null and !product.graphics.isEmpty()}">
                                 <span class="icon icon-gpu"></span>
-                                <span th:if="${product.description.toLowerCase().contains('rtx 3050')}" th:text="'RTX 3050'"></span>
-                                <span th:if="${product.description.toLowerCase().contains('rtx 3060')}" th:text="'RTX 3060'"></span>
-                                <span th:if="${product.description.toLowerCase().contains('rtx 3070')}" th:text="'RTX 3070'"></span>
-                                <span th:if="${product.description.toLowerCase().contains('rtx 4050')}" th:text="'RTX 4050'"></span>
-                                <span th:if="${product.description.toLowerCase().contains('rtx 4060')}" th:text="'RTX 4060'"></span>
-                                <span th:if="${product.description.toLowerCase().contains('gtx')}" th:text="'GTX'"></span>
+                                <span th:text="${product.graphics}">RTX 3050</span>
                             </span>
 
-                            <!-- RAM -->
-                            <span class="spec-item" th:if="${product.description != null and product.description.toLowerCase().contains('gb ram')}">
+                            <!-- RAM/Memory -->
+                            <span class="spec-item" th:if="${product.memory != null and !product.memory.isEmpty()}">
                                 <span class="icon icon-ram"></span>
-                                <span th:if="${product.description.toLowerCase().contains('8gb ram')}" th:text="'8 GB'"></span>
-                                <span th:if="${product.description.toLowerCase().contains('16gb ram')}" th:text="'16 GB'"></span>
-                                <span th:if="${product.description.toLowerCase().contains('32gb ram')}" th:text="'32 GB'"></span>
-                                <span th:if="${product.description.toLowerCase().contains('64gb ram')}" th:text="'64 GB'"></span>
+                                <span th:text="${product.memory}">16 GB</span>
                             </span>
 
                             <!-- Storage -->
-                            <span class="spec-item" th:if="${product.description != null and product.description.toLowerCase().contains('ssd')}">
+                            <span class="spec-item" th:if="${product.storage != null and !product.storage.isEmpty()}">
                                 <span class="icon icon-storage"></span>
-                                <span th:if="${product.description.toLowerCase().contains('256gb ssd')}" th:text="'256 GB'"></span>
-                                <span th:if="${product.description.toLowerCase().contains('512gb ssd')}" th:text="'512 GB'"></span>
-                                <span th:if="${product.description.toLowerCase().contains('1tb ssd')}" th:text="'1 TB'"></span>
-                                <span th:if="${product.description.toLowerCase().contains('2tb ssd')}" th:text="'2 TB'"></span>
+                                <span th:text="${product.storage}">512 GB</span>
                             </span>
                         </div>
 
                         <div class="product-specs-secondary">
-                            <!-- Screen size, refresh rate, battery, weight can be added here if needed -->
+                            <!-- Display -->
+                            <span class="spec-item" th:if="${product.display != null and !product.display.isEmpty()}">
+                                <span class="icon icon-display"></span>
+                                <span th:text="${product.display}">15.6 inch FHD</span>
+                            </span>
+
+                            <!-- Battery -->
+                            <span class="spec-item" th:if="${product.battery != null and !product.battery.isEmpty()}">
+                                <span class="icon icon-battery"></span>
+                                <span th:text="${product.battery}">56Wh</span>
+                            </span>
                         </div>
 
                         <div class="product-price-section">

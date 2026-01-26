@@ -7,7 +7,6 @@ import com.group4.ecommerceplatform.dto.MomoPaymentResponse;
 import com.group4.ecommerceplatform.entities.Order;
 import com.group4.ecommerceplatform.repositories.OrderRepository;
 import com.group4.ecommerceplatform.services.payment.MomoPaymentService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ import java.util.UUID;
  * Implementation của MomoPaymentService
  */
 @Service
-@Slf4j
 public class MomoPaymentServiceImpl implements MomoPaymentService {
 
     @Autowired
@@ -84,7 +82,6 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<MomoPaymentRequest> entity = new HttpEntity<>(request, headers);
 
-        log.info("Sending payment request to MoMo for order: {}", orderId);
 
         try {
             ResponseEntity<MomoPaymentResponse> response = restTemplate.exchange(
@@ -100,19 +97,14 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
                 throw new RuntimeException("Không nhận được phản hồi từ MoMo");
             }
 
-            log.info("MoMo response - resultCode: {}, message: {}",
-                momoResponse.getResultCode(), momoResponse.getMessage());
-
             if (momoResponse.getResultCode() == 0) {
                 // KHÔNG lưu order vào DB - sẽ lưu sau khi thanh toán thành công
-                log.info("MoMo payment URL created successfully for order: {}", orderId);
                 return momoResponse.getPayUrl();
             } else {
                 throw new RuntimeException("Lỗi từ MoMo: " + momoResponse.getMessage());
             }
 
         } catch (Exception e) {
-            log.error("Error creating MoMo payment: ", e);
             throw new RuntimeException("Không thể tạo thanh toán MoMo: " + e.getMessage());
         }
     }
@@ -120,7 +112,6 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
     @Override
     public boolean handleIPNCallback(MomoIPNRequest ipnRequest) {
         try {
-            log.info("Received IPN callback for order: {}", ipnRequest.getOrderId());
 
             // Verify signature
             String rawSignature = String.format(
@@ -141,7 +132,6 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
             );
 
             if (!verifySignature(rawSignature, ipnRequest.getSignature())) {
-                log.error("Invalid signature from MoMo IPN");
                 return false;
             }
 
@@ -155,23 +145,17 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
                     // Thanh toán thành công
                     order.setPaymentStatus("PAID");
                     order.setPaidAt(LocalDateTime.now());
-                    log.info("Payment successful for order: {}", ipnRequest.getOrderId());
                 } else {
                     // Thanh toán thất bại
                     order.setPaymentStatus("FAILED");
-                    log.warn("Payment failed for order: {}, code: {}",
-                        ipnRequest.getOrderId(), ipnRequest.getResultCode());
                 }
 
                 orderRepository.save(order);
-            } else {
-                log.info("Order not found in DB (may be created later): {}", ipnRequest.getOrderId());
             }
 
             return true;
 
         } catch (Exception e) {
-            log.error("Error handling IPN callback: ", e);
             return false;
         }
     }
@@ -186,24 +170,20 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
                 Order order = orderOpt.get();
 
                 if (resultCode == 0) {
-                    log.info("User returned from MoMo payment - Success for order: {}", orderId);
+                    // Payment success - no action needed here
                 } else {
                     // Thanh toán thất bại
                     order.setPaymentStatus("FAILED");
                     orderRepository.save(order);
-                    log.warn("User returned from MoMo payment - Failed for order: {}, code: {}",
-                        orderId, resultCode);
                 }
 
                 return order;
             } else {
-                log.info("Order not found - will be created in controller: {}", orderId);
                 // Return null - controller sẽ tạo order mới
                 return null;
             }
 
         } catch (Exception e) {
-            log.error("Error handling return URL: ", e);
             throw new RuntimeException("Lỗi xử lý kết quả thanh toán");
         }
     }
@@ -214,7 +194,6 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
             String generatedSignature = signHmacSHA256(rawSignature, momoConfig.getSecretKey());
             return generatedSignature.equals(signature);
         } catch (Exception e) {
-            log.error("Error verifying signature: ", e);
             return false;
         }
     }

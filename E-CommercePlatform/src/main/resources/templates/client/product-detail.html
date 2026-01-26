@@ -78,6 +78,60 @@
                     </p>
                 </div>
 
+                <!-- Product Specifications -->
+                <div class="product-specifications">
+                    <h3>Thông số kỹ thuật</h3>
+                    <div class="specs-grid">
+                        <div class="spec-row" th:if="${product.processor != null and !product.processor.isEmpty()}">
+                            <span class="spec-label">
+                                <span class="icon icon-cpu icon-inline"></span>
+                                Bộ xử lý:
+                            </span>
+                            <span class="spec-value" th:text="${product.processor}">Intel Core i5</span>
+                        </div>
+
+                        <div class="spec-row" th:if="${product.graphics != null and !product.graphics.isEmpty()}">
+                            <span class="spec-label">
+                                <span class="icon icon-gpu icon-inline"></span>
+                                Card đồ họa:
+                            </span>
+                            <span class="spec-value" th:text="${product.graphics}">NVIDIA RTX 3050</span>
+                        </div>
+
+                        <div class="spec-row" th:if="${product.memory != null and !product.memory.isEmpty()}">
+                            <span class="spec-label">
+                                <span class="icon icon-ram icon-inline"></span>
+                                RAM:
+                            </span>
+                            <span class="spec-value" th:text="${product.memory}">16 GB</span>
+                        </div>
+
+                        <div class="spec-row" th:if="${product.storage != null and !product.storage.isEmpty()}">
+                            <span class="spec-label">
+                                <span class="icon icon-storage icon-inline"></span>
+                                Ổ cứng:
+                            </span>
+                            <span class="spec-value" th:text="${product.storage}">512 GB SSD</span>
+                        </div>
+
+                        <div class="spec-row" th:if="${product.display != null and !product.display.isEmpty()}">
+                            <span class="spec-label">
+                                <span class="icon icon-display icon-inline"></span>
+                                Màn hình:
+                            </span>
+                            <span class="spec-value" th:text="${product.display}">15.6 inch FHD</span>
+                        </div>
+
+                        <div class="spec-row" th:if="${product.battery != null and !product.battery.isEmpty()}">
+                            <span class="spec-label">
+                                <span class="icon icon-battery icon-inline"></span>
+                                Pin:
+                            </span>
+                            <span class="spec-value" th:text="${product.battery}">56Wh</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Login Required Message -->
                 <div th:if="${session.user == null}" class="login-required-message">
                     <span class="icon icon-md icon-inline" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27currentColor%27 stroke-width=%272%27%3E%3Cpath d=%27M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z%27/%3E%3C/svg%3E');"></span>

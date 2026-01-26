@@ -1,57 +1,82 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Nhập - Cửa Hàng Laptop</title>
+    <title>Đăng Nhập - TechStore</title>
     <link rel="stylesheet" th:href="@{/client/login.css}">
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-header">
-            <h1>Chào Mừng Trở Lại!</h1>
-            <p>Đăng nhập để truy cập tài khoản của bạn</p>
+    <div class="bg-gradient-1"></div>
+    <div class="bg-gradient-2"></div>
+
+    <div class="login-wrapper">
+        <div class="brand">
+            <div class="brand-icon"></div>
+            <span class="brand-name">TechStore</span>
         </div>
 
-        <div class="login-body">
-            <!-- Error Message -->
+        <div class="login-container">
+            <div class="login-header">
+                <h1>Chào Mừng Trở Lại</h1>
+                <p>Đăng nhập để truy cập đơn hàng và danh sách yêu thích</p>
+            </div>
+
             <div th:if="${error}" class="alert alert-error">
                 <span th:text="${error}"></span>
             </div>
 
-            <!-- Success Message -->
             <div th:if="${success}" class="alert alert-success">
                 <span th:text="${success}"></span>
             </div>
 
-            <form th:action="@{/auth/login}" method="post">
+            <form th:action="@{/auth/login}" method="post" class="login-form">
                 <div class="form-group">
                     <label for="email">Địa Chỉ Email</label>
-                    <input type="email" id="email" name="email"
-                           placeholder="Nhập email của bạn" required>
+                    <div class="input-wrapper">
+                        <input type="email" id="email" name="email" placeholder="name@example.com" required class="input-email">
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Mật Khẩu</label>
-                    <input type="password" id="password" name="password"
-                           placeholder="Nhập mật khẩu" required>
+                    <div class="label-row">
+                        <label for="password">Mật Khẩu</label>
+                        <a href="#" class="forgot-link">Quên mật khẩu?</a>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" name="password" placeholder="••••••••" required class="input-password">
+                    </div>
                 </div>
 
-                <button type="submit" class="btn">Đăng Nhập</button>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="remember-me">
+                    <label for="remember-me">Ghi nhớ đăng nhập</label>
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    Đăng Nhập
+                </button>
             </form>
 
-            <div class="forgot-password">
-                <a href="#">Quên mật khẩu?</a>
-            </div>
-
             <div class="divider">
-                <span>HOẶC</span>
+                <span>Hoặc</span>
             </div>
 
             <div class="register-link">
-                Chưa có tài khoản? <a th:href="@{/auth/register}">Đăng Ký Ngay</a>
+                <p>Chưa có tài khoản?
+                    <a th:href="@{/auth/register}">Đăng ký ngay</a>
+                </p>
             </div>
         </div>
+
+        <div class="footer-links">
+            <a href="#">Chính Sách Bảo Mật</a>
+            <span class="separator">•</span>
+            <a href="#">Điều Khoản Dịch Vụ</a>
+            <span class="separator">•</span>
+            <a href="#">Trợ Giúp</a>
+        </div>
     </div>
+
 </body>
 </html>

@@ -272,6 +272,57 @@ body {
     font-style: italic;
 }
 
+/* Product Specifications */
+.product-specifications {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.product-specifications h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #333;
+    font-weight: 600;
+}
+
+.specs-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.spec-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: white;
+    border-radius: 8px;
+    border-left: 3px solid #667eea;
+}
+
+.spec-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    color: #555;
+    font-size: 14px;
+}
+
+.spec-value {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.icon-inline {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+}
+
 /* Login Required Message */
 .login-required-message {
     display: flex;
