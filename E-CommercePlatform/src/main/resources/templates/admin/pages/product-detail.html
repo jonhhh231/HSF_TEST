@@ -49,6 +49,36 @@
                                    placeholder="Nhập số lượng">
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Bộ xử lý (Processor)</label>
+                            <input th:field="*{processor}" id="processor" class="form-control"
+                                   placeholder="VD: Intel Core i5-12500H">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Card đồ họa (Graphics)</label>
+                            <input th:field="*{graphics}" id="graphics" class="form-control"
+                                   placeholder="VD: NVIDIA RTX 3050 4GB">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">RAM (Memory)</label>
+                            <input th:field="*{memory}" id="memory" class="form-control"
+                                   placeholder="VD: 16GB DDR4">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ổ cứng (Storage)</label>
+                            <input th:field="*{storage}" id="storage" class="form-control"
+                                   placeholder="VD: 512GB SSD NVMe">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Màn hình (Display)</label>
+                            <input th:field="*{display}" id="display" class="form-control"
+                                   placeholder="VD: 15.6 inch FHD 144Hz">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Pin (Battery)</label>
+                            <input th:field="*{battery}" id="battery" class="form-control"
+                                   placeholder="VD: 56Wh">
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Trạng thái</label>
                             <select th:field="*{isActive}" class="form-control">
                                 <option value="true" th:selected="${product.isActive == true}">Hoạt động</option>

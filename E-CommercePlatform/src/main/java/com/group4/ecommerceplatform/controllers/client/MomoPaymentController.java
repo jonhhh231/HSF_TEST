@@ -75,7 +75,18 @@ public class MomoPaymentController {
             }
 
             if (resultCode == 0) {
-                // Thanh toán thành công - TẠO ĐơN HÀNG THỰC
+                // Thanh toán thành công
+
+                // KIỂM TRA XEM ORDER ĐÃ TỒN TẠI CHƯA (trường hợp refresh/share link)
+                Order existingOrder = orderService.findByOrderCode(orderId);
+
+                if (existingOrder != null) {
+                    // Order đã tồn tại rồi - chỉ redirect sang success page
+                    log.info("Order already exists: {}, redirecting to success page", orderId);
+                    return "redirect:/payment/momo/success?orderId=" + existingOrder.getId();
+                }
+
+                // Order chưa tồn tại - TẠO MỚI
                 Integer userId = (Integer) session.getAttribute("userId");
                 String pendingOrderCode = (String) session.getAttribute("pendingOrderCode");
                 @SuppressWarnings("unchecked")
@@ -87,9 +98,13 @@ public class MomoPaymentController {
                     return "client/payment-failed";
                 }
 
+                // Lấy địa chỉ giao hàng từ session
+                String pendingAddress = (String) session.getAttribute("pendingAddress");
+
                 // Lấy thông tin user và tạo Order thông qua service
                 User user = orderService.findUserById(userId);
-                Order order = orderService.createOrderFromCart(user, pendingOrderCode, cartItems, cartTotal, "MOMO");
+                Order order = orderService.createOrderFromCart(user, pendingOrderCode, cartItems, cartTotal, "MOMO",
+                        pendingAddress);
 
                 // Xóa giỏ hàng
                 cartService.clearCart(userId);
@@ -98,12 +113,14 @@ public class MomoPaymentController {
                 session.removeAttribute("pendingOrderCode");
                 session.removeAttribute("pendingCartItems");
                 session.removeAttribute("pendingCartTotal");
+                session.removeAttribute("pendingAddress");
+                session.removeAttribute("pendingPhone");
+                session.removeAttribute("pendingNote");
 
                 log.info("Order created successfully: {}", order.getOrderCode());
 
-                model.addAttribute("order", order);
-                model.addAttribute("message", "Thanh toán thành công!");
-                return "client/payment-success";
+                // Redirect sang success page với orderId để tránh lỗi khi refresh
+                return "redirect:/payment/momo/success?orderId=" + order.getId();
             } else {
                 // Thanh toán thất bại - KHÔNG tạo Order
                 String pendingOrderCode = (String) session.getAttribute("pendingOrderCode");
@@ -123,5 +140,34 @@ public class MomoPaymentController {
         }
     }
 
+    /**
+     * Endpoint hiển thị trang payment success
+     * URL clean, có thể refresh hoặc share được
+     */
+    @GetMapping("/success")
+    public String showPaymentSuccess(
+            @RequestParam(required = false) Integer orderId,
+            HttpSession session,
+            Model model) {
+
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        if (orderId == null || userId == null) {
+            return "redirect:/orders";
+        }
+
+        try {
+            // Lấy thông tin order
+            Order order = orderService.getOrderDetail(orderId, userId);
+
+            model.addAttribute("order", order);
+            model.addAttribute("message", "Thanh toán thành công!");
+            return "client/payment-success";
+
+        } catch (Exception e) {
+            log.error("Error loading payment success page: ", e);
+            return "redirect:/orders";
+        }
+    }
 
 }

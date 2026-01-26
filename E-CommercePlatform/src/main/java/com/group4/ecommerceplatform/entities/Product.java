@@ -50,6 +50,24 @@ public class Product {
     @Column(name = "url", columnDefinition = "NVARCHAR(500)")
     private String url;
 
+    @Column(name = "processor", columnDefinition = "NVARCHAR(255)")
+    private String processor;
+
+    @Column(name = "graphics", columnDefinition = "NVARCHAR(255)")
+    private String graphics;
+
+    @Column(name = "memory", columnDefinition = "NVARCHAR(100)")
+    private String memory;
+
+    @Column(name = "storage", columnDefinition = "NVARCHAR(100)")
+    private String storage;
+
+    @Column(name = "display", columnDefinition = "NVARCHAR(255)")
+    private String display;
+
+    @Column(name = "battery", columnDefinition = "NVARCHAR(100)")
+    private String battery;
+
     @Column(name = "is_active")
     private Boolean isActive = true;
 

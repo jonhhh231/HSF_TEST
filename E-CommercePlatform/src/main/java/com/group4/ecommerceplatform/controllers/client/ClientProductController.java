@@ -2,6 +2,7 @@ package com.group4.ecommerceplatform.controllers.client;
 
 import com.group4.ecommerceplatform.entities.Product;
 import com.group4.ecommerceplatform.services.client.ProductService;
+import com.group4.ecommerceplatform.services.client.ReviewService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,12 +15,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Controller
 public class ClientProductController {
 
     @Autowired
     @Qualifier("clientProductService")
     private ProductService productService;
+
+    @Autowired
+    private ReviewService reviewService;
 
     @GetMapping("/")
     public String homePage() {
@@ -57,6 +65,17 @@ public class ClientProductController {
         model.addAttribute("totalItems", productPage.getTotalElements());
         model.addAttribute("categoryId", categoryId);
         model.addAttribute("search", search);
+
+        // Lấy ratings cho tất cả sản phẩm trong trang (1 query duy nhất)
+        List<Integer> productIds = productPage.getContent().stream()
+            .map(Product::getId)
+            .collect(Collectors.toList());
+
+        Map<Integer, Double> ratings = reviewService.getAverageRatingsForProducts(productIds);
+        Map<Integer, Long> reviewCounts = reviewService.getReviewCountsForProducts(productIds);
+
+        model.addAttribute("productRatings", ratings);
+        model.addAttribute("productReviewCounts", reviewCounts);
 
         return "client/products";
     }
