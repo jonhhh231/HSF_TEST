@@ -1,35 +1,90 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
+    <meta charset="UTF-8">
+    <title>Footer</title>
 </head>
 <body>
     <!-- Footer Fragment -->
-    <footer class="footer" th:fragment="footer">
-        <div class="footer-container">
-            <div>
-                <h4>Về Chúng Tôi</h4>
-                <p>Cửa hàng laptop cao cấp với giá tốt nhất cho laptop gaming, văn phòng và mỏng nhẹ.</p>
+    <footer class="site-footer" th:fragment="footer">
+        <div class="footer-main">
+            <div class="footer-content">
+                <!-- Brand Section -->
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <div class="footer-logo-icon">
+                            <span class="material-symbols-outlined">laptop_mac</span>
+                        </div>
+                        <span class="footer-brand-name">TechStore</span>
+                    </div>
+                    <p class="footer-description">
+                        Cửa hàng laptop hàng đầu Việt Nam. Chuyên cung cấp laptop gaming, văn phòng và mỏng nhẹ với giá tốt nhất thị trường.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" class="social-link" title="Facebook">
+                            <span class="material-symbols-outlined">public</span>
+                        </a>
+                        <a href="#" class="social-link" title="Twitter">
+                            <span class="material-symbols-outlined">tag</span>
+                        </a>
+                        <a href="#" class="social-link" title="Instagram">
+                            <span class="material-symbols-outlined">photo_camera</span>
+                        </a>
+                        <a href="#" class="social-link" title="YouTube">
+                            <span class="material-symbols-outlined">play_circle</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-section">
+                    <h4>Sản Phẩm</h4>
+                    <div class="footer-links">
+                        <a href="/products" class="footer-link">Tất Cả Laptop</a>
+                        <a href="/products?category=1" class="footer-link">Laptop Gaming</a>
+                        <a href="/products?category=2" class="footer-link">Laptop Văn Phòng</a>
+                        <a href="/products?category=3" class="footer-link">Laptop Mỏng Nhẹ</a>
+                    </div>
+                </div>
+
+                <!-- Customer Service -->
+                <div class="footer-section">
+                    <h4>Hỗ Trợ</h4>
+                    <div class="footer-links">
+                        <a href="/orders" class="footer-link">Tra Cứu Đơn Hàng</a>
+                        <a href="/help" class="footer-link">Câu Hỏi Thường Gặp</a>
+                        <a href="/shipping" class="footer-link">Chính Sách Vận Chuyển</a>
+                        <a href="/warranty" class="footer-link">Chính Sách Bảo Hành</a>
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div class="footer-section">
+                    <h4>Liên Hệ</h4>
+                    <div class="contact-item">
+                        <span class="material-symbols-outlined">location_on</span>
+                        <span>123 Đường ABC, Quận 1, TP.HCM</span>
+                    </div>
+                    <div class="contact-item">
+                        <span class="material-symbols-outlined">phone</span>
+                        <span>+84 234 567 8900</span>
+                    </div>
+                    <div class="contact-item">
+                        <span class="material-symbols-outlined">mail</span>
+                        <span>support@techstore.vn</span>
+                    </div>
+                </div>
             </div>
-            <div>
-                <h4>Liên Kết Nhanh</h4>
-                <a href="/products">Tất Cả Sản Phẩm</a>
-                <a href="/about">Giới Thiệu</a>
-                <a href="/contact">Liên Hệ</a>
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <p class="copyright">© 2026 TechStore Inc. All rights reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="/privacy" class="footer-bottom-link">Chính Sách Bảo Mật</a>
+                    <a href="/terms" class="footer-bottom-link">Điều Khoản Dịch Vụ</a>
+                    <a href="/returns" class="footer-bottom-link">Chính Sách Đổi Trả</a>
+                </div>
             </div>
-            <div>
-                <h4>Dịch Vụ Khách Hàng</h4>
-                <a href="/help">Trung Tâm Trợ Giúp</a>
-                <a href="/shipping">Thông Tin Vận Chuyển</a>
-                <a href="/returns">Đổi Trả Hàng</a>
-            </div>
-            <div>
-                <h4>Liên Hệ</h4>
-                <p>Email: support@laptopstore.com</p>
-                <p>Điện thoại: +84 234 567 8900</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Cửa Hàng Laptop. Tất cả quyền được bảo lưu.</p>
         </div>
     </footer>
 </body>

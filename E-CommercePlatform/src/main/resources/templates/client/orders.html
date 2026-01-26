@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<html class="dark" xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đơn Hàng Của Tôi</title>
-    <link rel="stylesheet" th:href="@{/client/products.css}">
-    <link rel="stylesheet" th:href="@{/client/icons.css}">
+    <title>Đơn hàng của tôi - TechStore</title>
+    <link rel="stylesheet" th:href="@{/client/global.css}">
     <link rel="stylesheet" th:href="@{/client/orders.css}">
 </head>
 <body>
@@ -13,119 +12,113 @@
     <div th:replace="~{client/fragments/header :: header}"></div>
 
     <!-- Main Content -->
-    <div class="orders-container">
-        <!-- Success Message for New Order -->
-        <div th:if="${successMessage != null and orderCode != null}" class="success-message" id="orderSuccessMessage">
-            <div class="success-icon">✓</div>
-            <h2>Đặt Hàng Thành Công!</h2>
-            <p th:text="${successMessage}">Đặt hàng thành công!</p>
-            <p>Mã đơn hàng: <strong th:text="${orderCode}">ORD_xxx</strong></p>
-            <p class="cod-note">
-                Bạn đã chọn thanh toán khi nhận hàng. Vui lòng chuẩn bị tiền mặt khi nhận hàng.
-            </p>
-        </div>
+    <main class="main-content">
+        <div class="container">
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb">
+                <a href="/">Trang chủ</a>
+                <span class="material-symbols-outlined">chevron_right</span>
+                <span class="current">Đơn hàng của tôi</span>
+            </nav>
 
-        <!-- Generic Success/Error Messages (for cancellation, etc.) -->
-        <div th:if="${successMessage != null and orderCode == null}" class="alert alert-success" id="genericSuccessMessage">
-            <span class="icon icon-md icon-check-circle icon-inline"></span>
-            <span th:text="${successMessage}">Thành công!</span>
-        </div>
-
-        <div th:if="${errorMessage != null}" class="alert alert-error" id="errorMessage">
-            <span class="icon icon-md icon-error icon-inline"></span>
-            <span th:text="${errorMessage}">Có lỗi xảy ra!</span>
-        </div>
-
-        <h1 class="page-title">Đơn Hàng Của Tôi</h1>
-
-        <!-- Orders List -->
-        <div th:if="${not #lists.isEmpty(orders)}">
-            <div class="order-card" th:each="order : ${orders}">
-                <div class="order-header">
-                    <div class="order-code">
-                        <span class="icon icon-md icon-inline" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27currentColor%27 stroke-width=%272%27%3E%3Cpath d=%27M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2%27/%3E%3C/svg%3E');"></span>
-                        <span th:text="${order.orderCode}">ORD_123456</span>
-                    </div>
-                    <span class="order-status"
-                          th:classappend="${order.paymentStatus == 'PAID' ? 'status-paid' : (order.paymentStatus == 'PENDING' ? 'status-pending' : (order.paymentStatus == 'CANCELLED' ? 'status-cancelled' : 'status-failed'))}">
-                        <span th:if="${order.paymentStatus == 'PAID'}">✓ Đã Thanh Toán</span>
-                        <span th:if="${order.paymentStatus == 'PENDING'}">⏳ Chờ Thanh Toán</span>
-                        <span th:if="${order.paymentStatus == 'CANCELLED'}">🚫 Đã Hủy</span>
-                        <span th:if="${order.paymentStatus == 'FAILED'}">✗ Thất Bại</span>
-                    </span>
+            <!-- Orders Header -->
+            <div class="orders-header">
+                <h1>Đơn hàng của tôi</h1>
+                <div class="order-count">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                    <span th:text="${orders.size()} + ' đơn hàng'">0 đơn hàng</span>
                 </div>
+            </div>
 
-                <div class="order-info">
-                    <div class="info-item">
-                        <span class="info-label">Ngày đặt hàng</span>
-                        <span class="info-value" th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">22/01/2026 10:30</span>
+            <!-- Empty Orders -->
+            <div th:if="${orders == null || orders.isEmpty()}" class="empty-orders">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <h2>Chưa có đơn hàng nào</h2>
+                <p>Bạn chưa thực hiện đơn hàng nào</p>
+                <a href="/products" class="btn btn-primary">
+                    <span class="material-symbols-outlined">shopping_bag</span>
+                    Mua sắm ngay
+                </a>
+            </div>
+
+            <!-- Orders List -->
+            <div th:if="${orders != null && !orders.isEmpty()}" class="orders-list">
+                <div th:each="order : ${orders}" class="order-card">
+                    <div class="order-header">
+                        <div class="order-info">
+                            <div class="order-code">
+                                <span class="material-symbols-outlined">tag</span>
+                                <span>Mã đơn: <strong th:text="${order.orderCode}">ORD123</strong></span>
+                            </div>
+                            <div class="order-date">
+                                <span class="material-symbols-outlined">schedule</span>
+                                <span th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</span>
+                            </div>
+                        </div>
+                        <div class="order-status" th:classappend="${order.paymentStatus}">
+                            <span class="status-icon material-symbols-outlined"
+                                  th:text="${order.paymentStatus == 'PAID' ? 'check_circle' :
+                                           (order.paymentStatus == 'PENDING' ? 'schedule' : 'cancel')}">
+                                schedule
+                            </span>
+                            <span class="status-text"
+                                  th:text="${order.paymentStatus == 'PAID' ? 'Đã thanh toán' :
+                                           (order.paymentStatus == 'PENDING' ? 'Chờ thanh toán' : 'Đã hủy')}">
+                                Trạng thái
+                            </span>
+                        </div>
                     </div>
 
-                    <div class="info-item" th:if="${order.paidAt != null}">
-                        <span class="info-label">Ngày thanh toán</span>
-                        <span class="info-value" th:text="${#temporals.format(order.paidAt, 'dd/MM/yyyy HH:mm')}">22/01/2026 10:35</span>
+                    <div class="order-items">
+                        <div th:each="detail : ${order.orderDetails}" class="order-item">
+                            <div class="item-image">
+                                <img th:if="${detail.product.url != null}"
+                                     th:src="${detail.product.url}"
+                                     th:alt="${detail.product.name}">
+                                <div th:if="${detail.product.url == null}" class="no-image">
+                                    <span class="material-symbols-outlined">laptop_mac</span>
+                                </div>
+                            </div>
+                            <div class="item-details">
+                                <h3 th:text="${detail.product.name}">Product Name</h3>
+                                <div class="item-specs">
+                                    <span class="spec-badge" th:if="${detail.product.processor != null}">
+                                        <span class="material-symbols-outlined">memory</span>
+                                        <span th:text="${detail.product.processor}">CPU</span>
+                                    </span>
+                                    <span class="spec-badge" th:if="${detail.product.memory != null}">
+                                        <span class="material-symbols-outlined">memory</span>
+                                        <span th:text="${detail.product.memory}">RAM</span>
+                                    </span>
+                                </div>
+                                <div class="item-quantity">
+                                    Số lượng: <strong th:text="${detail.quantity}">1</strong>
+                                </div>
+                            </div>
+                            <div class="item-price">
+                                <span class="price" th:text="${#numbers.formatDecimal(detail.price * detail.quantity, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="info-item">
-                        <span class="info-label">Phương thức thanh toán</span>
-                        <span class="payment-method">
-                            <span th:if="${order.paymentMethod == 'CASH'}">Tiền mặt</span>
-                            <span th:if="${order.paymentMethod == 'MOMO'}">MoMo</span>
-                            <span th:if="${order.paymentMethod != 'CASH' && order.paymentMethod != 'MOMO'}" th:text="${order.paymentMethod}">Khác</span>
-                        </span>
+                    <div class="order-footer">
+                        <div class="order-total">
+                            <span>Tổng tiền:</span>
+                            <span class="total-price" th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                        </div>
+                        <div class="order-actions">
+                            <a th:href="@{/orders/{id}(id=${order.id})}" class="btn btn-detail">
+                                <span class="material-symbols-outlined">visibility</span>
+                                Chi tiết
+                            </a>
+                        </div>
                     </div>
-
-                    <div class="info-item">
-                        <span class="info-label">Tổng tiền</span>
-                        <span class="order-total" th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">28,990,000 đ</span>
-                    </div>
-                </div>
-
-                <div class="order-actions">
-                    <a th:href="@{/orders/{id}(id=${order.id})}" class="btn btn-primary">Xem Chi Tiết</a>
-                    <a th:if="${order.paymentStatus == 'PENDING' && order.paymentMethod != 'CASH'}" href="#" class="btn">Thanh Toán Lại</a>
-                    <form th:if="${order.paymentStatus == 'PENDING'}"
-                          th:action="@{/orders/cancel/{id}(id=${order.id})}"
-                          method="post"
-                          style="display: inline;"
-                          onsubmit="return confirm('Bạn có chắc muốn hủy đơn hàng này?')">
-                        <button type="submit" class="btn btn-danger">Hủy Đơn Hàng</button>
-                    </form>
                 </div>
             </div>
         </div>
-
-        <!-- No Orders -->
-        <div class="no-orders" th:if="${#lists.isEmpty(orders)}">
-            <span class="icon icon-xxl icon-centered" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23ccc%27 stroke-width=%271%27%3E%3Cpath d=%27M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2%27/%3E%3C/svg%3E');"></span>
-            <h2>Bạn chưa có đơn hàng nào</h2>
-            <p>Hãy khám phá và mua sắm các sản phẩm laptop tuyệt vời của chúng tôi!</p>
-            <a href="/products" class="btn btn-primary">Mua Sắm Ngay</a>
-        </div>
-    </div>
+    </main>
 
     <!-- Footer -->
     <div th:replace="~{client/fragments/footer :: footer}"></div>
-
-    <script>
-        // Auto-hide messages after 10 seconds
-        function autoHideMessage(elementId) {
-            const element = document.getElementById(elementId);
-            if (element) {
-                setTimeout(function() {
-                    element.style.opacity = '0';
-                    element.style.transition = 'opacity 0.5s ease-out';
-                    setTimeout(function() {
-                        element.style.display = 'none';
-                    }, 500);
-                }, 10000); // 10 seconds
-            }
-        }
-
-        // Auto-hide all messages
-        autoHideMessage('orderSuccessMessage');
-        autoHideMessage('genericSuccessMessage');
-        autoHideMessage('errorMessage');
-    </script>
 </body>
 </html>

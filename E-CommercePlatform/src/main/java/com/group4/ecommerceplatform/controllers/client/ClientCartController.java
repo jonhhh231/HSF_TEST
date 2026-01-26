@@ -385,4 +385,13 @@ public class ClientCartController {
     private Integer getCurrentUserId(HttpSession session) {
         return (Integer) session.getAttribute("userId");
     }
+    
+    private void updateCartCountInSession(HttpSession session, Integer userId) {
+        if (userId != null) {
+            int count = cartService.getCartItemCount(userId);
+            session.setAttribute("cartItemCount", count);
+        } else {
+            session.setAttribute("cartItemCount", 0);
+        }
+    }
 }

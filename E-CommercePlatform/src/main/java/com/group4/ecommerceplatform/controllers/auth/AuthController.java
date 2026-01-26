@@ -2,6 +2,7 @@ package com.group4.ecommerceplatform.controllers.auth;
 
 import com.group4.ecommerceplatform.entities.User;
 import com.group4.ecommerceplatform.services.auth.AuthService;
+import com.group4.ecommerceplatform.services.client.CartService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,8 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+    @Autowired
+    private CartService cartService;
 
     @GetMapping("/login")
     public String showLoginPage(Model model) {
@@ -36,6 +39,10 @@ public class AuthController {
                 session.setAttribute("userName", user.getFullName());
                 session.setAttribute("userEmail", user.getEmail());
                 session.setAttribute("userRole", user.getRole());
+
+                // Initialize cart count
+                int cartCount = cartService.getCartItemCount(user.getId());
+                session.setAttribute("cartItemCount", cartCount);
 
                 if ("ADMIN".equals(user.getRole())) {
                     return "redirect:/admin/dashboard";

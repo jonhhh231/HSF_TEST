@@ -2,7 +2,7 @@
 <html class="dark" lang="en"><head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Login - TechStore</title>
+    <title>My Orders - TechStore</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -40,82 +40,268 @@
     }
     ::-webkit-scrollbar-thumb:hover {
         background: #3A3A3A;
-    }.tech-bg {
-         background-color: #121212;
-         background-image:
-                 linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                 linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-         background-size: 40px 40px;
-     }
+    }
     </style>
 </head>
-<body class="tech-bg font-display text-white min-h-screen flex items-center justify-center p-4 antialiased selection:bg-primary selection:text-white relative overflow-hidden">
-<div class="absolute top-[-20%] left-[-10%] w-[50vw] h-[50vh] bg-primary/10 blur-[120px] rounded-full pointer-events-none"></div>
-<div class="absolute bottom-[-20%] right-[-10%] w-[50vw] h-[50vh] bg-blue-900/10 blur-[120px] rounded-full pointer-events-none"></div>
-<div class="w-full max-w-[440px] relative z-10 flex flex-col gap-8">
-    <div class="flex items-center justify-center gap-3">
-        <div class="flex items-center justify-center size-12 bg-primary rounded-xl text-white shadow-xl shadow-primary/20">
-            <span class="material-symbols-outlined text-[28px]">laptop_mac</span>
-        </div>
-        <span class="text-3xl font-bold tracking-tight">TechStore</span>
-    </div>
-    <div class="bg-surface-dark border border-[#2A2A2A] rounded-2xl shadow-2xl p-6 sm:p-10 backdrop-blur-sm bg-opacity-95">
-        <div class="mb-8 text-center">
-            <h1 class="text-2xl font-bold mb-2">Welcome Back</h1>
-            <p class="text-text-secondary text-sm">Sign in to access your orders and wishlist</p>
-        </div>
-        <form class="space-y-5">
-            <div class="space-y-1.5">
-                <label class="block text-sm font-medium text-gray-300" for="email">Email Address</label>
-                <div class="relative group">
-                    <span class="absolute left-3 top-3.5 text-gray-500 group-focus-within:text-primary transition-colors material-symbols-outlined text-[20px]">mail</span>
-                    <input class="w-full bg-surface-dark-lighter border border-[#2A2A2A] rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm shadow-sm" id="email" placeholder="name@example.com" type="email"/>
+<body class="bg-background-light dark:bg-background-dark font-display text-white min-h-screen flex flex-col antialiased selection:bg-primary selection:text-white">
+<header class="sticky top-0 z-50 w-full border-b border-[#2A2A2A] bg-[#121212]/95 backdrop-blur supports-[backdrop-filter]:bg-[#121212]/60">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex h-16 items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <div class="flex items-center justify-center size-8 bg-primary rounded-lg text-white">
+                    <span class="material-symbols-outlined text-[20px]">laptop_mac</span>
                 </div>
+                <span class="text-xl font-bold tracking-tight">TechStore</span>
             </div>
-            <div class="space-y-1.5">
-                <div class="flex items-center justify-between">
-                    <label class="block text-sm font-medium text-gray-300" for="password">Password</label>
-                    <a class="text-xs text-primary hover:text-white transition-colors font-medium" href="#">Forgot Password?</a>
+            <nav class="hidden md:flex items-center gap-8">
+                <a class="text-sm font-medium text-gray-300 hover:text-white transition-colors" href="#">Laptops</a>
+                <a class="text-sm font-medium text-gray-300 hover:text-white transition-colors" href="#">Components</a>
+                <a class="text-sm font-medium text-gray-300 hover:text-white transition-colors" href="#">Monitors</a>
+                <a class="text-sm font-medium text-gray-300 hover:text-white transition-colors" href="#">Sale</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <div class="hidden lg:flex items-center relative group">
+                    <span class="absolute left-3 text-gray-500 material-symbols-outlined text-[20px]">search</span>
+                    <input class="h-10 w-64 rounded-full bg-surface-dark border border-transparent focus:border-primary focus:ring-1 focus:ring-primary pl-10 pr-4 text-sm text-white placeholder-gray-500 transition-all outline-none" placeholder="Search products..." type="text"/>
                 </div>
-                <div class="relative group">
-                    <span class="absolute left-3 top-3.5 text-gray-500 group-focus-within:text-primary transition-colors material-symbols-outlined text-[20px]">lock</span>
-                    <input class="w-full bg-surface-dark-lighter border border-[#2A2A2A] rounded-lg pl-10 pr-10 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm shadow-sm" id="password" placeholder="••••••••" type="password"/>
-                    <button class="absolute right-3 top-3 text-gray-500 hover:text-white transition-colors focus:outline-none" type="button">
-                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                <div class="flex items-center gap-2">
+                    <button class="p-2 text-gray-300 hover:text-white hover:bg-surface-dark rounded-full transition-colors relative">
+                        <span class="material-symbols-outlined">shopping_cart</span>
+                    </button>
+                    <button class="p-2 text-white bg-surface-dark hover:bg-surface-dark-lighter rounded-full transition-colors">
+                        <span class="material-symbols-outlined">person</span>
                     </button>
                 </div>
             </div>
-            <div class="flex items-center">
-                <input class="h-4 w-4 rounded border-gray-600 bg-surface-dark-lighter text-primary focus:ring-primary focus:ring-offset-surface-dark" id="remember-me" type="checkbox"/>
-                <label class="ml-2 block text-sm text-text-secondary select-none" for="remember-me">Remember me</label>
-            </div>
-            <button class="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3.5 px-4 rounded-lg transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 group mt-2" type="submit">
-                Sign In
-                <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform text-[20px]">arrow_forward</span>
-            </button>
-        </form>
-        <div class="relative my-8">
-            <div class="absolute inset-0 flex items-center">
-                <div class="w-full border-t border-[#2A2A2A]"></div>
-            </div>
-            <div class="relative flex justify-center text-xs uppercase">
-                <span class="bg-surface-dark px-2 text-text-secondary font-medium tracking-wider">Or</span>
-            </div>
-        </div>
-        <div class="text-center">
-            <p class="text-sm text-text-secondary">
-                Don't have an account?
-                <a class="font-bold text-white hover:text-primary transition-colors ml-1" href="#">Create an account</a>
-            </p>
         </div>
     </div>
-    <div class="flex justify-center gap-6 text-xs text-text-secondary/60">
-        <a class="hover:text-text-secondary transition-colors" href="#">Privacy Policy</a>
-        <span class="text-[#2A2A2A]">•</span>
-        <a class="hover:text-text-secondary transition-colors" href="#">Terms of Service</a>
-        <span class="text-[#2A2A2A]">•</span>
-        <a class="hover:text-text-secondary transition-colors" href="#">Help</a>
+</header>
+<main class="flex-grow py-8 px-4 sm:px-6 lg:px-8">
+    <div class="container mx-auto max-w-7xl">
+        <nav class="flex items-center text-sm text-text-secondary mb-8">
+            <a class="hover:text-white transition-colors" href="#">Home</a>
+            <span class="mx-2 material-symbols-outlined text-[16px]">chevron_right</span>
+            <a class="hover:text-white transition-colors" href="#">My Account</a>
+            <span class="mx-2 material-symbols-outlined text-[16px]">chevron_right</span>
+            <span class="text-white font-medium">My Orders</span>
+        </nav>
+        <div class="lg:grid lg:grid-cols-12 lg:gap-12">
+            <div class="hidden lg:block lg:col-span-3">
+                <div class="sticky top-24 space-y-1">
+                    <div class="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                        Account Settings
+                    </div>
+                    <a class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-300 hover:bg-surface-dark hover:text-white transition-colors" href="#">
+                        <span class="material-symbols-outlined text-[20px] text-gray-500 group-hover:text-white transition-colors">person</span>
+                        Personal Info
+                    </a>
+                    <a class="group flex items-center gap-3 rounded-lg bg-surface-dark px-3 py-2 text-sm font-medium text-primary shadow-sm ring-1 ring-inset ring-primary/20" href="#">
+                        <span class="material-symbols-outlined text-[20px]">package_2</span>
+                        My Orders
+                    </a>
+                    <a class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-300 hover:bg-surface-dark hover:text-white transition-colors" href="#">
+                        <span class="material-symbols-outlined text-[20px] text-gray-500 group-hover:text-white transition-colors">favorite</span>
+                        Wishlist
+                    </a>
+                    <a class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-300 hover:bg-surface-dark hover:text-white transition-colors" href="#">
+                        <span class="material-symbols-outlined text-[20px] text-gray-500 group-hover:text-white transition-colors">credit_card</span>
+                        Payment Methods
+                    </a>
+                    <a class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-300 hover:bg-surface-dark hover:text-white transition-colors" href="#">
+                        <span class="material-symbols-outlined text-[20px] text-gray-500 group-hover:text-white transition-colors">location_on</span>
+                        Addresses
+                    </a>
+                    <div class="my-4 border-t border-[#2A2A2A]"></div>
+                    <a class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors" href="#">
+                        <span class="material-symbols-outlined text-[20px]">logout</span>
+                        Sign Out
+                    </a>
+                </div>
+            </div>
+            <div class="lg:col-span-9">
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-3xl font-bold tracking-tight">Order History</h1>
+                    <div class="relative">
+                        <button class="flex items-center gap-2 text-sm font-medium text-gray-300 hover:text-white bg-surface-dark border border-[#2A2A2A] rounded-lg px-4 py-2 transition-colors">
+                            <span>Last 3 months</span>
+                            <span class="material-symbols-outlined text-[18px]">expand_more</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="bg-surface-dark border border-[#2A2A2A] rounded-xl overflow-hidden shadow-lg shadow-black/20 hover:border-primary/30 transition-all duration-300 group">
+                        <div class="bg-surface-dark-lighter/50 px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#2A2A2A]">
+                            <div class="grid grid-cols-2 md:flex md:gap-8 text-sm gap-y-4">
+                                <div>
+                                    <span class="block text-text-secondary text-xs uppercase tracking-wide mb-1">Order Placed</span>
+                                    <span class="text-white font-medium">May 24, 2024</span>
+                                </div>
+                                <div>
+                                    <span class="block text-text-secondary text-xs uppercase tracking-wide mb-1">Total</span>
+                                    <span class="text-white font-medium">$3,100.00</span>
+                                </div>
+                                <div class="col-span-2 md:col-auto">
+                                    <span class="block text-text-secondary text-xs uppercase tracking-wide mb-1">Order #</span>
+                                    <span class="text-white font-medium font-mono">ORD-9921-XJ</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto">
+<span class="inline-flex items-center gap-1.5 rounded-full bg-yellow-500/10 px-3 py-1 text-xs font-medium text-yellow-500 ring-1 ring-inset ring-yellow-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></span>
+                                        Processing
+                                    </span>
+                                <button class="text-sm font-medium text-white hover:bg-white/10 border border-white/10 px-4 py-2 rounded-lg transition-colors">
+                                    View Invoice
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
+                                <div class="flex gap-6 items-center">
+                                    <div class="relative shrink-0">
+                                        <div class="h-20 w-32 rounded-lg bg-surface-dark-lighter overflow-hidden border border-[#2A2A2A]">
+                                            <img alt="Laptop" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzHrMYu6xQ1vEfRkxstweQyoXaLk4qPZ6kzP-FQVHHdW-9wwb7fJ8oJjjNqm7aDf6WprjvH_YO8r_7JUvKGOjJWz3xcawXRSAg5RIwoC9gHwRY-rfTJMVdoj0cMOS1jhno2qGnJl_wNAyn6NE3sgQrcHTD3Pkh_N7qE5BjJxirbX_ryi7DW7EN36vq0r_egkY2LqqAjpoQNWeKP_RiT1nNTzD8KGaje3trR7Ww9ofB_21Wd2Bi2CrFioRCbg2rq6YRthIu0Fsh9M8"/>
+                                        </div>
+                                        <div class="absolute -bottom-2 -right-2 bg-[#2A2A2A] text-xs font-bold px-2 py-0.5 rounded-full border border-[#121212] shadow-sm">x1</div>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-white mb-1"><a class="hover:text-primary transition-colors" href="#">Gaming Beast Z5 - RTX Edition</a></h3>
+                                        <p class="text-text-secondary text-sm">Target Delivery: <span class="text-gray-300">May 28, 2024</span></p>
+                                    </div>
+                                </div>
+                                <div class="w-full md:w-auto flex flex-col gap-2">
+                                    <button class="w-full md:w-auto bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-lg text-sm font-bold transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                                        Track Order
+                                    </button>
+                                    <a class="text-center text-sm text-text-secondary hover:text-white transition-colors py-1" href="#">View Order Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-surface-dark border border-[#2A2A2A] rounded-xl overflow-hidden shadow-lg shadow-black/20 hover:border-primary/30 transition-all duration-300 group">
+                        <div class="bg-surface-dark-lighter/50 px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#2A2A2A]">
+                            <div class="grid grid-cols-2 md:flex md:gap-8 text-sm gap-y-4">
+                                <div>
+                                    <span class="block text-text-secondary text-xs uppercase tracking-wide mb-1">Order Placed</span>
+                                    <span class="text-white font-medium">April 12, 2024</span>
+                                </div>
+                                <div>
+                                    <span class="block text-text-secondary text-xs uppercase tracking-wide mb-1">Total</span>
+                                    <span class="text-white font-medium">$3,498.00</span>
+                                </div>
+                                <div class="col-span-2 md:col-auto">
+                                    <span class="block text-text-secondary text-xs uppercase tracking-wide mb-1">Order #</span>
+                                    <span class="text-white font-medium font-mono">ORD-8832-KL</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto">
+<span class="inline-flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1 text-xs font-medium text-green-500 ring-1 ring-inset ring-green-500/20">
+<span class="material-symbols-outlined text-[14px]">local_shipping</span>
+                                        Shipped
+                                    </span>
+                                <button class="text-sm font-medium text-white hover:bg-white/10 border border-white/10 px-4 py-2 rounded-lg transition-colors">
+                                    View Invoice
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
+                                <div class="flex gap-6 items-center">
+                                    <div class="flex -space-x-4">
+                                        <div class="h-16 w-24 rounded-lg bg-surface-dark-lighter overflow-hidden border border-[#2A2A2A] relative z-10">
+                                            <img alt="Laptop" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_FKrGuEgonAZ1ZXWKDBE0cPzysD7gAjDInG3JocQy_pREwXD24iCIh6iKTHIxHw6K0fQ1aGqntdFL6aE4uRByFMngLE026Q2CSUs418UIdokarHbH9YdTeqQ2PUB9oiZVaszAaLp0isQzIUEFQzLo-qUO-zymX_olGfNsfbKbIc70DsI_qh8dpcLXFORBMBqew3dKJgfcGoadfzSpGHIgSsP7GHVjbZT-c5iKbVM0lwcm0waOI06StkLYTQq3VyJvuU1Jw6er3W4"/>
+                                        </div>
+                                        <div class="h-16 w-24 rounded-lg bg-surface-dark-lighter overflow-hidden border border-[#2A2A2A] relative z-0">
+                                            <img alt="Tablet" class="h-full w-full object-cover opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhDAQhUTGHfOuAqKTZkRvY0uR4Scf4yurprhYl8p1se9Z-hIYkYvtzRC4YtPgzJmAHL_Git3TyFt-Z1HVUG5Q_XlwuZaFWY01VXiz5VLuQFQhvoPD7K0EznMCuOaj2CIrHYAiCIg27kV2hstgOzOhyNZkSstE97m6moQMP_0DZOSInA-oH4vfREPYraRP-dPoMT1lH1xxOL0BBmX5M7Egzf_Avm8AOANaqztqU54nn5ZpErhJMztmobp-udVUNHWVZlzmaph73fbY"/>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-white mb-1"><a class="hover:text-primary transition-colors" href="#">ProBook X1 &amp; Studio Tab S9</a></h3>
+                                        <p class="text-text-secondary text-sm">Arriving tomorrow</p>
+                                    </div>
+                                </div>
+                                <div class="w-full md:w-auto flex flex-col gap-2">
+                                    <button class="w-full md:w-auto bg-surface-dark-lighter hover:bg-[#3A3A3A] text-white border border-[#2A2A2A] px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2">
+                                        View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-surface-dark border border-[#2A2A2A] rounded-xl overflow-hidden shadow-lg shadow-black/20 hover:border-primary/30 transition-all duration-300 group opacity-80 hover:opacity-100">
+                        <div class="bg-surface-dark-lighter/50 px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#2A2A2A]">
+                            <div class="grid grid-cols-2 md:flex md:gap-8 text-sm gap-y-4">
+                                <div>
+                                    <span class="block text-text-secondary text-xs uppercase tracking-wide mb-1">Order Placed</span>
+                                    <span class="text-white font-medium">Feb 10, 2024</span>
+                                </div>
+                                <div>
+                                    <span class="block text-text-secondary text-xs uppercase tracking-wide mb-1">Total</span>
+                                    <span class="text-white font-medium">$999.00</span>
+                                </div>
+                                <div class="col-span-2 md:col-auto">
+                                    <span class="block text-text-secondary text-xs uppercase tracking-wide mb-1">Order #</span>
+                                    <span class="text-white font-medium font-mono">ORD-7721-AB</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto">
+<span class="inline-flex items-center gap-1.5 rounded-full bg-surface-dark-lighter px-3 py-1 text-xs font-medium text-gray-400 ring-1 ring-inset ring-gray-500/20">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                        Delivered
+                                    </span>
+                                <button class="text-sm font-medium text-white hover:bg-white/10 border border-white/10 px-4 py-2 rounded-lg transition-colors">
+                                    View Invoice
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
+                                <div class="flex gap-6 items-center">
+                                    <div class="relative shrink-0">
+                                        <div class="h-20 w-32 rounded-lg bg-surface-dark-lighter overflow-hidden border border-[#2A2A2A]">
+                                            <img alt="Tablet" class="h-full w-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhDAQhUTGHfOuAqKTZkRvY0uR4Scf4yurprhYl8p1se9Z-hIYkYvtzRC4YtPgzJmAHL_Git3TyFt-Z1HVUG5Q_XlwuZaFWY01VXiz5VLuQFQhvoPD7K0EznMCuOaj2CIrHYAiCIg27kV2hstgOzOhyNZkSstE97m6moQMP_0DZOSInA-oH4vfREPYraRP-dPoMT1lH1xxOL0BBmX5M7Egzf_Avm8AOANaqztqU54nn5ZpErhJMztmobp-udVUNHWVZlzmaph73fbY"/>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-white mb-1"><a class="hover:text-primary transition-colors" href="#">Studio Tab S9 Ultra</a></h3>
+                                        <p class="text-text-secondary text-sm">Delivered on Feb 14, 2024</p>
+                                    </div>
+                                </div>
+                                <div class="w-full md:w-auto flex flex-col gap-2">
+                                    <button class="w-full md:w-auto bg-surface-dark-lighter hover:bg-[#3A3A3A] text-white border border-[#2A2A2A] px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2">
+                                        Write a Review
+                                    </button>
+                                    <button class="text-center text-sm text-primary hover:text-primary-hover transition-colors py-1 flex items-center justify-center gap-1">
+                                        <span class="material-symbols-outlined text-[16px]">refresh</span>
+                                        Buy Again
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 flex items-center justify-between border-t border-[#2A2A2A] pt-8">
+                    <div class="text-sm text-text-secondary">
+                        Showing <span class="text-white font-medium">1</span> to <span class="text-white font-medium">3</span> of <span class="text-white font-medium">12</span> orders
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="px-4 py-2 text-sm font-medium text-gray-500 cursor-not-allowed bg-surface-dark border border-[#2A2A2A] rounded-lg">Previous</button>
+                        <button class="px-4 py-2 text-sm font-medium text-white hover:bg-surface-dark-lighter bg-surface-dark border border-[#2A2A2A] rounded-lg transition-colors">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+</main>
+<footer class="border-t border-[#2A2A2A] bg-[#121212] py-8 mt-12">
+    <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-sm text-text-secondary">
+        <p>© 2024 TechStore Inc. All rights reserved.</p>
+        <div class="flex gap-6 mt-4 md:mt-0">
+            <a class="hover:text-white" href="#">Privacy Policy</a>
+            <a class="hover:text-white" href="#">Terms of Service</a>
+            <a class="hover:text-white" href="#">Returns</a>
+        </div>
+    </div>
+</footer>
 
 </body></html>

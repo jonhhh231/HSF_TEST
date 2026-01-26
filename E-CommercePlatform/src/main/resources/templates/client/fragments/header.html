@@ -1,64 +1,90 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
+    <meta charset="UTF-8">
+    <title>Header</title>
 </head>
 <body>
     <!-- Header Fragment -->
-    <header class="header" th:fragment="header">
+    <header class="site-header" th:fragment="header">
         <div class="header-container">
-            <a href="/" class="logo">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                    <line x1="8" y1="21" x2="16" y2="21"></line>
-                    <line x1="12" y1="17" x2="12" y2="21"></line>
-                </svg>
-                LAPTOP STORE
-            </a>
-
-            <form class="search-bar" th:action="@{/products}" method="get">
-                <input type="text" name="search" th:value="${search}" placeholder="Bạn cần tìm gì?">
-                <button type="submit">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <path d="m21 21-4.35-4.35"></path>
-                    </svg>
-                </button>
-            </form>
-
-            <div class="header-actions">
-                <a href="/orders" class="header-link">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
-                    <div class="header-link-text">
-                        <span class="small">Tra cứu</span>
-                        <strong>đơn hàng</strong>
+            <div class="header-main">
+                <!-- Logo -->
+                <a href="/" class="brand-logo">
+                    <div class="logo-icon-wrapper">
+                        <span class="material-symbols-outlined">laptop_mac</span>
                     </div>
+                    <span class="brand-name">TechStore</span>
                 </a>
 
-                <a href="/cart" class="header-link cart-badge">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    <span class="badge">0</span>
-                    <div class="header-link-text">
-                        <span class="small">Giỏ</span>
-                        <strong>hàng</strong>
+                <!-- Right Section -->
+                <div class="header-right-section">
+                    <!-- Search -->
+                    <div class="search-box">
+                        <div class="search-icon-wrapper">
+                            <span class="material-symbols-outlined">search</span>
+                        </div>
+                        <form th:action="@{/products}" method="get" style="margin: 0;">
+                            <input
+                                class="search-field"
+                                placeholder="Tìm kiếm sản phẩm..."
+                                type="text"
+                                name="search"
+                                th:value="${search}"
+                            />
+                        </form>
                     </div>
-                </a>
 
-                <a th:href="${session.user != null ? '/auth/logout' : '/auth/login'}" class="header-link">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                    <div class="header-link-text">
-                        <span class="small" th:if="${session.user != null}" th:text="${session.user.fullName}">User</span>
-                        <span class="small" th:if="${session.user == null}">Đăng</span>
-                        <strong th:if="${session.user != null}">Đăng xuất</strong>
-                        <strong th:if="${session.user == null}">nhập</strong>
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <a href="/orders" class="action-btn" title="Đơn hàng">
+                            <span class="material-symbols-outlined">receipt_long</span>
+                        </a>
+                        <a href="/cart" class="action-btn" title="Giỏ hàng">
+                            <span class="material-symbols-outlined">shopping_cart</span>
+                            <span class="cart-counter" th:text="${session.cartItemCount != null ? session.cartItemCount : 0}">0</span>
+                        </a>
+
+                        <!-- User Dropdown -->
+                        <div class="user-dropdown">
+                            <button class="action-btn user-btn" title="Tài khoản">
+                                <span class="material-symbols-outlined">person</span>
+                            </button>
+                            <div class="dropdown-menu">
+                                <div th:if="${session.user != null}" class="dropdown-content">
+                                    <div class="dropdown-header">
+                                        <span class="material-symbols-outlined">account_circle</span>
+                                        <span class="user-name" th:text="${session.user.fullName}">User Name</span>
+                                    </div>
+                                    <div class="dropdown-divider"></div>
+                                    <a href="/orders" class="dropdown-item">
+                                        <span class="material-symbols-outlined">receipt_long</span>
+                                        <span>Đơn hàng của tôi</span>
+                                    </a>
+                                    <a href="/auth/logout" class="dropdown-item logout">
+                                        <span class="material-symbols-outlined">logout</span>
+                                        <span>Đăng xuất</span>
+                                    </a>
+                                </div>
+                                <div th:if="${session.user == null}" class="dropdown-content">
+                                    <a href="/auth/login" class="dropdown-item">
+                                        <span class="material-symbols-outlined">login</span>
+                                        <span>Đăng nhập</span>
+                                    </a>
+                                    <a href="/auth/register" class="dropdown-item">
+                                        <span class="material-symbols-outlined">person_add</span>
+                                        <span>Đăng ký</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </a>
+
+                    <!-- Mobile Menu Button -->
+                    <button class="mobile-menu-btn" aria-label="Menu">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                </div>
             </div>
         </div>
     </header>

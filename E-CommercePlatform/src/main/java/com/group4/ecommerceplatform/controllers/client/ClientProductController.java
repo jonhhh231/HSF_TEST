@@ -1,6 +1,7 @@
 package com.group4.ecommerceplatform.controllers.client;
 
 import com.group4.ecommerceplatform.entities.Product;
+import com.group4.ecommerceplatform.services.client.CartService;
 import com.group4.ecommerceplatform.services.client.ProductService;
 import com.group4.ecommerceplatform.services.client.ReviewService;
 import jakarta.servlet.http.HttpSession;
@@ -28,6 +29,9 @@ public class ClientProductController {
 
     @Autowired
     private ReviewService reviewService;
+
+    @Autowired
+    private CartService cartService;
 
     @GetMapping("/")
     public String homePage() {
@@ -89,6 +93,14 @@ public class ClientProductController {
         Object user = session.getAttribute("user");
         if (user != null) {
             model.addAttribute("currentUser", user);
+            // Initialize cart count
+            Integer userId = (Integer) session.getAttribute("userId");
+            if (userId != null) {
+                int cartCount = cartService.getCartItemCount(userId);
+                session.setAttribute("cartItemCount", cartCount);
+            }
+        } else {
+            session.setAttribute("cartItemCount", 0);
         }
 
         Product product = productService.getProductById(id);
