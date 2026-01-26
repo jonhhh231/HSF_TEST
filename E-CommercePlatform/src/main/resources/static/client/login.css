@@ -5,8 +5,8 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #000;
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -16,15 +16,15 @@ body {
 
 .login-container {
     background: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     overflow: hidden;
     width: 100%;
     max-width: 400px;
 }
 
 .login-header {
-    background: linear-gradient(135deg, #1a1a1a 0%, #2c3e50 100%);
+    background: #e30019;
     padding: 40px 30px;
     text-align: center;
     color: white;
@@ -33,11 +33,12 @@ body {
 .login-header h1 {
     font-size: 28px;
     margin-bottom: 10px;
+    font-weight: 700;
 }
 
 .login-header p {
     font-size: 14px;
-    opacity: 0.9;
+    opacity: 0.95;
 }
 
 .login-body {
@@ -52,15 +53,15 @@ body {
 }
 
 .alert-error {
-    background-color: #fee;
-    color: #c33;
-    border: 1px solid #fcc;
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #ef4444;
 }
 
 .alert-success {
-    background-color: #efe;
-    color: #3c3;
-    border: 1px solid #cfc;
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #10b981;
 }
 
 .form-group {
@@ -71,7 +72,7 @@ body {
     display: block;
     margin-bottom: 8px;
     color: #333;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 14px;
 }
 
@@ -86,8 +87,8 @@ body {
 
 .form-group input:focus {
     outline: none;
-    border-color: #2c3e50;
-    box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .form-group input::placeholder {
@@ -97,7 +98,7 @@ body {
 .btn {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, #1a1a1a 0%, #2c3e50 100%);
+    background-color: #2563eb;
     color: white;
     border: none;
     border-radius: 8px;
@@ -109,8 +110,9 @@ body {
 }
 
 .btn:hover {
+    background-color: #1d4ed8;
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(26, 26, 26, 0.5);
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
 }
 
 .btn:active {
@@ -123,7 +125,7 @@ body {
 }
 
 .forgot-password a {
-    color: #2c3e50;
+    color: #2563eb;
     text-decoration: none;
     font-size: 14px;
 }
@@ -163,7 +165,7 @@ body {
 }
 
 .register-link a {
-    color: #2c3e50;
+    color: #2563eb;
     text-decoration: none;
     font-weight: 600;
 }
