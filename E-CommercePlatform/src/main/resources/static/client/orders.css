@@ -314,6 +314,12 @@
     border-top: 1px solid #3A3A3A;
 }
 
+.order-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
 .order-total {
     display: flex;
     align-items: center;
@@ -375,6 +381,34 @@
     transform: translateY(-2px);
 }
 
+.btn-cancel {
+    background: transparent;
+    color: #dc2626;
+    border: 2px solid #dc2626;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.btn-cancel:hover {
+    background: #dc2626;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+}
+
+.btn-cancel .material-symbols-outlined {
+    font-size: 18px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .orders-header {
@@ -405,9 +439,11 @@
 
     .order-actions {
         width: 100%;
+        flex-direction: column;
     }
 
-    .btn-detail {
+    .btn-detail,
+    .btn-cancel {
         width: 100%;
     }
 }

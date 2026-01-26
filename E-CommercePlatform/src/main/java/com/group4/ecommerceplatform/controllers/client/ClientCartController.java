@@ -47,6 +47,9 @@ public class ClientCartController {
         model.addAttribute("cartTotal", cartTotal);
         model.addAttribute("itemCount", itemCount);
 
+        // Cập nhật số lượng giỏ hàng trong session
+        updateCartCountInSession(session, userId);
+
         return "client/cart";
     }
 
@@ -68,6 +71,8 @@ public class ClientCartController {
         try {
             cartService.addProductToCart(userId, productId, quantity);
             redirectAttributes.addFlashAttribute("successMessage", "Đã thêm sản phẩm vào giỏ hàng");
+            // Cập nhật số lượng giỏ hàng trong session
+            updateCartCountInSession(session, userId);
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
@@ -125,6 +130,8 @@ public class ClientCartController {
         try {
             cartService.removeProductFromCart(userId, productId);
             redirectAttributes.addFlashAttribute("successMessage", "Đã xóa sản phẩm khỏi giỏ hàng");
+            // Cập nhật số lượng giỏ hàng trong session
+            updateCartCountInSession(session, userId);
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra khi xóa sản phẩm");
         }
@@ -143,6 +150,8 @@ public class ClientCartController {
         try {
             cartService.clearCart(userId);
             redirectAttributes.addFlashAttribute("successMessage", "Đã xóa tất cả sản phẩm trong giỏ hàng");
+            // Cập nhật số lượng giỏ hàng trong session
+            updateCartCountInSession(session, userId);
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra khi xóa giỏ hàng");
         }
@@ -220,14 +229,23 @@ public class ClientCartController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
+        System.out.println("=== CHECKOUT PROCEED CALLED ===");
+        System.out.println("Address: " + address);
+        System.out.println("Phone: " + phone);
+        System.out.println("Payment Method: " + paymentMethod);
+
         Integer userId = getCurrentUserId(session);
 
         if (userId == null) {
+            System.out.println("User not logged in, redirecting to login");
             return "redirect:/auth/login";
         }
 
+        System.out.println("User ID: " + userId);
+
         // Validate address
         if (address == null || address.trim().length() < 10) {
+            System.out.println("Address validation failed: " + (address != null ? address.length() : "null"));
             redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng nhập địa chỉ giao hàng đầy đủ");
             return "redirect:/cart/checkout";
         }
@@ -309,6 +327,9 @@ public class ClientCartController {
 
             // Xóa giỏ hàng
             cartService.clearCart(userId);
+
+            // Cập nhật số lượng giỏ hàng trong session
+            updateCartCountInSession(session, userId);
 
             // Xóa session pending
             session.removeAttribute("pendingCartItems");

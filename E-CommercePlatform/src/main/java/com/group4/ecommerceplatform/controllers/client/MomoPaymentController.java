@@ -109,6 +109,9 @@ public class MomoPaymentController {
                 // Xóa giỏ hàng
                 cartService.clearCart(userId);
 
+                // Cập nhật số lượng giỏ hàng trong session về 0
+                session.setAttribute("cartItemCount", 0);
+
                 // Xóa session data
                 session.removeAttribute("pendingOrderCode");
                 session.removeAttribute("pendingCartItems");

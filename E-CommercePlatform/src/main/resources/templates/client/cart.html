@@ -63,15 +63,27 @@
                                 <div class="item-specs">
                                     <span class="spec-badge" th:if="${item.product.processor != null}">
                                         <span class="material-symbols-outlined">memory</span>
-                                        <span th:text="${item.product.processor}">Processor</span>
+                                        <span th:text="${item.product.processor}"></span>
+                                    </span>
+                                    <span class="spec-badge" th:if="${item.product.graphics != null}">
+                                        <span class="material-symbols-outlined">grid_view</span>
+                                        <span th:text="${item.product.graphics}"></span>
                                     </span>
                                     <span class="spec-badge" th:if="${item.product.memory != null}">
                                         <span class="material-symbols-outlined">memory</span>
-                                        <span th:text="${item.product.memory}">RAM</span>
+                                        <span th:text="${item.product.memory}"></span>
                                     </span>
                                     <span class="spec-badge" th:if="${item.product.storage != null}">
                                         <span class="material-symbols-outlined">storage</span>
-                                        <span th:text="${item.product.storage}">Storage</span>
+                                        <span th:text="${item.product.storage}"></span>
+                                    </span>
+                                    <span class="spec-badge" th:if="${item.product.display != null}">
+                                        <span class="material-symbols-outlined">monitor</span>
+                                        <span th:text="${item.product.display}"></span>
+                                    </span>
+                                    <span class="spec-badge" th:if="${item.product.battery != null}">
+                                        <span class="material-symbols-outlined">battery_full</span>
+                                        <span th:text="${item.product.battery}"></span>
                                     </span>
                                 </div>
 

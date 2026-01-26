@@ -21,6 +21,16 @@
                 <span class="current">Đơn hàng của tôi</span>
             </nav>
 
+            <!-- Flash Messages -->
+            <div th:if="${errorMessage}" class="alert alert-error" style="background-color: #dc2626; color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-outlined">error</span>
+                <span th:text="${errorMessage}">Error message</span>
+            </div>
+            <div th:if="${successMessage}" class="alert alert-success" style="background-color: #16a34a; color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span th:text="${successMessage}">Success message</span>
+            </div>
+
             <!-- Orders Header -->
             <div class="orders-header">
                 <h1>Đơn hàng của tôi</h1>
@@ -84,11 +94,27 @@
                                 <div class="item-specs">
                                     <span class="spec-badge" th:if="${detail.product.processor != null}">
                                         <span class="material-symbols-outlined">memory</span>
-                                        <span th:text="${detail.product.processor}">CPU</span>
+                                        <span th:text="${detail.product.processor}"></span>
+                                    </span>
+                                    <span class="spec-badge" th:if="${detail.product.graphics != null}">
+                                        <span class="material-symbols-outlined">grid_view</span>
+                                        <span th:text="${detail.product.graphics}"></span>
                                     </span>
                                     <span class="spec-badge" th:if="${detail.product.memory != null}">
                                         <span class="material-symbols-outlined">memory</span>
-                                        <span th:text="${detail.product.memory}">RAM</span>
+                                        <span th:text="${detail.product.memory}"></span>
+                                    </span>
+                                    <span class="spec-badge" th:if="${detail.product.storage != null}">
+                                        <span class="material-symbols-outlined">storage</span>
+                                        <span th:text="${detail.product.storage}"></span>
+                                    </span>
+                                    <span class="spec-badge" th:if="${detail.product.display != null}">
+                                        <span class="material-symbols-outlined">monitor</span>
+                                        <span th:text="${detail.product.display}"></span>
+                                    </span>
+                                    <span class="spec-badge" th:if="${detail.product.battery != null}">
+                                        <span class="material-symbols-outlined">battery_full</span>
+                                        <span th:text="${detail.product.battery}"></span>
                                     </span>
                                 </div>
                                 <div class="item-quantity">
@@ -111,6 +137,32 @@
                                 <span class="material-symbols-outlined">visibility</span>
                                 Chi tiết
                             </a>
+                            <button th:if="${order.paymentStatus == 'PENDING'}"
+                                    type="button"
+                                    class="btn btn-cancel"
+                                    th:onclick="'if(confirm(\'Bạn có chắc muốn hủy đơn hàng này?\')) { document.getElementById(\'cancelForm' + ${order.id} + '\').submit(); }'">
+                                <span class="material-symbols-outlined">cancel</span>
+                                Hủy đơn
+                            </button>
+                            <button th:if="${order.paymentStatus == 'CANCELLED'}"
+                                    type="button"
+                                    class="btn btn-delete"
+                                    th:onclick="'if(confirm(\'Bạn có chắc muốn xóa đơn hàng này?\')) { document.getElementById(\'deleteForm' + ${order.id} + '\').submit(); }'">
+                                <span class="material-symbols-outlined">delete</span>
+                                Xóa đơn
+                            </button>
+                            <form th:if="${order.paymentStatus == 'PENDING'}"
+                                  th:id="'cancelForm' + ${order.id}"
+                                  th:action="@{/orders/{id}/cancel(id=${order.id})}"
+                                  method="post"
+                                  style="display: none;">
+                            </form>
+                            <form th:if="${order.paymentStatus == 'CANCELLED'}"
+                                  th:id="'deleteForm' + ${order.id}"
+                                  th:action="@{/orders/{id}/delete(id=${order.id})}"
+                                  method="post"
+                                  style="display: none;">
+                            </form>
                         </div>
                     </div>
                 </div>

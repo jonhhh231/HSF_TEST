@@ -3,9 +3,11 @@ package com.group4.ecommerceplatform.services.client.impl;
 import com.group4.ecommerceplatform.entities.CartProduct;
 import com.group4.ecommerceplatform.entities.Order;
 import com.group4.ecommerceplatform.entities.OrderDetail;
+import com.group4.ecommerceplatform.entities.Product;
 import com.group4.ecommerceplatform.entities.User;
 import com.group4.ecommerceplatform.repositories.OrderDetailRepository;
 import com.group4.ecommerceplatform.repositories.OrderRepository;
+import com.group4.ecommerceplatform.repositories.ProductRepository;
 import com.group4.ecommerceplatform.repositories.UserRepository;
 import com.group4.ecommerceplatform.services.client.OrderService;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     @Override
     @Transactional
@@ -65,9 +70,28 @@ public class OrderServiceImpl implements OrderService {
         // Lưu đơn hàng
         order = orderRepository.save(order);
 
-        // Tạo OrderDetails
+        // Tạo OrderDetails và cập nhật stock
         List<OrderDetail> orderDetails = new ArrayList<>();
         for (CartProduct cartItem : cartItems) {
+            // Lấy thông tin sản phẩm
+            Product product = productRepository.findById(cartItem.getProduct().getId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm với ID: " + cartItem.getProduct().getId()));
+
+            // Kiểm tra số lượng tồn kho
+            if (product.getStockQuantity() < cartItem.getQuantity()) {
+                throw new RuntimeException("Sản phẩm '" + product.getName() + "' không đủ số lượng trong kho");
+            }
+
+            // Giảm số lượng tồn kho
+            product.setStockQuantity(product.getStockQuantity() - cartItem.getQuantity());
+            productRepository.save(product);
+
+            log.info("Updated stock for product {}: {} -> {}",
+                    product.getId(),
+                    product.getStockQuantity() + cartItem.getQuantity(),
+                    product.getStockQuantity());
+
+            // Tạo OrderDetail
             OrderDetail orderDetail = new OrderDetail();
             orderDetail.setOrderId(order.getId());
             orderDetail.setProductId(cartItem.getProduct().getId());
@@ -130,5 +154,22 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
 
         log.info("Order {} has been cancelled", orderId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteOrder(Integer orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+
+        // Chỉ cho phép xóa đơn hàng đã bị hủy
+        if (!"CANCELLED".equals(order.getPaymentStatus())) {
+            throw new RuntimeException("Chỉ có thể xóa đơn hàng đã bị hủy");
+        }
+
+        // Xóa đơn hàng
+        orderRepository.delete(order);
+
+        log.info("Order {} has been deleted", orderId);
     }
 }

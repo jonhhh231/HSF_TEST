@@ -83,7 +83,7 @@ public class ClientOrderController {
     /**
      * Hủy đơn hàng
      */
-    @PostMapping("/cancel/{id}")
+    @PostMapping("/{id}/cancel")
     public String cancelOrder(
             @PathVariable Integer id,
             HttpSession session,
@@ -104,6 +104,38 @@ public class ClientOrderController {
                 redirectAttributes.addFlashAttribute("successMessage", "Đã hủy đơn hàng thành công");
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "Không thể hủy đơn hàng này");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
+        }
+
+        return "redirect:/orders";
+    }
+
+    /**
+     * Xóa đơn hàng đã hủy
+     */
+    @PostMapping("/{id}/delete")
+    public String deleteOrder(
+            @PathVariable Integer id,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+        Integer userId = getCurrentUserId(session);
+
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+
+        try {
+            // Kiểm tra đơn hàng có thuộc về user này không
+            Order order = orderService.getOrderDetail(id, userId);
+
+            // Chỉ cho phép xóa đơn hàng đã bị hủy
+            if ("CANCELLED".equals(order.getPaymentStatus())) {
+                orderService.deleteOrder(id);
+                redirectAttributes.addFlashAttribute("successMessage", "Đã xóa đơn hàng thành công");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Chỉ có thể xóa đơn hàng đã bị hủy");
             }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());

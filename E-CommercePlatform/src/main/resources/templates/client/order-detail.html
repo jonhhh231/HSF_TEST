@@ -65,7 +65,7 @@
                                 <span class="material-symbols-outlined">payment</span>
                                 <div>
                                     <span class="info-label">Phương thức thanh toán</span>
-                                    <span class="info-value" th:text="${order.paymentMethod == 'MOMO' ? 'Thanh toán MoMo' : 'Thanh toán khi nhận hàng'}">Payment Method</span>
+                                    <span class="info-value" th:text="${order.paymentMethod == 'MOMO' ? 'Thanh toán MoMo' : 'Thanh toán bằng tiền mặt'}">Payment Method</span>
                                 </div>
                             </div>
                             <div class="info-item" th:if="${order.address != null}">
@@ -96,15 +96,27 @@
                                     <div class="item-specs">
                                         <span class="spec-badge" th:if="${detail.product.processor != null}">
                                             <span class="material-symbols-outlined">memory</span>
-                                            <span th:text="${detail.product.processor}">CPU</span>
+                                            <span th:text="${detail.product.processor}"></span>
+                                        </span>
+                                        <span class="spec-badge" th:if="${detail.product.graphics != null}">
+                                            <span class="material-symbols-outlined">grid_view</span>
+                                            <span th:text="${detail.product.graphics}"></span>
                                         </span>
                                         <span class="spec-badge" th:if="${detail.product.memory != null}">
                                             <span class="material-symbols-outlined">memory</span>
-                                            <span th:text="${detail.product.memory}">RAM</span>
+                                            <span th:text="${detail.product.memory}"></span>
                                         </span>
                                         <span class="spec-badge" th:if="${detail.product.storage != null}">
                                             <span class="material-symbols-outlined">storage</span>
-                                            <span th:text="${detail.product.storage}">Storage</span>
+                                            <span th:text="${detail.product.storage}"></span>
+                                        </span>
+                                        <span class="spec-badge" th:if="${detail.product.display != null}">
+                                            <span class="material-symbols-outlined">monitor</span>
+                                            <span th:text="${detail.product.display}"></span>
+                                        </span>
+                                        <span class="spec-badge" th:if="${detail.product.battery != null}">
+                                            <span class="material-symbols-outlined">battery_full</span>
+                                            <span th:text="${detail.product.battery}"></span>
                                         </span>
                                     </div>
                                     <div class="item-pricing">
