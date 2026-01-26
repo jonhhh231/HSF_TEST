@@ -5,9 +5,9 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f5f5f5;
-    color: #333;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #000;
+    color: #fff;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -15,10 +15,12 @@ body {
 
 /* Header */
 .header {
-    background: linear-gradient(135deg, #1a1a1a 0%, #2c3e50 100%);
-    color: white;
-    padding: 20px 0;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    background: #e30019;
+    padding: 12px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .header-container {
@@ -26,31 +28,41 @@ body {
     margin: 0 auto;
     padding: 0 20px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
     gap: 20px;
 }
 
 .logo {
-    font-size: 28px;
-    font-weight: bold;
-    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     color: white;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
     white-space: nowrap;
 }
 
 .search-bar {
     flex: 1;
-    max-width: 500px;
+    max-width: 600px;
     position: relative;
+    display: flex;
 }
 
 .search-bar input {
     width: 100%;
     padding: 12px 50px 12px 20px;
     border: none;
-    border-radius: 25px;
+    border-radius: 8px;
     font-size: 14px;
+    background: white;
+    color: #333;
+}
+
+.search-bar input::placeholder {
+    color: #999;
 }
 
 .search-bar button {
@@ -58,40 +70,44 @@ body {
     right: 5px;
     top: 50%;
     transform: translateY(-50%);
-    background: #2c3e50;
-    color: white;
+    background: white;
+    color: #e30019;
     border: none;
-    padding: 8px 20px;
-    border-radius: 20px;
+    padding: 10px 16px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
 }
 
 .search-bar button:hover {
-    background: #1a1a1a;
+    background: #f5f5f5;
+    color: #c00015;
 }
 
 .header-actions {
     display: flex;
-    gap: 15px;
+    gap: 35px;
     align-items: center;
 }
 
-.header-actions a {
-    color: white;
-    text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    transition: background 0.3s;
+.header-link {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s;
+    padding: 8px 12px;
+    border-radius: 8px;
     white-space: nowrap;
 }
 
-.header-actions a:hover,
-.header-actions a.active {
-    background: rgba(255,255,255,0.2);
+.header-link:hover,
+.header-link.active {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
 }
 
 .user-greeting {
@@ -105,9 +121,10 @@ body {
 
 /* Breadcrumb */
 .breadcrumb {
-    background: white;
-    padding: 15px 0;
-    border-bottom: 1px solid #e0e0e0;
+    padding: 20px 0;
+    font-size: 14px;
+    color: #666;
+    background-color: #fff;
 }
 
 .breadcrumb .container {
@@ -115,22 +132,23 @@ body {
     margin: 0 auto;
     padding: 0 20px;
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
 }
 
 .breadcrumb a {
-    color: #667eea;
+    color: #2563eb;
     text-decoration: none;
     transition: color 0.3s;
 }
 
 .breadcrumb a:hover {
-    color: #2c3e50;
+    color: #1d4ed8;
+    text-decoration: underline;
 }
 
 .breadcrumb span {
-    color: #999;
+    color: #666;
 }
 
 /* Container */
@@ -157,6 +175,7 @@ body {
         transform: translateY(-20px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -179,9 +198,9 @@ body {
 /* Checkout Form Section */
 .checkout-form-section {
     background: white;
-    border-radius: 15px;
+    border-radius: 12px;
     padding: 35px;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
 }
 
 .section-header {
@@ -194,7 +213,7 @@ body {
 .step-number {
     width: 36px;
     height: 36px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #2563eb;
     color: white;
     border-radius: 50%;
     display: flex;
@@ -206,7 +225,7 @@ body {
 
 .section-header h2 {
     font-size: 22px;
-    color: #2c3e50;
+    color: #333;
     margin: 0;
 }
 
@@ -290,14 +309,15 @@ textarea.form-control {
 
 .address-status.error {
     color: #e74c3c;
+    color: #ef4444;
 }
 
 /* Order Summary */
 .order-summary {
     background: white;
-    border-radius: 15px;
+    border-radius: 12px;
     padding: 30px;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
     height: fit-content;
     position: sticky;
     top: 20px;
@@ -305,7 +325,7 @@ textarea.form-control {
 
 .order-summary h2 {
     font-size: 22px;
-    color: #2c3e50;
+    color: #333;
     margin-bottom: 25px;
     padding-bottom: 15px;
     border-bottom: 2px solid #f0f0f0;
@@ -387,11 +407,11 @@ textarea.form-control {
 
 .summary-row .amount {
     font-weight: 600;
-    color: #2c3e50;
+    color: #333;
 }
 
 .shipping-fee {
-    color: #27ae60 !important;
+    color: #10b981 !important;
 }
 
 .summary-row.total {
@@ -401,11 +421,11 @@ textarea.form-control {
 }
 
 .summary-row.total span {
-    color: #2c3e50;
+    color: #333;
 }
 
 .total-amount {
-    color: #e74c3c !important;
+    color: #ef4444 !important;
     font-size: 22px !important;
 }
 
@@ -418,7 +438,7 @@ textarea.form-control {
 
 .payment-method h3 {
     font-size: 16px;
-    color: #2c3e50;
+    color: #333;
     margin-bottom: 15px;
 }
 
@@ -440,18 +460,18 @@ textarea.form-control {
 }
 
 .payment-option:hover {
-    border-color: #667eea;
+    border-color: #2563eb;
 }
 
 .payment-option.selected {
-    border-color: #667eea;
-    background: rgba(102, 126, 234, 0.05);
+    border-color: #2563eb;
+    background: rgba(37, 99, 235, 0.05);
 }
 
 .payment-option input[type="radio"] {
     width: 20px;
     height: 20px;
-    accent-color: #667eea;
+    accent-color: #2563eb;
     cursor: pointer;
 }
 
@@ -501,7 +521,7 @@ textarea.form-control {
 
 .btn-checkout {
     width: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-color: #ef4444;
     color: white;
     font-size: 16px;
     padding: 18px;
@@ -509,22 +529,22 @@ textarea.form-control {
 }
 
 .btn-checkout:hover {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    background-color: #dc2626;
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
 }
 
 .btn-back {
     width: 100%;
     background: white;
-    color: #2c3e50;
+    color: #333;
     border: 2px solid #e0e0e0;
     margin-top: 15px;
 }
 
 .btn-back:hover {
-    background: #f8f8f8;
-    border-color: #2c3e50;
+    background: #f3f4f6;
+    border-color: #333;
 }
 
 /* Checkout Benefits */
@@ -550,10 +570,11 @@ textarea.form-control {
 
 /* Footer */
 .footer {
-    background: #333;
-    color: white;
-    padding: 40px 0 20px;
+    background: #0a0a0a;
+    color: #aaa;
+    padding: 50px 0 25px;
     margin-top: 60px;
+    border-top: 1px solid #2a2a2a;
 }
 
 .footer-container {
@@ -562,38 +583,43 @@ textarea.form-control {
     padding: 0 20px;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 30px;
+    gap: 40px;
 }
 
 .footer-section h4 {
-    margin-bottom: 15px;
-    color: #ecf0f1;
+    margin-bottom: 18px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
 }
 
 .footer-section p {
-    color: #ccc;
-    margin-bottom: 8px;
+    color: #aaa;
+    margin-bottom: 10px;
     line-height: 1.6;
+    font-size: 14px;
 }
 
 .footer-section a {
-    color: #ccc;
+    color: #aaa;
     text-decoration: none;
     display: block;
     margin-bottom: 8px;
     transition: color 0.3s;
+    font-size: 14px;
 }
 
 .footer-section a:hover {
-    color: white;
+    color: #667eea;
 }
 
 .footer-bottom {
     text-align: center;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #555;
-    color: #999;
+    margin-top: 40px;
+    padding-top: 25px;
+    border-top: 1px solid #2a2a2a;
+    color: #666;
+    font-size: 13px;
 }
 
 /* Responsive */
