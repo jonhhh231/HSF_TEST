@@ -1,10 +1,11 @@
 package com.group4.ecommerceplatform.services.client.impl;
 
-import com.group4.ecommerceplatform.entities.Review;
-import com.group4.ecommerceplatform.repositories.ReviewRepository;
+import com.group4.ecommerceplatform.entities.*;
+import com.group4.ecommerceplatform.repositories.*;
 import com.group4.ecommerceplatform.services.client.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,15 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Autowired
     private ReviewRepository reviewRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Override
     public Double getAverageRating(Integer productId) {
@@ -105,5 +115,98 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         return countsMap;
+    }
+
+    @Override
+    public List<Review> getProductReviews(Integer productId) {
+        if (productId == null) {
+            return List.of();
+        }
+        return reviewRepository.findByProductIdOrderByIdDesc(productId);
+    }
+
+    @Override
+    public boolean canUserReviewProduct(Integer userId, Integer productId) {
+        if (userId == null || productId == null) {
+            return false;
+        }
+
+        User user = userRepository.findById(userId).orElse(null);
+        Product product = productRepository.findById(productId).orElse(null);
+
+        if (user == null || product == null) {
+            return false;
+        }
+
+        // Kiểm tra xem user đã review sản phẩm này chưa
+        if (reviewRepository.existsByUserAndProduct(user, product)) {
+            return false;
+        }
+
+        // Kiểm tra xem user có đơn hàng nào đã thanh toán chứa sản phẩm này không
+        List<Order> paidOrders = orderRepository.findByUserOrderByCreatedAtDesc(user).stream()
+                .filter(order -> "PAID".equals(order.getPaymentStatus()))
+                .collect(Collectors.toList());
+
+        for (Order order : paidOrders) {
+            if (order.getOrderDetails() != null) {
+                boolean hasProduct = order.getOrderDetails().stream()
+                        .anyMatch(detail -> detail.getProductId().equals(productId));
+                if (hasProduct) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    @Transactional
+    public Review submitReview(Integer userId, Integer productId, Integer rating, String comment) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
+
+        // Kiểm tra quyền review
+        if (!canUserReviewProduct(userId, productId)) {
+            throw new RuntimeException("Bạn không có quyền review sản phẩm này hoặc đã review rồi");
+        }
+
+        // Validate rating
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating phải từ 1 đến 5");
+        }
+
+        // Validate comment
+        if (comment == null || comment.trim().length() < 10) {
+            throw new IllegalArgumentException("Nhận xét phải có ít nhất 10 ký tự");
+        }
+
+        Review review = new Review();
+        review.setUser(user);
+        review.setProduct(product);
+        review.setRating(rating);
+        review.setComment(comment.trim());
+
+        return reviewRepository.save(review);
+    }
+
+    @Override
+    public boolean hasUserReviewedProduct(Integer userId, Integer productId) {
+        if (userId == null || productId == null) {
+            return false;
+        }
+
+        User user = userRepository.findById(userId).orElse(null);
+        Product product = productRepository.findById(productId).orElse(null);
+
+        if (user == null || product == null) {
+            return false;
+        }
+
+        return reviewRepository.existsByUserAndProduct(user, product);
     }
 }

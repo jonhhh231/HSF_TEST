@@ -1,5 +1,8 @@
 package com.group4.ecommerceplatform.services.client;
 
+import com.group4.ecommerceplatform.entities.Review;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,4 +31,25 @@ public interface ReviewService {
      * @return Map với key là productId, value là số lượng reviews
      */
     Map<Integer, Long> getReviewCountsForProducts(Iterable<Integer> productIds);
+
+    /**
+     * Lấy tất cả reviews của một sản phẩm
+     */
+    List<Review> getProductReviews(Integer productId);
+
+    /**
+     * Kiểm tra xem user có thể review sản phẩm này không
+     * (đã mua và đơn hàng đã thanh toán, chưa review trước đó)
+     */
+    boolean canUserReviewProduct(Integer userId, Integer productId);
+
+    /**
+     * Submit review mới
+     */
+    Review submitReview(Integer userId, Integer productId, Integer rating, String comment);
+
+    /**
+     * Kiểm tra xem user đã review sản phẩm này chưa
+     */
+    boolean hasUserReviewedProduct(Integer userId, Integer productId);
 }
