@@ -20,7 +20,7 @@ Dự án này được thiết kế theo mô hình MVC, sử dụng Rendering ph
 ###  Phân hệ Người dùng (Client)
 * **Trang chủ & Sản phẩm:** Xem danh sách sản phẩm, chi tiết sản phẩm.
 * **Giỏ hàng:** Thêm, sửa, xóa sản phẩm trong giỏ.
-* **Đặt hàng:** Quy trình Checkout đơn giản.
+* **Đặt hàng:** Quy trình Checkout đơn giản(Sử dụng API Momo để thanh toán online).
 * **Authentication:** Đăng ký, Đăng nhập.
 
 ###  Phân hệ Quản trị (Admin)
