@@ -65,6 +65,59 @@ function sendChatMessage() {
 
 }
 
+async function sendChatMessage() {
+    const input = document.getElementById('aiInput');
+    const chatMessages = document.getElementById('chatMessages');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    appendMessage(message, 'user');
+    input.value = '';
+
+    typingIndicator.style.display = 'flex';
+
+    chatMessages.appendChild(typingIndicator);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    try {
+        const response = await fetch('/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: message })
+        });
+
+        const reply = await response.text();
+
+        typingIndicator.style.display = 'none';
+
+        appendMessage(reply, 'bot');
+
+    } catch (error) {
+        console.error('Lỗi API:', error);
+        typingIndicator.style.display = 'none';
+        appendMessage("Xin lỗi, hệ thống đang bận. Thử lại sau nhé!", 'bot');
+    }
+}
+
+function appendMessage(text, sender) {
+    const chatMessages = document.getElementById('chatMessages');
+    const typingIndicator = document.getElementById('typingIndicator');
+
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${sender}`;
+
+    let formattedText = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" style="color: #007bff; text-decoration: underline;">$1</a>');
+
+    formattedText = formattedText.replace(/\n/g, '<br>');
+
+    msgDiv.innerHTML = formattedText;
+
+    chatMessages.insertBefore(msgDiv, typingIndicator);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
 function handleChatKey(e) {
     if (e.key === 'Enter') {
         sendChatMessage();
