@@ -37,18 +37,32 @@ function sendChatMessage() {
     userDiv.className = 'message user';
     userDiv.textContent = text;
     msgArea.appendChild(userDiv);
-
     input.value = '';
     msgArea.scrollTop = msgArea.scrollHeight;
-
-    // Giả lập bot
-    setTimeout(() => {
+    fetch('/chat', {
+        method: "POST",
+        headers: {
+            "content-type": "application/json"
+        },
+        body: JSON.stringify({
+            message: text,
+        })
+    }).then(res => res.text())
+        .then(data => {
+            const botDiv = document.createElement('div');
+            botDiv.className = 'message bot';
+            botDiv.textContent = data;
+            msgArea.appendChild(botDiv);
+            msgArea.scrollTop = msgArea.scrollHeight;
+        })
+        .catch(err => {
         const botDiv = document.createElement('div');
         botDiv.className = 'message bot';
-        botDiv.textContent = "Đang kết nối với trí tuệ nhân tạo...";
+        botDiv.textContent = "Xin lỗi bạn, hệ thống đang xảy ra vấn đề, vui lòng gửi lại sau!";
         msgArea.appendChild(botDiv);
         msgArea.scrollTop = msgArea.scrollHeight;
-    }, 500);
+    })
+
 }
 
 function handleChatKey(e) {
