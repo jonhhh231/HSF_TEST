@@ -69,12 +69,14 @@ public class ChatAIServiceImpl implements ChatAIService {
     }
 
     private String formatResponse(List<Product> products) {
-        StringBuilder sb = new StringBuilder("Dưới đây là các mẫu máy phù hợp nhất:\n\n");
+        StringBuilder sb = new StringBuilder("Dưới đây là các mẫu máy phù hợp nhất cho bạn:\n\n");
         products.stream().limit(3).forEach(p -> {
             sb.append("💻 **").append(p.getName()).append("**\n");
             sb.append("💰 Giá: ").append(String.format("%,.0f", p.getPrice())).append("đ\n");
             sb.append("⚙️ ").append(p.getProcessor()).append(" | ").append(p.getGraphics()).append("\n");
-            sb.append("📦 SSD: ").append(p.getStorage()).append(" | Màn: ").append(p.getDisplay()).append("\n\n");
+            sb.append("📦 SSD: ").append(p.getStorage()).append(" | Màn: ").append(p.getDisplay()).append("\n");
+
+            sb.append("🔗 [Xem chi tiết sản phẩm tại đây](/products/").append(p.getId()).append(")\n\n");
         });
         return sb.toString();
     }
