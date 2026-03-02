@@ -725,3 +725,172 @@
         align-items: flex-start;
     }
 }
+
+/* ===================================
+   ORDER ITEM REVIEW SECTION
+   =================================== */
+.item-review-wrapper {
+    grid-column: 1 / -1;
+    padding: 1rem 0 0.25rem;
+    border-top: 1px solid #2A2A2A;
+    margin-top: 0.75rem;
+}
+
+/* "Write Review" toggle button */
+.btn-write-review {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    background: transparent;
+    border: 1px solid #6366f1;
+    color: #818cf8;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-write-review:hover {
+    background: rgba(99, 102, 241, 0.12);
+    color: #c7d2fe;
+}
+
+.btn-write-review .material-symbols-outlined {
+    font-size: 1.1rem;
+}
+
+/* Inline review form */
+.review-form-inline {
+    margin-top: 0.75rem;
+    padding: 1.25rem;
+    background: #1a1a2e;
+    border: 1px solid #2d2d4e;
+    border-radius: 0.75rem;
+}
+
+.review-form-inline h4 {
+    font-size: 0.95rem;
+    color: #d1d5db;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.review-product-name {
+    color: #818cf8;
+}
+
+/* Star rating row */
+.star-row {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.star-interactive {
+    font-size: 1.6rem;
+    color: #4b5563;
+    cursor: pointer;
+    transition: color 0.15s, transform 0.1s;
+    line-height: 1;
+    user-select: none;
+}
+
+.star-interactive:hover,
+.star-interactive.active {
+    color: #f59e0b;
+    transform: scale(1.1);
+}
+
+.star-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-left: 0.5rem;
+}
+
+/* Textarea */
+.review-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    background: #111827;
+    border: 1px solid #374151;
+    border-radius: 0.5rem;
+    color: #d1d5db;
+    font-size: 0.875rem;
+    resize: vertical;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.review-textarea:focus {
+    border-color: #6366f1;
+}
+
+/* Error messages */
+.error-msg {
+    font-size: 0.8rem;
+    color: #f87171;
+    min-height: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+/* Form actions */
+.review-form-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.btn-submit-review {
+    padding: 0.5rem 1.25rem;
+    background: #6366f1;
+    border: none;
+    border-radius: 0.5rem;
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-submit-review:hover {
+    background: #4f46e5;
+}
+
+.btn-cancel-review {
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid #374151;
+    border-radius: 0.5rem;
+    color: #9ca3af;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-cancel-review:hover {
+    border-color: #6b7280;
+    color: #d1d5db;
+}
+
+/* Already-reviewed badge */
+.review-done-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.9rem;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 9999px;
+    color: #34d399;
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+
+.review-done-badge .material-symbols-outlined {
+    font-size: 1rem;
+}

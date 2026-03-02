@@ -210,6 +210,11 @@
                                     <span class="total-label">Thành tiền</span>
                                     <span class="total-price" th:text="${#numbers.formatDecimal(detail.price * detail.quantity, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
                                 </div>
+                                <!-- Review Placeholder -->
+                                <div class="item-review-wrapper"
+                                     th:data-product-id="${detail.product.id}"
+                                     th:data-product-name="${detail.product.name}">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -253,5 +258,164 @@
 
     <!-- Footer -->
     <div th:replace="~{client/fragments/footer :: footer}"></div>
+
+    <script>
+        // ===== REVIEW SYSTEM FOR ORDER DETAIL =====
+
+        const selectedRatings = {}; // Track selected rating per product
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const reviewWrappers = document.querySelectorAll('.item-review-wrapper');
+            reviewWrappers.forEach(wrapper => {
+                const productId = wrapper.dataset.productId;
+                const productName = wrapper.dataset.productName;
+                if (productId) {
+                    loadReviewStatus(wrapper, parseInt(productId), productName);
+                }
+            });
+        });
+
+        async function loadReviewStatus(wrapper, productId, productName) {
+            try {
+                const response = await fetch(`/reviews/status/${productId}`);
+                const data = await response.json();
+
+                if (data.alreadyReviewed) {
+                    wrapper.innerHTML = `
+                        <div class="review-done-badge">
+                            <span class="material-symbols-outlined">verified</span>
+                            <span>Bạn đã đánh giá sản phẩm này</span>
+                        </div>`;
+                } else if (data.canReview) {
+                    wrapper.innerHTML = buildReviewSection(productId, productName);
+                    initReviewForm(wrapper, productId);
+                }
+                // else: hasn't purchased / not eligible — show nothing
+            } catch (e) {
+                console.error('Error loading review status for product ' + productId, e);
+            }
+        }
+
+        function buildReviewSection(productId, productName) {
+            return `
+                <div class="item-review-section" id="review-section-${productId}">
+                    <div class="review-toggle-area">
+                        <button class="btn-write-review" onclick="toggleReviewForm(${productId})">
+                            <span class="material-symbols-outlined">rate_review</span>
+                            Viết Đánh Giá
+                        </button>
+                    </div>
+                    <div class="review-form-inline" id="review-form-inline-${productId}" style="display:none;">
+                        <h4>Đánh giá: <span class="review-product-name">${escapeHtml(productName)}</span></h4>
+                        <div class="star-row">
+                            <span class="star-interactive" data-product="${productId}" data-val="1">★</span>
+                            <span class="star-interactive" data-product="${productId}" data-val="2">★</span>
+                            <span class="star-interactive" data-product="${productId}" data-val="3">★</span>
+                            <span class="star-interactive" data-product="${productId}" data-val="4">★</span>
+                            <span class="star-interactive" data-product="${productId}" data-val="5">★</span>
+                            <span class="star-label" id="star-label-${productId}">Chọn số sao</span>
+                        </div>
+                        <div class="error-msg" id="rating-err-${productId}"></div>
+                        <textarea class="review-textarea" id="comment-${productId}" rows="4"
+                            placeholder="Chia sẻ trải nghiệm của bạn... (tối thiểu 10 ký tự)"></textarea>
+                        <div class="error-msg" id="comment-err-${productId}"></div>
+                        <div class="review-form-actions">
+                            <button class="btn-submit-review" onclick="submitOrderReview(${productId})">Gửi Đánh Giá</button>
+                            <button class="btn-cancel-review" onclick="toggleReviewForm(${productId})">Hủy</button>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function initReviewForm(wrapper, productId) {
+            selectedRatings[productId] = 0;
+            wrapper.querySelectorAll(`.star-interactive[data-product="${productId}"]`).forEach(star => {
+                star.addEventListener('mouseover', () => highlightStars(productId, parseInt(star.dataset.val)));
+                star.addEventListener('mouseout', () => highlightStars(productId, selectedRatings[productId]));
+                star.addEventListener('click', () => {
+                    selectedRatings[productId] = parseInt(star.dataset.val);
+                    highlightStars(productId, selectedRatings[productId]);
+                    const labels = ['', 'Rất tệ', 'Tệ', 'Bình thường', 'Tốt', 'Rất tốt'];
+                    document.getElementById(`star-label-${productId}`).textContent = labels[selectedRatings[productId]];
+                    document.getElementById(`rating-err-${productId}`).textContent = '';
+                });
+            });
+        }
+
+        function highlightStars(productId, count) {
+            document.querySelectorAll(`.star-interactive[data-product="${productId}"]`).forEach((s, i) => {
+                s.classList.toggle('active', i < count);
+            });
+        }
+
+        function toggleReviewForm(productId) {
+            const form = document.getElementById(`review-form-inline-${productId}`);
+            const toggleArea = form.previousElementSibling;
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+                toggleArea.style.display = 'none';
+            } else {
+                form.style.display = 'none';
+                toggleArea.style.display = 'block';
+                // Reset form
+                selectedRatings[productId] = 0;
+                highlightStars(productId, 0);
+                document.getElementById(`comment-${productId}`).value = '';
+                document.getElementById(`star-label-${productId}`).textContent = 'Chọn số sao';
+                document.getElementById(`rating-err-${productId}`).textContent = '';
+                document.getElementById(`comment-err-${productId}`).textContent = '';
+            }
+        }
+
+        async function submitOrderReview(productId) {
+            const rating = selectedRatings[productId] || 0;
+            const comment = document.getElementById(`comment-${productId}`).value.trim();
+
+            let hasError = false;
+            if (!rating || rating < 1 || rating > 5) {
+                document.getElementById(`rating-err-${productId}`).textContent = 'Vui lòng chọn số sao';
+                hasError = true;
+            } else {
+                document.getElementById(`rating-err-${productId}`).textContent = '';
+            }
+            if (!comment || comment.length < 10) {
+                document.getElementById(`comment-err-${productId}`).textContent = 'Nhận xét phải có ít nhất 10 ký tự';
+                hasError = true;
+            } else {
+                document.getElementById(`comment-err-${productId}`).textContent = '';
+            }
+            if (hasError) return;
+
+            try {
+                const response = await fetch('/reviews/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId, rating, comment })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    // Replace the whole review section with a success badge
+                    const wrapper = document.querySelector(`.item-review-wrapper[data-product-id="${productId}"]`);
+                    wrapper.innerHTML = `
+                        <div class="review-done-badge">
+                            <span class="material-symbols-outlined">verified</span>
+                            <span>Đánh giá đã được gửi thành công!</span>
+                        </div>`;
+                } else {
+                    alert(data.message || 'Có lỗi xảy ra khi gửi đánh giá');
+                }
+            } catch (e) {
+                console.error('Error submitting review:', e);
+                alert('Có lỗi xảy ra. Vui lòng thử lại sau.');
+            }
+        }
+
+        function escapeHtml(text) {
+            const d = document.createElement('div');
+            d.textContent = text;
+            return d.innerHTML;
+        }
+    </script>
 </body>
 </html>

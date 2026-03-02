@@ -80,6 +80,31 @@ public class ClientReviewController {
     }
 
     /**
+     * Lấy trạng thái review của user cho một sản phẩm
+     * Trả về: canReview (có thể viết review) và alreadyReviewed (đã viết review rồi)
+     */
+    @GetMapping("/status/{productId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getReviewStatus(
+            @PathVariable Integer productId,
+            HttpSession session) {
+        Integer userId = getCurrentUserId(session);
+
+        Map<String, Object> response = new HashMap<>();
+        if (userId == null) {
+            response.put("canReview", false);
+            response.put("alreadyReviewed", false);
+            return ResponseEntity.ok(response);
+        }
+
+        boolean canReview = reviewService.canUserReviewProduct(userId, productId);
+        boolean alreadyReviewed = reviewService.hasUserReviewedProduct(userId, productId);
+        response.put("canReview", canReview);
+        response.put("alreadyReviewed", alreadyReviewed);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * Submit review mới
      */
     @PostMapping("/submit")
