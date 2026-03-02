@@ -46,6 +46,82 @@
                 </div>
             </div>
 
+            <!-- Shipping Status Progress Bar -->
+            <div class="shipping-status-card">
+                <h2>Trạng thái vận chuyển</h2>
+                <div class="shipping-progress">
+                    <div th:with="
+                        currentIndex=${
+                            order.shippingStatus == 'PENDING' ? 0 :
+                            order.shippingStatus == 'PROCESSING' ? 1 :
+                            order.shippingStatus == 'PACKAGING' ? 2 :
+                            order.shippingStatus == 'DELIVERING' ? 3 : 4
+                        }"
+                        class="progress-track">
+                        <!-- Step 1: PENDING -->
+                        <div th:classappend="${currentIndex >= 0 ? 'completed' : ''} + ' ' + ${currentIndex == 0 ? 'active' : ''}" class="progress-step">
+                            <div class="step-connector left-connector" th:classappend="${currentIndex >= 0 ? 'filled' : ''}"></div>
+                            <div class="step-circle">
+                                <span class="material-symbols-outlined" th:text="${currentIndex > 0 ? 'check' : 'hourglass_empty'}">hourglass_empty</span>
+                            </div>
+                            <div class="step-connector right-connector" th:classappend="${currentIndex >= 1 ? 'filled' : ''}"></div>
+                            <div class="step-label">
+                                <span class="step-name">Chờ xử lý</span>
+                                <span class="step-sub">Pending</span>
+                            </div>
+                        </div>
+                        <!-- Step 2: PROCESSING -->
+                        <div th:classappend="${currentIndex >= 1 ? 'completed' : ''} + ' ' + ${currentIndex == 1 ? 'active' : ''}" class="progress-step">
+                            <div class="step-connector left-connector" th:classappend="${currentIndex >= 1 ? 'filled' : ''}"></div>
+                            <div class="step-circle">
+                                <span class="material-symbols-outlined" th:text="${currentIndex > 1 ? 'check' : 'settings'}">settings</span>
+                            </div>
+                            <div class="step-connector right-connector" th:classappend="${currentIndex >= 2 ? 'filled' : ''}"></div>
+                            <div class="step-label">
+                                <span class="step-name">Đang xử lý</span>
+                                <span class="step-sub">Processing</span>
+                            </div>
+                        </div>
+                        <!-- Step 3: PACKAGING -->
+                        <div th:classappend="${currentIndex >= 2 ? 'completed' : ''} + ' ' + ${currentIndex == 2 ? 'active' : ''}" class="progress-step">
+                            <div class="step-connector left-connector" th:classappend="${currentIndex >= 2 ? 'filled' : ''}"></div>
+                            <div class="step-circle">
+                                <span class="material-symbols-outlined" th:text="${currentIndex > 2 ? 'check' : 'inventory_2'}">inventory_2</span>
+                            </div>
+                            <div class="step-connector right-connector" th:classappend="${currentIndex >= 3 ? 'filled' : ''}"></div>
+                            <div class="step-label">
+                                <span class="step-name">Đang đóng gói</span>
+                                <span class="step-sub">Packaging</span>
+                            </div>
+                        </div>
+                        <!-- Step 4: DELIVERING -->
+                        <div th:classappend="${currentIndex >= 3 ? 'completed' : ''} + ' ' + ${currentIndex == 3 ? 'active' : ''}" class="progress-step">
+                            <div class="step-connector left-connector" th:classappend="${currentIndex >= 3 ? 'filled' : ''}"></div>
+                            <div class="step-circle">
+                                <span class="material-symbols-outlined" th:text="${currentIndex > 3 ? 'check' : 'local_shipping'}">local_shipping</span>
+                            </div>
+                            <div class="step-connector right-connector" th:classappend="${currentIndex >= 4 ? 'filled' : ''}"></div>
+                            <div class="step-label">
+                                <span class="step-name">Đang giao hàng</span>
+                                <span class="step-sub">Delivering</span>
+                            </div>
+                        </div>
+                        <!-- Step 5: DELIVERED -->
+                        <div th:classappend="${currentIndex >= 4 ? 'completed' : ''} + ' ' + ${currentIndex == 4 ? 'active' : ''}" class="progress-step">
+                            <div class="step-connector left-connector" th:classappend="${currentIndex >= 4 ? 'filled' : ''}"></div>
+                            <div class="step-circle">
+                                <span class="material-symbols-outlined">home</span>
+                            </div>
+                            <div class="step-connector right-connector"></div>
+                            <div class="step-label">
+                                <span class="step-name">Đã giao hàng</span>
+                                <span class="step-sub">Delivered</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Order Layout -->
             <div class="order-layout">
                 <!-- Main Content -->
