@@ -17,7 +17,7 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepository;
     @Override
     public void changeCodePaymentStatus(Integer orderId, String status) {
-        Order order = orderRepository.findByIdAndPaymentMethod(orderId, "COD").orElseThrow(() -> new RuntimeException("Order not valid to update"));
+        Order order = orderRepository.findByIdAndPaymentMethod(orderId, "CASH").orElseThrow(() -> new RuntimeException("Order not valid to update"));
         order.setPaymentStatus(status);
         orderRepository.save(order);
     }

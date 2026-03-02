@@ -36,9 +36,6 @@ public class Order {
     @Column(name = "payment_status", length = 100)
     private String paymentStatus;
 
-    @Column(name = "shipping_status", length = 100)
-    private String shippingStatus = "PENDING";
-
     @Column(name = "paid_at")
     private LocalDateTime paidAt;
 
