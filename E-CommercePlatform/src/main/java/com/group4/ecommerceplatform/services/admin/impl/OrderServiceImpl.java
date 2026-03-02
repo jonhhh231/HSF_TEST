@@ -26,4 +26,28 @@ public class OrderServiceImpl implements OrderService {
     public Page<Order> getOrderList(String keyword, Pageable pageable) {
         return orderRepository.findByOrderCodeContainingOrderByCreatedAtDesc(keyword, pageable);
     }
+
+    @Override
+    public void changeToNextHandleStatus(Integer orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not valid"));
+        switch (order.getStatus()) {
+            case "pending":
+                order.setStatus("processing");
+                break;
+            case "processing":
+                order.setStatus("packaging");
+                break;
+            case "packaging":
+                order.setStatus("delivering");
+                break;
+            case "delivering":
+                order.setStatus("delivered");
+                break;
+            default:
+                break;
+        }
+        orderRepository.save(order);
+    }
+
+
 }
