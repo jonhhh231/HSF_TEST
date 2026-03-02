@@ -45,8 +45,8 @@ public class Order {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "status", length = 50) // processing, packaging, delivering, delivered
-    private String status;
+    @Column(name = "shipping_status", length = 100)
+    private String shippingStatus = "PENDING";
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderDetail> orderDetails;
 

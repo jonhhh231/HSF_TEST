@@ -30,18 +30,18 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void changeToNextHandleStatus(Integer orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not valid"));
-        switch (order.getStatus()) {
-            case "pending":
-                order.setStatus("processing");
+        switch (order.getShippingStatus()) {
+            case "PENDING":
+                order.setShippingStatus("PROCESSING");
                 break;
-            case "processing":
-                order.setStatus("packaging");
+            case "PROCESSING":
+                order.setShippingStatus("PACKAGING");
                 break;
-            case "packaging":
-                order.setStatus("delivering");
+            case "PACKAGING":
+                order.setShippingStatus("DELIVERING");
                 break;
-            case "delivering":
-                order.setStatus("delivered");
+            case "DELIVERING":
+                order.setShippingStatus("DELIVERED");
                 break;
             default:
                 break;

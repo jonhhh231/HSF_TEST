@@ -68,34 +68,29 @@
                                         <td>
                                             <form th:action="'/admin/orders/to-next-handle-status/' + ${order.id}" method="POST">
 
-                                                <button type="submit" th:if="${order.status == 'pending'}"
+                                                <button type="submit" th:if="${order.shippingStatus == 'PENDING'}"
                                                         class="btn badge bg-secondary-subtle text-secondary border-secondary">
                                                     <i class="las la-clock me-1"></i> Chờ xử lý
                                                 </button>
 
-                                                <button type="submit" th:if="${order.status == 'processing'}"
+                                                <button type="submit" th:if="${order.shippingStatus == 'PROCESSING'}"
                                                         class="btn badge bg-info-subtle text-info border-info">
                                                     <i class="las la-sync la-spin me-1"></i> Đang xử lý
                                                 </button>
 
-                                                <button type="submit" th:if="${order.status == 'packaging'}"
+                                                <button type="submit" th:if="${order.shippingStatus == 'PACKAGING'}"
                                                         class="btn badge bg-warning-subtle text-warning border-warning">
                                                     <i class="las la-box me-1"></i> Đang đóng gói
                                                 </button>
 
-                                                <button type="submit" th:if="${order.status == 'delivering'}"
+                                                <button type="submit" th:if="${order.shippingStatus == 'DELIVERING'}"
                                                         class="btn badge bg-primary-subtle text-primary border-primary">
                                                     <i class="las la-truck me-1"></i> Đang vận chuyển
                                                 </button>
 
-                                                <button type="submit" th:if="${order.status == 'delivered'}"
+                                                <button type="submit" th:if="${order.shippingStatus == 'DELIVERED'}"
                                                         class="btn badge bg-success-subtle text-success border-success">
                                                     <i class="las la-check-double me-1"></i> Đã giao hàng
-                                                </button>
-
-                                                <button type="button" th:if="${order.status == 'cancelled'}"
-                                                        class="btn badge bg-danger-subtle text-danger border-danger disabled">
-                                                    <i class="las la-ban me-1"></i> Đã hủy
                                                 </button>
                                             </form>
                                         </td>
