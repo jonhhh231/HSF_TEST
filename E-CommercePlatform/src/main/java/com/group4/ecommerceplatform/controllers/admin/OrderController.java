@@ -46,4 +46,14 @@ public class OrderController {
             return "admin/pages/errors/base-error";
         }
     }
+    @PostMapping("/to-next-handle-status/{id}")
+    public String updateOrderStatus(@PathVariable("id") Integer id, Model model){
+        try {
+            orderService.changeToNextHandleStatus(id);
+            return "redirect:/admin/orders";
+        }catch (Exception e){
+            model.addAttribute("message", e.getMessage());
+            return "admin/pages/errors/base-error";
+        }
+    }
 }

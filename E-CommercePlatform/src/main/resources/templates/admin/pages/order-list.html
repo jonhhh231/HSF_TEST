@@ -47,7 +47,8 @@
                                         <th style="width: 15%;">Tổng tiền</th>
                                         <th style="width: 15%;">Thanh toán</th>
                                         <th style="width: 15%;">Ngày đặt</th>
-                                        <th style="width: 10%;">Trạng thái</th>
+                                        <th style="width: 10%;">Trạng thái Đơn hàng</th>
+                                        <th style="width: 10%;">Trạng thái Thanh toán</th>
                                         <th class="text-end" style="width: 10%;">Hành động</th>
                                     </tr>
                                     </thead>
@@ -64,6 +65,35 @@
                                         <td th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
                                         <td th:text="${order.paymentMethod}"></td>
                                         <td th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                                        <td>
+                                            <form th:action="'/admin/orders/to-next-handle-status/' + ${order.id}" method="POST">
+
+                                                <button type="submit" th:if="${order.shippingStatus == 'PENDING'}"
+                                                        class="btn badge bg-secondary-subtle text-secondary border-secondary">
+                                                    <i class="las la-clock me-1"></i> Chờ xử lý
+                                                </button>
+
+                                                <button type="submit" th:if="${order.shippingStatus == 'PROCESSING'}"
+                                                        class="btn badge bg-info-subtle text-info border-info">
+                                                    <i class="las la-sync la-spin me-1"></i> Đang xử lý
+                                                </button>
+
+                                                <button type="submit" th:if="${order.shippingStatus == 'PACKAGING'}"
+                                                        class="btn badge bg-warning-subtle text-warning border-warning">
+                                                    <i class="las la-box me-1"></i> Đang đóng gói
+                                                </button>
+
+                                                <button type="submit" th:if="${order.shippingStatus == 'DELIVERING'}"
+                                                        class="btn badge bg-primary-subtle text-primary border-primary">
+                                                    <i class="las la-truck me-1"></i> Đang vận chuyển
+                                                </button>
+
+                                                <button type="submit" th:if="${order.shippingStatus == 'DELIVERED'}"
+                                                        class="btn badge bg-success-subtle text-success border-success">
+                                                    <i class="las la-check-double me-1"></i> Đã giao hàng
+                                                </button>
+                                            </form>
+                                        </td>
                                         <td>
                                             <form th:action="'/admin/orders/change-status/' + ${order.id} + '/' + ${order.paymentStatus == 'PAID' ? 'UNPAID' : 'PAID'}" method="POST">
                                                 <button type="submit" th:if="${order.paymentStatus == 'PAID'}" class="btn badge bg-success-subtle text-success">

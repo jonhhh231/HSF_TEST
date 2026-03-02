@@ -9,4 +9,5 @@ import java.util.List;
 public interface OrderService {
     void changeCodePaymentStatus(Integer orderId, String status);
     Page<Order> getOrderList(String keyword, Pageable pageable);
+    void changeToNextHandleStatus(Integer orderId);
 }
