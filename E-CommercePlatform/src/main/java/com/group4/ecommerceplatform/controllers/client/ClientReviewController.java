@@ -80,12 +80,13 @@ public class ClientReviewController {
     }
 
     /**
-     * Lấy trạng thái review của user cho một sản phẩm
-     * Trả về: canReview (có thể viết review) và alreadyReviewed (đã viết review rồi)
+     * Lấy trạng thái review của user cho một sản phẩm trong một đơn hàng cụ thể
+     * Trả về: canReview (có thể viết review) và alreadyReviewed (đã viết review cho đơn này rồi)
      */
-    @GetMapping("/status/{productId}")
+    @GetMapping("/status/{orderId}/{productId}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getReviewStatus(
+            @PathVariable Integer orderId,
             @PathVariable Integer productId,
             HttpSession session) {
         Integer userId = getCurrentUserId(session);
@@ -97,8 +98,9 @@ public class ClientReviewController {
             return ResponseEntity.ok(response);
         }
 
-        boolean canReview = reviewService.canUserReviewProduct(userId, productId);
-        boolean alreadyReviewed = reviewService.hasUserReviewedProduct(userId, productId);
+        boolean alreadyReviewed = reviewService.hasUserReviewedProductForOrder(userId, orderId, productId);
+        // canReview: order must be DELIVERED and not yet reviewed for this specific order
+        boolean canReview = !alreadyReviewed && reviewService.canUserReviewProduct(userId, productId);
         response.put("canReview", canReview);
         response.put("alreadyReviewed", alreadyReviewed);
         return ResponseEntity.ok(response);
@@ -123,12 +125,13 @@ public class ClientReviewController {
         }
 
         try {
+            Integer orderId = (Integer) requestBody.get("orderId");
             Integer productId = (Integer) requestBody.get("productId");
             Integer rating = (Integer) requestBody.get("rating");
             String comment = (String) requestBody.get("comment");
 
             // Validation
-            if (productId == null || rating == null || comment == null || comment.trim().isEmpty()) {
+            if (orderId == null || productId == null || rating == null || comment == null || comment.trim().isEmpty()) {
                 response.put("success", false);
                 response.put("message", "Vui lòng điền đầy đủ thông tin");
                 return ResponseEntity.badRequest().body(response);
@@ -146,7 +149,7 @@ public class ClientReviewController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            Review review = reviewService.submitReview(userId, productId, rating, comment);
+            Review review = reviewService.submitReview(userId, orderId, productId, rating, comment);
             response.put("success", true);
             response.put("message", "Đánh giá của bạn đã được gửi thành công!");
             response.put("reviewId", review.getId());

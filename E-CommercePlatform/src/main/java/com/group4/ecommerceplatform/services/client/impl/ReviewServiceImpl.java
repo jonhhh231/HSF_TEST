@@ -138,22 +138,21 @@ public class ReviewServiceImpl implements ReviewService {
             return false;
         }
 
-        // Kiểm tra xem user đã review sản phẩm này chưa
-        if (reviewRepository.existsByUserAndProduct(user, product)) {
-            return false;
-        }
-
-        // Kiểm tra xem user có đơn hàng nào đã thanh toán chứa sản phẩm này không
-        List<Order> paidOrders = orderRepository.findByUserOrderByCreatedAtDesc(user).stream()
-                .filter(order -> "PAID".equals(order.getPaymentStatus()))
+        // Kiểm tra xem user có đơn hàng nào đã giao (DELIVERED) chứa sản phẩm này
+        // và chưa review sản phẩm đó trong đơn đó chưa
+        List<Order> deliveredOrders = orderRepository.findByUserOrderByCreatedAtDesc(user).stream()
+                .filter(order -> "DELIVERED".equals(order.getShippingStatus()))
                 .collect(Collectors.toList());
 
-        for (Order order : paidOrders) {
+        for (Order order : deliveredOrders) {
             if (order.getOrderDetails() != null) {
                 boolean hasProduct = order.getOrderDetails().stream()
                         .anyMatch(detail -> detail.getProductId().equals(productId));
                 if (hasProduct) {
-                    return true;
+                    // Allow review if this specific (user, product, order) hasn't been reviewed yet
+                    if (!reviewRepository.existsByUserAndProductAndOrder(user, product, order)) {
+                        return true;
+                    }
                 }
             }
         }
@@ -163,24 +162,43 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public Review submitReview(Integer userId, Integer productId, Integer rating, String comment) {
+    public Review submitReview(Integer userId, Integer orderId, Integer productId, Integer rating, String comment) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+        // 1. Load order and verify ownership
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+
+        if (!order.getUser().getId().equals(userId)) {
+            throw new SecurityException("Đơn hàng này không thuộc về bạn");
+        }
+
+        // 2. Gate: only allow review when order is DELIVERED
+        if (!"DELIVERED".equals(order.getShippingStatus())) {
+            throw new IllegalStateException("Chỉ có thể đánh giá sau khi đơn hàng đã được giao");
+        }
+
+        // 3. Verify product is actually in this order
+        if (order.getOrderDetails() == null || order.getOrderDetails().stream()
+                .noneMatch(detail -> detail.getProductId().equals(productId))) {
+            throw new IllegalArgumentException("Sản phẩm này không có trong đơn hàng");
+        }
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
 
-        // Kiểm tra quyền review
-        if (!canUserReviewProduct(userId, productId)) {
-            throw new RuntimeException("Bạn không có quyền review sản phẩm này hoặc đã review rồi");
+        // 4. Prevent duplicate review for this specific (user, order, product)
+        if (reviewRepository.existsByUserAndProductAndOrder(user, product, order)) {
+            throw new IllegalStateException("Bạn đã đánh giá sản phẩm này trong đơn hàng này rồi");
         }
 
-        // Validate rating
+        // 5. Validate rating
         if (rating < 1 || rating > 5) {
             throw new IllegalArgumentException("Rating phải từ 1 đến 5");
         }
 
-        // Validate comment
+        // 6. Validate comment
         if (comment == null || comment.trim().length() < 10) {
             throw new IllegalArgumentException("Nhận xét phải có ít nhất 10 ký tự");
         }
@@ -188,6 +206,7 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = new Review();
         review.setUser(user);
         review.setProduct(product);
+        review.setOrder(order);
         review.setRating(rating);
         review.setComment(comment.trim());
 
@@ -208,5 +227,22 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         return reviewRepository.existsByUserAndProduct(user, product);
+    }
+
+    @Override
+    public boolean hasUserReviewedProductForOrder(Integer userId, Integer orderId, Integer productId) {
+        if (userId == null || orderId == null || productId == null) {
+            return false;
+        }
+
+        User user = userRepository.findById(userId).orElse(null);
+        Order order = orderRepository.findById(orderId).orElse(null);
+        Product product = productRepository.findById(productId).orElse(null);
+
+        if (user == null || order == null || product == null) {
+            return false;
+        }
+
+        return reviewRepository.existsByUserAndProductAndOrder(user, product, order);
     }
 }
