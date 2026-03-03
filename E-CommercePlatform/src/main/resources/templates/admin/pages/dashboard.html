@@ -49,8 +49,14 @@
                                 th:selected="${y == selectedYear}"></option>
                     </select>
                 </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit">Xem thống kê</button>
 
-                <button type="submit">Xem thống kê</button>
+                    <button type="button" onclick="exportExcel()"
+                            style="background-color: #28a745; display: flex; align-items: center; gap: 5px;">
+                        <span style="font-size: 18px;"></span> Xuất Excel
+                    </button>
+                </div>
             </form>
         </div>
 
@@ -69,17 +75,24 @@
                 <h3 style="text-align: center; margin-bottom: 15px;">Top Sản phẩm bán chạy</h3>
                 <canvas id="barChartTopProducts"></canvas>
             </div>
+
+            <div class="card chart-col">
+                <h3 style="text-align: center; margin-bottom: 15px;">Tỉ trọng loại sản phẩm bán ra</h3>
+                <canvas id="doughnutChartCategory" style="max-height: 300px;"></canvas>
+            </div>
         </div>
     </div>
 
     <script th:inline="javascript">
-        /* Lấy dữ liệu từ Model do Spring boot gửi xuống */
+
         const revenueData = [[${revenueData}]];
         const topProducts = [[${topProducts}]];
+        const categorySales = [[${categorySales}]];
 
         document.addEventListener("DOMContentLoaded", function() {
             renderRevenueChart(revenueData);
             renderTopProductsChart(topProducts);
+            renderCategoryChart(categorySales);
         });
 
         function renderRevenueChart(data) {
@@ -110,21 +123,65 @@
 
             const ctx = document.getElementById('barChartTopProducts').getContext('2d');
             new Chart(ctx, {
-                type: 'bar',
+                type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
                         label: 'Số lượng bán',
                         data: values,
-                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                        borderWidth: 1
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                        tension: 0.4,
+                        fill: true
                     }]
                 },
                 options: {
                     responsive: true,
-                    plugins: { legend: { display: false } }
+                    plugins: {
+                        legend: { display: true, position: 'top' }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
                 }
             });
+        }
+        function renderCategoryChart(data) {
+            const labels = data.map(item => item.label);
+            const values = data.map(item => item.value);
+
+            const ctx = document.getElementById('doughnutChartCategory').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: [
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+        function exportExcel() {
+            const month = document.getElementById('monthFilter').value;
+            const year = document.getElementById('yearFilter').value;
+            window.location.href = `/admin/dashboard/export?month=${month}&year=${year}`;
         }
     </script>
 </div>

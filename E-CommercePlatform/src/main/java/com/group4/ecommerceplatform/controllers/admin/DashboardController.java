@@ -7,6 +7,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import java.io.ByteArrayInputStream; // Sửa lỗi Cannot resolve symbol 'ByteArrayInputStream'
+import java.io.IOException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -31,8 +37,10 @@ public class DashboardController {
         int totalOrders = chartService.getTotalOrdersInMonth(targetMonth, targetYear);
         List<ChartDataDto> revenueData = chartService.getRevenueChartData(targetMonth, targetYear);
         List<ChartDataDto> topProducts = chartService.getTopProductChartData(targetMonth, targetYear);
+        List<ChartDataDto> categorySales = chartService.getCategorySalesData(targetMonth, targetYear);
 
         // Đẩy toàn bộ vào Model
+        model.addAttribute("categorySales", categorySales);
         model.addAttribute("selectedMonth", targetMonth);
         model.addAttribute("selectedYear", targetYear);
         model.addAttribute("totalOrders", totalOrders);
@@ -40,5 +48,21 @@ public class DashboardController {
         model.addAttribute("topProducts", topProducts);
 
         return "admin/pages/dashboard";
+    }
+
+    @GetMapping("/admin/dashboard/export")
+    public ResponseEntity<InputStreamResource> exportExcel(
+            @RequestParam int month,
+            @RequestParam int year) throws IOException {
+
+        ByteArrayInputStream in = chartService.exportDashboardToExcel(month, year);
+
+
+        String fileName = "ThongKe_" + month + "_" + year + ".xlsx";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(new InputStreamResource(in)); // Bây giờ sẽ nhận diện được InputStreamResource
     }
 }
