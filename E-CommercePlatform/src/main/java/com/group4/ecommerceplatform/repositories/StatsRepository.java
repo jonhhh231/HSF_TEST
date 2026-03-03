@@ -31,4 +31,14 @@ public interface StatsRepository extends JpaRepository<Order, Long> {
             "WHERE MONTH(created_at) = :month " +
             "AND YEAR(created_at) = :year", nativeQuery = true)
     Integer countOrdersInMonth(@Param("month") int month, @Param("year") int year);
+
+    @Query(value = "SELECT c.name as label, SUM(od.quantity) as value " +
+            "FROM order_details od " +
+            "JOIN products p ON od.product_id = p.id " +
+            "JOIN categories c ON p.category_id = c.id " +
+            "JOIN orders o ON od.order_id = o.id " +
+            "WHERE MONTH(o.created_at) = :month AND YEAR(o.created_at) = :year " +
+            "GROUP BY c.name " +
+            "ORDER BY value DESC", nativeQuery = true)
+    List<Object[]> getCategorySalesRaw(@Param("month") int month, @Param("year") int year);
 }
