@@ -879,26 +879,26 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    background: rgba(99, 102, 241, 0.08);
-    border: 1px solid rgba(99, 102, 241, 0.25);
+    background: rgba(212, 17, 50, 0.06);
+    border: 1px solid rgba(212, 17, 50, 0.25);
     border-radius: 0.75rem;
-    color: #a0a8c8;
+    color: #A0A0A0;
     font-size: 0.875rem;
     margin-bottom: 1.5rem;
 }
 
 .review-info-note .material-symbols-outlined {
     font-size: 1.1rem;
-    color: #6366f1;
+    color: #d41132;
     flex-shrink: 0;
 }
 
 .review-info-note a {
-    color: #818cf8;
+    color: #ff4d6d;
     text-decoration: underline;
     text-underline-offset: 2px;
 }
 
 .review-info-note a:hover {
-    color: #c7d2fe;
+    color: #fff;
 }

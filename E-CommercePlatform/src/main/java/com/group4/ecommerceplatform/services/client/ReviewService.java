@@ -39,17 +39,23 @@ public interface ReviewService {
 
     /**
      * Kiểm tra xem user có thể review sản phẩm này không
-     * (đã mua và đơn hàng đã thanh toán, chưa review trước đó)
+     * (đã mua và đơn hàng đã giao (DELIVERED), chưa review đơn đó)
      */
     boolean canUserReviewProduct(Integer userId, Integer productId);
 
     /**
      * Submit review mới
+     * orderId: đơn hàng cụ thể được review (phải ở trạng thái DELIVERED)
      */
-    Review submitReview(Integer userId, Integer productId, Integer rating, String comment);
+    Review submitReview(Integer userId, Integer orderId, Integer productId, Integer rating, String comment);
 
     /**
-     * Kiểm tra xem user đã review sản phẩm này chưa
+     * Kiểm tra xem user đã review sản phẩm này chưa (bất kỳ đơn nào)
      */
     boolean hasUserReviewedProduct(Integer userId, Integer productId);
+
+    /**
+     * Kiểm tra xem user đã review sản phẩm này trong một đơn hàng cụ thể chưa
+     */
+    boolean hasUserReviewedProductForOrder(Integer userId, Integer orderId, Integer productId);
 }

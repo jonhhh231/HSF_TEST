@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "reviews")
+@Table(name = "reviews", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"user_id", "order_id", "product_id"}) // one review per order per product
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,6 +23,11 @@ public class Review {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
+
+    // Gate: ties the review to the specific order (allows re-review on repurchase)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
 
     @Column(name = "rating")
     private Integer rating;

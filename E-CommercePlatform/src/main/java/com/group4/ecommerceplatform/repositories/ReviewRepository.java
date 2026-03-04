@@ -1,8 +1,9 @@
 package com.group4.ecommerceplatform.repositories;
 
+import com.group4.ecommerceplatform.entities.Order;
+import com.group4.ecommerceplatform.entities.Product;
 import com.group4.ecommerceplatform.entities.Review;
 import com.group4.ecommerceplatform.entities.User;
-import com.group4.ecommerceplatform.entities.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -40,9 +41,16 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     List<Review> findByProductIdOrderByIdDesc(@Param("productId") Integer productId);
 
     /**
-     * Kiểm tra xem user đã review sản phẩm này chưa
+     * Kiểm tra xem user đã review sản phẩm này chưa (bất kỳ đơn nào)
+     * Dùng để hiển thị badge "đã đánh giá" trên trang sản phẩm
      */
     boolean existsByUserAndProduct(User user, Product product);
+
+    /**
+     * Kiểm tra xem user đã review sản phẩm này trong đơn hàng cụ thể chưa
+     * Dùng để chặn review trùng lặp theo từng đơn hàng
+     */
+    boolean existsByUserAndProductAndOrder(User user, Product product, Order order);
 
     /**
      * Tìm review của user cho một sản phẩm cụ thể

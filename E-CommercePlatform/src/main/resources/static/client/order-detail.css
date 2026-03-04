@@ -743,8 +743,8 @@
     gap: 0.4rem;
     padding: 0.45rem 1rem;
     background: transparent;
-    border: 1px solid #6366f1;
-    color: #818cf8;
+    border: 1px solid #d41132;
+    color: #ff4d6d;
     border-radius: 0.5rem;
     font-size: 0.85rem;
     cursor: pointer;
@@ -752,8 +752,8 @@
 }
 
 .btn-write-review:hover {
-    background: rgba(99, 102, 241, 0.12);
-    color: #c7d2fe;
+    background: rgba(212, 17, 50, 0.12);
+    color: #fff;
 }
 
 .btn-write-review .material-symbols-outlined {
@@ -764,8 +764,8 @@
 .review-form-inline {
     margin-top: 0.75rem;
     padding: 1.25rem;
-    background: #1a1a2e;
-    border: 1px solid #2d2d4e;
+    background: #1a1a1a;
+    border: 1px solid #2A2A2A;
     border-radius: 0.75rem;
 }
 
@@ -777,7 +777,7 @@
 }
 
 .review-product-name {
-    color: #818cf8;
+    color: #ff4d6d;
 }
 
 /* Star rating row */
@@ -826,7 +826,7 @@
 }
 
 .review-textarea:focus {
-    border-color: #6366f1;
+    border-color: #d41132;
 }
 
 /* Error messages */
@@ -847,7 +847,7 @@
 
 .btn-submit-review {
     padding: 0.5rem 1.25rem;
-    background: #6366f1;
+    background: #dc3232;
     border: none;
     border-radius: 0.5rem;
     color: #fff;
@@ -858,7 +858,7 @@
 }
 
 .btn-submit-review:hover {
-    background: #4f46e5;
+    background: #db2518;
 }
 
 .btn-cancel-review {
