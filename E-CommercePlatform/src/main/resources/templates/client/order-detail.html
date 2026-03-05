@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html class="dark" xmlns:th="http://www.thymeleaf.org" lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" th:href="@{/client/global.css}">
     <link rel="stylesheet" th:href="@{/client/order-detail.css}">
 </head>
+
 <body>
     <!-- Header -->
     <div th:replace="~{client/fragments/header :: header}"></div>
@@ -33,14 +35,18 @@
                     </div>
                 </div>
                 <div class="order-status" th:classappend="${order.paymentStatus}">
-                    <span class="status-icon material-symbols-outlined"
-                          th:text="${order.paymentStatus == 'PAID' ? 'check_circle' :
-                                   (order.paymentStatus == 'PENDING' ? 'schedule' : 'cancel')}">
+                    <span class="status-icon material-symbols-outlined" th:text="${order.paymentStatus == 'PAID'           ? 'check_circle' :
+                                   (order.paymentStatus == 'PENDING'         ? 'schedule'     :
+                                   (order.paymentStatus == 'REFUND_PENDING'  ? 'currency_exchange' :
+                                   (order.paymentStatus == 'REFUNDED'        ? 'payments'     :
+                                   'cancel')))}">
                         schedule
                     </span>
-                    <span class="status-text"
-                          th:text="${order.paymentStatus == 'PAID' ? 'Đã thanh toán' :
-                                   (order.paymentStatus == 'PENDING' ? 'Chờ thanh toán' : 'Đã hủy')}">
+                    <span class="status-text" th:text="${order.paymentStatus == 'PAID'           ? 'Đã thanh toán'   :
+                                   (order.paymentStatus == 'PENDING'         ? 'Chờ thanh toán'  :
+                                   (order.paymentStatus == 'REFUND_PENDING'  ? 'Đang hoàn tiền'  :
+                                   (order.paymentStatus == 'REFUNDED'        ? 'Đã hoàn tiền'    :
+                                   'Đã hủy')))}">
                         Trạng thái
                     </span>
                 </div>
@@ -51,70 +57,91 @@
                 <h2>Trạng thái vận chuyển</h2>
                 <div class="shipping-progress">
                     <div th:with="
+                        ss=${order.shippingStatus},
                         currentIndex=${
-                            order.shippingStatus == 'PENDING' ? 0 :
-                            order.shippingStatus == 'PROCESSING' ? 1 :
-                            order.shippingStatus == 'PACKAGING' ? 2 :
-                            order.shippingStatus == 'DELIVERING' ? 3 : 4
-                        }"
-                        class="progress-track">
+                            ss == 'PENDING'         ? 0 :
+                            (ss == 'PROCESSING'     ? 1 :
+                            (ss == 'PACKAGING'      ? 2 :
+                            (ss == 'DELIVERING'     ? 3 :
+                            (ss == 'DELIVERED'      ? 4 : -1))))
+                        },
+                        failed=${ss == 'DELIVERY_FAILED'}" class="progress-track">
                         <!-- Step 1: PENDING -->
-                        <div th:classappend="${currentIndex >= 0 ? 'completed' : ''} + ' ' + ${currentIndex == 0 ? 'active' : ''}" class="progress-step">
-                            <div class="step-connector left-connector" th:classappend="${currentIndex >= 0 ? 'filled' : ''}"></div>
+                        <div th:classappend="${currentIndex >= 0 ? 'completed' : ''} + ' ' + ${currentIndex == 0 ? 'active' : ''}"
+                            class="progress-step">
+                            <div class="step-connector left-connector"
+                                th:classappend="${currentIndex >= 0 ? 'filled' : ''}"></div>
                             <div class="step-circle">
-                                <span class="material-symbols-outlined" th:text="${currentIndex > 0 ? 'check' : 'hourglass_empty'}">hourglass_empty</span>
+                                <span class="material-symbols-outlined"
+                                    th:text="${currentIndex > 0 or failed} ? 'check' : 'hourglass_empty'">hourglass_empty</span>
                             </div>
-                            <div class="step-connector right-connector" th:classappend="${currentIndex >= 1 ? 'filled' : ''}"></div>
+                            <div class="step-connector right-connector"
+                                th:classappend="${currentIndex >= 1 or failed ? 'filled' : ''}"></div>
                             <div class="step-label">
                                 <span class="step-name">Chờ xử lý</span>
                                 <span class="step-sub">Pending</span>
                             </div>
                         </div>
                         <!-- Step 2: PROCESSING -->
-                        <div th:classappend="${currentIndex >= 1 ? 'completed' : ''} + ' ' + ${currentIndex == 1 ? 'active' : ''}" class="progress-step">
-                            <div class="step-connector left-connector" th:classappend="${currentIndex >= 1 ? 'filled' : ''}"></div>
+                        <div th:classappend="${currentIndex >= 1 or failed ? 'completed' : ''} + ' ' + ${currentIndex == 1 ? 'active' : ''}"
+                            class="progress-step">
+                            <div class="step-connector left-connector"
+                                th:classappend="${currentIndex >= 1 or failed ? 'filled' : ''}"></div>
                             <div class="step-circle">
-                                <span class="material-symbols-outlined" th:text="${currentIndex > 1 ? 'check' : 'settings'}">settings</span>
+                                <span class="material-symbols-outlined"
+                                    th:text="${currentIndex > 1 or failed} ? 'check' : 'settings'">settings</span>
                             </div>
-                            <div class="step-connector right-connector" th:classappend="${currentIndex >= 2 ? 'filled' : ''}"></div>
+                            <div class="step-connector right-connector"
+                                th:classappend="${currentIndex >= 2 or failed ? 'filled' : ''}"></div>
                             <div class="step-label">
                                 <span class="step-name">Đang xử lý</span>
                                 <span class="step-sub">Processing</span>
                             </div>
                         </div>
                         <!-- Step 3: PACKAGING -->
-                        <div th:classappend="${currentIndex >= 2 ? 'completed' : ''} + ' ' + ${currentIndex == 2 ? 'active' : ''}" class="progress-step">
-                            <div class="step-connector left-connector" th:classappend="${currentIndex >= 2 ? 'filled' : ''}"></div>
+                        <div th:classappend="${currentIndex >= 2 or failed ? 'completed' : ''} + ' ' + ${currentIndex == 2 ? 'active' : ''}"
+                            class="progress-step">
+                            <div class="step-connector left-connector"
+                                th:classappend="${currentIndex >= 2 or failed ? 'filled' : ''}"></div>
                             <div class="step-circle">
-                                <span class="material-symbols-outlined" th:text="${currentIndex > 2 ? 'check' : 'inventory_2'}">inventory_2</span>
+                                <span class="material-symbols-outlined"
+                                    th:text="${currentIndex > 2 or failed} ? 'check' : 'inventory_2'">inventory_2</span>
                             </div>
-                            <div class="step-connector right-connector" th:classappend="${currentIndex >= 3 ? 'filled' : ''}"></div>
+                            <div class="step-connector right-connector"
+                                th:classappend="${currentIndex >= 3 or failed ? 'filled' : ''}"></div>
                             <div class="step-label">
-                                <span class="step-name">Đang đóng gói</span>
+                                <span class="step-name">Đóng gói</span>
                                 <span class="step-sub">Packaging</span>
                             </div>
                         </div>
-                        <!-- Step 4: DELIVERING -->
-                        <div th:classappend="${currentIndex >= 3 ? 'completed' : ''} + ' ' + ${currentIndex == 3 ? 'active' : ''}" class="progress-step">
-                            <div class="step-connector left-connector" th:classappend="${currentIndex >= 3 ? 'filled' : ''}"></div>
-                            <div class="step-circle">
-                                <span class="material-symbols-outlined" th:text="${currentIndex > 3 ? 'check' : 'local_shipping'}">local_shipping</span>
+                        <!-- Step 4: DELIVERING / FAILED -->
+                        <div th:classappend="${currentIndex >= 3 or failed ? 'completed' : ''} + ' ' + ${currentIndex == 3 ? 'active' : ''} + ' ' + ${failed ? 'failed-step' : ''}"
+                            class="progress-step">
+                            <div class="step-connector left-connector"
+                                th:classappend="${currentIndex >= 3 or failed ? 'filled' : ''}"></div>
+                            <div class="step-circle" th:style="${failed} ? 'background:#e11d48;' : ''">
+                                <span class="material-symbols-outlined"
+                                    th:text="${failed} ? 'cancel' : (${currentIndex > 3} ? 'check' : 'local_shipping')">local_shipping</span>
                             </div>
-                            <div class="step-connector right-connector" th:classappend="${currentIndex >= 4 ? 'filled' : ''}"></div>
+                            <div class="step-connector right-connector"
+                                th:classappend="${currentIndex >= 4 ? 'filled' : ''}"></div>
                             <div class="step-label">
-                                <span class="step-name">Đang giao hàng</span>
-                                <span class="step-sub">Delivering</span>
+                                <span class="step-name" th:text="${failed} ? 'Giao thất bại' : 'Đang giao'">Đang
+                                    giao</span>
+                                <span class="step-sub" th:text="${failed} ? 'Thất bại' : 'Delivering'">Delivering</span>
                             </div>
                         </div>
                         <!-- Step 5: DELIVERED -->
-                        <div th:classappend="${currentIndex >= 4 ? 'completed' : ''} + ' ' + ${currentIndex == 4 ? 'active' : ''}" class="progress-step">
-                            <div class="step-connector left-connector" th:classappend="${currentIndex >= 4 ? 'filled' : ''}"></div>
+                        <div th:classappend="${currentIndex >= 4 ? 'completed' : ''} + ' ' + ${currentIndex == 4 ? 'active' : ''}"
+                            class="progress-step">
+                            <div class="step-connector left-connector"
+                                th:classappend="${currentIndex >= 4 ? 'filled' : ''}"></div>
                             <div class="step-circle">
                                 <span class="material-symbols-outlined">home</span>
                             </div>
                             <div class="step-connector right-connector"></div>
                             <div class="step-label">
-                                <span class="step-name">Đã giao hàng</span>
+                                <span class="step-name">Đã giao</span>
                                 <span class="step-sub">Delivered</span>
                             </div>
                         </div>
@@ -122,7 +149,7 @@
                 </div>
             </div>
 
-            <!-- Confirm Received Banner (only when DELIVERING) -->
+            <!-- Banner: DELIVERING – user xác nhận nhận hàng -->
             <div class="confirm-received-banner" th:if="${order.shippingStatus == 'DELIVERING'}">
                 <div class="confirm-received-content">
                     <span class="material-symbols-outlined confirm-icon">local_shipping</span>
@@ -130,12 +157,45 @@
                         <strong>Đơn hàng đang trên đường giao đến bạn!</strong>
                         <span>Nếu bạn đã nhận được hàng, vui lòng xác nhận để hoàn tất đơn hàng.</span>
                     </div>
-                    <form th:action="@{/orders/{id}/confirm-received(id=${order.id})}" method="post">
-                        <button type="button" class="btn-confirm-received" onclick="showConfirmModal()">
-                            <span class="material-symbols-outlined">check_circle</span>
-                            Đã nhận được hàng
-                        </button>
-                    </form>
+                    <button type="button" class="btn-confirm-received" onclick="showConfirmModal()">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        Đã nhận được hàng
+                    </button>
+                </div>
+            </div>
+
+            <!-- Banner: DELIVERY_FAILED – thông báo giao thất bại -->
+            <div class="confirm-received-banner" th:if="${order.shippingStatus == 'DELIVERY_FAILED'}"
+                style="background:linear-gradient(135deg,#fff1f2,#ffe4e6);border-color:#fda4af;">
+                <div class="confirm-received-content">
+                    <span class="material-symbols-outlined confirm-icon" style="color:#e11d48;">cancel</span>
+                    <div class="confirm-received-text">
+                        <strong style="color:#e11d48;">Đơn hàng giao không thành công</strong>
+                        <span th:if="${order.paymentStatus == 'REFUND_PENDING'}">
+                            Chúng tôi đang xử lý hoàn tiền về phương thức thanh toán của bạn. Vui lòng chờ trong vài
+                            ngày làm việc.
+                        </span>
+                        <span th:if="${order.paymentStatus == 'REFUNDED'}">
+                            Tiền đã được hoàn thành công về tài khoản / ví của bạn.
+                        </span>
+                        <span th:if="${order.paymentStatus == 'CANCELLED'}">
+                            Đơn hàng đã được hủy. Cảm ơn bạn đã mua hàng!
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Banner: REFUND_PENDING – chờ hoàn tiền -->
+            <div class="confirm-received-banner"
+                th:if="${order.paymentStatus == 'REFUND_PENDING' and order.shippingStatus != 'DELIVERY_FAILED'}"
+                style="background:linear-gradient(135deg,#fdf4ff,#f5d0fe);border-color:#d8b4fe;">
+                <div class="confirm-received-content">
+                    <span class="material-symbols-outlined confirm-icon" style="color:#9333ea;">currency_exchange</span>
+                    <div class="confirm-received-text">
+                        <strong style="color:#9333ea;">Đang xử lý hoàn tiền</strong>
+                        <span>Chúng tôi đang xử lý hoàn tiền về phương thức thanh toán của bạn. Vui lòng chờ trong vài
+                            ngày làm việc.</span>
+                    </div>
                 </div>
             </div>
 
@@ -146,7 +206,8 @@
                         <span class="material-symbols-outlined">inventory_2</span>
                     </div>
                     <h3>Xác nhận đã nhận hàng?</h3>
-                    <p>Bạn xác nhận đã nhận được đơn hàng <strong th:text="${order.orderCode}"></strong> và hàng hóa đầy đủ, đúng với đơn đặt hàng?</p>
+                    <p>Bạn xác nhận đã nhận được đơn hàng <strong th:text="${order.orderCode}"></strong> và hàng hóa đầy
+                        đủ, đúng với đơn đặt hàng?</p>
                     <div class="confirm-modal-actions">
                         <button class="btn-modal-cancel" onclick="closeConfirmModal()">Chưa nhận được</button>
                         <form th:action="@{/orders/{id}/confirm-received(id=${order.id})}" method="post">
@@ -171,14 +232,18 @@
                                 <span class="material-symbols-outlined">schedule</span>
                                 <div>
                                     <span class="info-label">Ngày đặt hàng</span>
-                                    <span class="info-value" th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</span>
+                                    <span class="info-value"
+                                        th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024
+                                        10:00</span>
                                 </div>
                             </div>
                             <div class="info-item">
                                 <span class="material-symbols-outlined">payment</span>
                                 <div>
                                     <span class="info-label">Phương thức thanh toán</span>
-                                    <span class="info-value" th:text="${order.paymentMethod == 'MOMO' ? 'Thanh toán MoMo' : 'Thanh toán bằng tiền mặt'}">Payment Method</span>
+                                    <span class="info-value"
+                                        th:text="${order.paymentMethod == 'MOMO' ? 'Thanh toán MoMo' : 'Thanh toán bằng tiền mặt'}">Payment
+                                        Method</span>
                                 </div>
                             </div>
                             <div class="info-item" th:if="${order.address != null}">
@@ -197,9 +262,8 @@
                         <div class="items-list">
                             <div th:each="detail : ${order.orderDetails}" class="order-item">
                                 <div class="item-image">
-                                    <img th:if="${detail.product.url != null}"
-                                         th:src="${detail.product.url}"
-                                         th:alt="${detail.product.name}">
+                                    <img th:if="${detail.product.url != null}" th:src="${detail.product.url}"
+                                        th:alt="${detail.product.name}">
                                     <div th:if="${detail.product.url == null}" class="no-image">
                                         <span class="material-symbols-outlined">laptop_mac</span>
                                     </div>
@@ -235,7 +299,9 @@
                                     <div class="item-pricing">
                                         <div class="unit-price">
                                             <span>Đơn giá:</span>
-                                            <span th:text="${#numbers.formatDecimal(detail.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                                            <span
+                                                th:text="${#numbers.formatDecimal(detail.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">0
+                                                đ</span>
                                         </div>
                                         <div class="quantity">
                                             <span>Số lượng:</span>
@@ -245,13 +311,13 @@
                                 </div>
                                 <div class="item-total">
                                     <span class="total-label">Thành tiền</span>
-                                    <span class="total-price" th:text="${#numbers.formatDecimal(detail.price * detail.quantity, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                                    <span class="total-price"
+                                        th:text="${#numbers.formatDecimal(detail.price * detail.quantity, 0, 'COMMA', 0, 'POINT')} + ' đ'">0
+                                        đ</span>
                                 </div>
                                 <!-- Review Placeholder -->
-                                <div class="item-review-wrapper"
-                                     th:data-product-id="${detail.product.id}"
-                                     th:data-product-name="${detail.product.name}"
-                                     th:data-order-id="${order.id}">
+                                <div class="item-review-wrapper" th:data-product-id="${detail.product.id}"
+                                    th:data-product-name="${detail.product.name}" th:data-order-id="${order.id}">
                                 </div>
                             </div>
                         </div>
@@ -266,7 +332,8 @@
                         <h3>Tổng tiền</h3>
                         <div class="summary-row">
                             <span>Tạm tính</span>
-                            <span th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                            <span th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">0
+                                đ</span>
                         </div>
                         <div class="summary-row">
                             <span>Phí vận chuyển</span>
@@ -275,7 +342,9 @@
                         <div class="summary-divider"></div>
                         <div class="summary-total">
                             <span>Tổng cộng</span>
-                            <span class="total-amount" th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                            <span class="total-amount"
+                                th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">0
+                                đ</span>
                         </div>
                     </div>
 
@@ -477,4 +546,5 @@
         });
     </script>
 </body>
+
 </html>
