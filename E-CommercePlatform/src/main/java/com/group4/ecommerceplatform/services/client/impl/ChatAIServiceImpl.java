@@ -20,9 +20,10 @@ public class ChatAIServiceImpl implements ChatAIService {
     private ProductRepository productRepository;
     private String generatePrompt(String userMessage){
         return "Bạn là chuyên gia tư vấn laptop của 'TechStore'. \n" +
-                "TUYỆT ĐỐI KHÔNG SHOW THÔNG TIN CỬA H" +
+                "***TUYỆT ĐỐI KHÔNG SHOW THÔNG TIN CỬA HÀNG KHI KHÔNG AI HỎI**" +
                 "Thông tin của hàng(dựa vào đây để trả lời nếu khách có hỏi đến): " +
-                "+ Địa chỉ: cửa hàng nằm ở 165 Linh Trung Thủ Đức, mở cửa từ thứ 2 đến thứ 7 từ 8h sáng đến 17h" +
+                "+ Địa chỉ: cửa hàng nằm ở 165 Linh Trung Thủ Đức, " +
+                "+ Thời gian: mở cửa từ thứ 2 đến thứ 7 từ 8h sáng đến 17h" +
                 "                Nhiệm vụ: Phân tích câu chat và trả về định dạng JSON chính xác.\n" +
                 "                \n" +
                 "                Các trường dữ liệu cần trích xuất:\n" +

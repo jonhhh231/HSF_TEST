@@ -1,0 +1,58 @@
+/* Card bao ngoài chiếm trọn chiều cao màn hình trừ header */
+.chat-main-card {
+    height: calc(100vh - 180px);
+    overflow: hidden;
+}
+
+/* Danh sách user bên trái */
+.chat-user-list {
+    overflow-y: auto;
+    max-height: 100%;
+}
+
+/* Vùng tin nhắn bên phải */
+.chat-messages {
+    overflow-y: auto;
+    background-color: #f5f7fb;
+}
+
+/* Avatar tròn giả lập */
+.chat-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #2563eb;
+    color: white;
+    font-weight: bold;
+}
+
+/* Cấu trúc bong bóng tin nhắn */
+.chat-message-left, .chat-message-right {
+    display: flex;
+    flex-shrink: 0;
+}
+
+.chat-message-left {
+    margin-right: auto;
+}
+
+.chat-message-right {
+    flex-direction: row-reverse;
+    margin-left: auto;
+}
+
+.message-content {
+    max-width: 70%;
+}
+
+/* Custom scrollbar cho hiện đại */
+::-webkit-scrollbar {
+    width: 5px;
+}
+::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
