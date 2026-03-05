@@ -2,6 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <div th:fragment="admin-chat-widget" id="chat-admin-widget" class="chat-admin-container">
+  <!-- Hidden inputs chứa thông tin user từ session -->
+  <input type="hidden" id="userId" th:value="${session.user != null ? session.user.id : ''}" />
+  <input type="hidden" id="userName" th:value="${session.user != null ? session.user.fullName : ''}" />
+
   <button type="button" class="chat-toggle-btn admin-theme-btn" onclick="toggleAdminChat()">
     <span class="material-symbols-outlined admin-icon">support_agent</span>
     <span class="material-symbols-outlined close-icon-admin" style="display: none;">close</span>
@@ -13,9 +17,7 @@
         <span class="material-symbols-outlined">person</span>
       </div>
       <div class="ai-status">
-        <span class="ai-name">Hỗ trợ viên</span>
-        <span class="status-dot"></span>
-        <small>Đang trực tuyến</small>
+        <span class="ai-name">TechStore Shop Admin</span>
       </div>
     </div>
 

@@ -23,8 +23,12 @@ public class ChatMessage {
     @JoinColumn(name = "sender_id")
     private User sender;
 
-    @Column(name = "receiver_id")
-    private Integer receiverId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
+
+    @Column(name = "type")
+    private Integer type; // 0 = CUSTOMER, 1 = ADMIN
 
     @Column(columnDefinition = "TEXT")
     private String content;
