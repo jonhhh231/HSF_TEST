@@ -1,7 +1,9 @@
 package com.group4.ecommerceplatform.controllers.socket;
 
-// import com.group4.ecommerceplatform.services.ChatService; // Khuyên dùng để gọi hàm lưu DB
 import com.group4.ecommerceplatform.dto.ChatMessageDto;
+import com.group4.ecommerceplatform.entities.User;
+import com.group4.ecommerceplatform.services.socket.ChatService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -17,8 +19,8 @@ public class ChatController {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    // @Autowired
-    // private ChatService chatService; // Inject Service để lưu DB
+    @Autowired
+    private ChatService chatService;
 
     // Khách hàng gửi tới Admin qua đường dẫn: /app/chat.sendToAdmin
     @MessageMapping("/chat.sendToAdmin")
@@ -26,10 +28,10 @@ public class ChatController {
         // 1. Tạo timestamp chuẩn để hiển thị trên giao diện
         chatMessage.setTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")));
 
-        // 2. Gọi Service để lưu tin nhắn vào Database (Bật lên khi bạn đã viết Service)
-        // chatService.saveMessage(chatMessage);
+        // 2. Gọi Service để lưu tin nhắn vào Database
+        chatService.saveMessage(chatMessage);
 
-        // 3. Gửi tới tất cả admin đang subcribe topic này
+        // 3. Gửi tới tất cả admin đang subscribe topic này
         messagingTemplate.convertAndSend("/topic/admin/messages", chatMessage);
     }
 
@@ -40,7 +42,7 @@ public class ChatController {
         chatMessage.setTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")));
 
         // 2. Lưu tin nhắn vào Database
-        // chatService.saveMessage(chatMessage);
+        chatService.saveMessage(chatMessage);
 
         // 3. Ép kiểu ID người nhận sang String (Bắt buộc đối với convertAndSendToUser)
         String receiverIdStr = String.valueOf(chatMessage.getReceiverId());

@@ -81,6 +81,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             let stompClient = null;
             let activeCustomerId = null;
+            let adminId = null;
 
             // THÊM MỚI: Biến lưu trữ lịch sử tin nhắn của từng người
             let messageHistory = {};
@@ -89,6 +90,65 @@
             const messageInput = document.getElementById('messageInput');
             const btnSendMessage = document.getElementById('btnSendMessage');
             const userListContainer = document.getElementById('userListContainer');
+
+            // Lấy thông tin admin từ session
+            function getAdminInfo() {
+                fetch('/api/user/current')
+                    .then(response => response.json())
+                    .then(user => {
+                        adminId = user.id;
+                        console.log('Admin ID:', adminId);
+                    })
+                    .catch(error => {
+                        console.error('Không thể lấy thông tin admin:', error);
+                    });
+            }
+
+            // Load danh sách customer đã chat
+            function loadCustomerList() {
+                console.log('Loading customer list...');
+                fetch('/admin/messages/api/customers')
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        if (!response.ok) throw new Error('Không thể tải danh sách khách hàng');
+                        return response.json();
+                    })
+                    .then(customers => {
+                        console.log('Customers loaded:', customers);
+                        if (customers.length === 0) {
+                            userListContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">Chưa có cuộc trò chuyện nào</div>';
+                            return;
+                        }
+
+                        userListContainer.innerHTML = '';
+                        customers.forEach(customer => {
+                            addCustomerToSidebar(customer);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Lỗi khi load danh sách khách hàng:', error);
+                    });
+            }
+
+            // Thêm customer vào sidebar
+            function addCustomerToSidebar(customer) {
+                const div = document.createElement('div');
+                div.className = 'user-item';
+                div.id = 'user-item-' + customer.customerId;
+
+                div.addEventListener('click', function() {
+                    selectCustomer(customer.customerId, customer.customerName, div);
+                });
+
+                div.innerHTML = `
+                    <div class="user-avatar" style="background: #007bff;">${customer.customerName.substring(0,2).toUpperCase()}</div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0">${customer.customerName}</h6>
+<!--                        <small class="text-muted">${customer.lastMessage ? customer.lastMessage.substring(0, 30) + '...' : 'Chưa có tin nhắn'}</small>-->
+                    </div>
+                `;
+                userListContainer.appendChild(div);
+            }
 
             // 1. KẾT NỐI WEBSOCKET
             function connect() {
@@ -113,20 +173,30 @@
                 if (!messageHistory[senderId]) {
                     messageHistory[senderId] = [];
                 }
-                messageHistory[senderId].push({ text: msgData.content, type: 'received' });
+                messageHistory[senderId].push({
+                    text: msgData.content,
+                    type: 'received',
+                    timestamp: msgData.timestamp
+                });
 
                 // Thêm người dùng vào sidebar nếu chưa có
                 let userItem = document.getElementById('user-item-' + senderId);
                 if (!userItem) {
-                    addUserToSidebar(senderId, msgData.senderName);
+                    const customer = {
+                        customerId: senderId,
+                        customerName: msgData.senderName,
+                        lastMessage: msgData.content
+                    };
+                    addCustomerToSidebar(customer);
+                    userItem = document.getElementById('user-item-' + senderId);
                 }
 
                 // Nếu đang mở đúng khung chat của người này thì in ra luôn
                 if (activeCustomerId === senderId) {
-                    displayMessage(msgData.content, 'received');
+                    displayMessage(msgData.content, 'received', msgData.timestamp);
                 } else {
                     // Nếu không, báo đỏ ở sidebar
-                    let userNameTag = document.querySelector('#user-item-' + senderId + ' h6');
+                    let userNameTag = userItem.querySelector('h6');
                     if(userNameTag) {
                         userNameTag.style.color = '#dc3545';
                         userNameTag.style.fontWeight = 'bold';
@@ -134,45 +204,40 @@
                 }
             }
 
-            // 3. THÊM NGƯỜI DÙNG VÀO CỘT TRÁI
-            function addUserToSidebar(id, name) {
-                if(userListContainer.innerHTML.includes('Chưa có cuộc trò chuyện nào')) {
-                    userListContainer.innerHTML = '';
-                }
-
-                const div = document.createElement('div');
-                div.className = 'user-item';
-                div.id = 'user-item-' + id;
-
-                div.addEventListener('click', function() {
-                    selectCustomer(id, name, div);
-                });
-
-                div.innerHTML = `
-                <div class="user-avatar" style="background: #007bff;">${name.substring(0,2).toUpperCase()}</div>
-                <div class="flex-grow-1">
-                    <h6 class="mb-0" style="transition: 0.3s;">${name}</h6>
-                    <small class="text-success fw-bold">Tin nhắn mới</small>
-                </div>
-                `;
-                userListContainer.prepend(div);
-            }
-
             // 4. CHỌN KHÁCH HÀNG ĐỂ CHAT
             function selectCustomer(id, name, element) {
                 activeCustomerId = id;
 
-                document.getElementById('currentName').innerHTML = name + '<br><small class="text-success">Đang hoạt động</small>';
+                document.getElementById('currentName').innerHTML = name + '<br><small class="text-success"></small>';
                 document.getElementById('currentAvatar').innerText = name.substring(0,2).toUpperCase();
+                document.getElementById('currentAvatar').style.background = '#007bff';
 
                 chatContainer.innerHTML = ''; // Làm sạch khung chat
 
-                // THÊM MỚI: Đổ lại toàn bộ lịch sử tin nhắn của người này ra màn hình
-                if (messageHistory[id]) {
-                    messageHistory[id].forEach(msg => {
-                        displayMessage(msg.text, msg.type);
+                // Load lịch sử chat từ server
+                fetch(`/admin/messages/api/history/${id}`)
+                    .then(response => response.json())
+                    .then(messages => {
+                        // Xóa messageHistory cũ
+                        messageHistory[id] = [];
+
+                        // Hiển thị từng tin nhắn
+                        messages.forEach(msg => {
+                            // Xác định type dựa vào senderId
+                            const type = msg.senderId === id ? 'received' : 'sent';
+                            displayMessage(msg.content, type, msg.timestamp);
+
+                            // Lưu vào messageHistory
+                            messageHistory[id].push({
+                                text: msg.content,
+                                type: type,
+                                timestamp: msg.timestamp
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Lỗi khi load lịch sử chat:', error);
                     });
-                }
 
                 element.querySelector('h6').style.color = '#3e4b5b';
                 element.querySelector('h6').style.fontWeight = 'normal';
@@ -182,10 +247,24 @@
             }
 
             // 5. HIỂN THỊ TIN NHẮN LÊN MÀN HÌNH
-            function displayMessage(text, type) {
+            function displayMessage(text, type, timestamp) {
                 const msgDiv = document.createElement('div');
                 msgDiv.className = type === 'sent' ? 'msg msg-sent' : 'msg msg-received';
-                msgDiv.textContent = text;
+
+                const textSpan = document.createElement('span');
+                textSpan.textContent = text;
+                msgDiv.appendChild(textSpan);
+
+                if (timestamp) {
+                    const timeSpan = document.createElement('small');
+                    timeSpan.style.display = 'block';
+                    timeSpan.style.fontSize = '0.75em';
+                    timeSpan.style.opacity = '0.7';
+                    timeSpan.style.marginTop = '4px';
+                    timeSpan.textContent = timestamp;
+                    msgDiv.appendChild(timeSpan);
+                }
+
                 chatContainer.appendChild(msgDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }
@@ -199,9 +278,9 @@
                     return;
                 }
 
-                if (text !== "" && stompClient) {
+                if (text !== "" && stompClient && adminId) {
                     const chatMessage = {
-                        senderId: null,
+                        senderId: adminId,
                         senderName: "Admin",
                         receiverId: activeCustomerId,
                         content: text,
@@ -214,9 +293,18 @@
                     if (!messageHistory[activeCustomerId]) {
                         messageHistory[activeCustomerId] = [];
                     }
-                    messageHistory[activeCustomerId].push({ text: text, type: 'sent' });
 
-                    displayMessage(text, 'sent');
+                    const now = new Date();
+                    const timestamp = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' +
+                                     now.toLocaleDateString('vi-VN');
+
+                    messageHistory[activeCustomerId].push({
+                        text: text,
+                        type: 'sent',
+                        timestamp: timestamp
+                    });
+
+                    displayMessage(text, 'sent', timestamp);
                     messageInput.value = '';
                 }
             }
@@ -237,6 +325,9 @@
                 });
             }
 
+            // Khởi tạo
+            getAdminInfo();
+            loadCustomerList();
             connect();
         });
     </script>
