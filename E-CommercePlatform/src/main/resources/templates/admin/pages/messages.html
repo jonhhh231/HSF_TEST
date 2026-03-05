@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layouts/default}">
+<head>
+    <title>Hỗ trợ khách hàng</title>
+    <style>
+        .chat-container { height: calc(100vh - 200px); background: #fff; border-radius: 8px; display: flex; overflow: hidden; border: 1px solid #e3ebf6; }
+        .chat-sidebar { width: 320px; border-right: 1px solid #e3ebf6; display: flex; flex-direction: column; background: #f8fafd; }
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: #fff; }
+
+        /* User List */
+        .user-search { padding: 15px; border-bottom: 1px solid #e3ebf6; }
+        .user-list { overflow-y: auto; flex: 1; }
+        .user-item { padding: 15px; display: flex; align-items: center; cursor: pointer; border-bottom: 1px solid #f1f5fa; transition: 0.3s; }
+        .user-item:hover { background: #fff; }
+        .user-item.active { background: #eef2f7; border-left: 4px solid #22c55e; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #637cf9; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; }
+
+        /* Message Area */
+        .chat-header { padding: 15px 20px; border-bottom: 1px solid #e3ebf6; display: flex; align-items: center; justify-content: space-between; }
+        .chat-content { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: #f4f7fa; }
+        .msg { max-width: 75%; padding: 10px 15px; border-radius: 12px; font-size: 14px; position: relative; word-wrap: break-word; }
+        .msg-received { align-self: flex-start; background: #fff; border: 1px solid #e3ebf6; color: #3e4b5b; }
+        .msg-sent { align-self: flex-end; background: #637cf9; color: #fff; }
+
+        /* Input Area */
+        .chat-input { padding: 15px 20px; border-top: 1px solid #e3ebf6; display: flex; gap: 10px; }
+        .chat-input input { flex: 1; border: 1px solid #e3ebf6; border-radius: 20px; padding: 8px 15px; outline: none; }
+    </style>
+</head>
+<body>
+
+<div layout:fragment="main">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Trung tâm phản hồi khách hàng</h4>
+                </div>
+                <div class="card-body">
+                    <div class="chat-container">
+
+                        <div class="chat-sidebar">
+                            <div class="user-search">
+                                <input type="text" class="form-control form-control-sm" placeholder="Tìm tên khách hàng...">
+                            </div>
+                            <div class="user-list" id="userListContainer">
+                                <div style="padding: 20px; text-align: center; color: #999;">
+                                    Chưa có cuộc trò chuyện nào
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-main">
+                            <div class="chat-header">
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar" id="currentAvatar" style="background: #ccc;">...</div>
+                                    <h6 class="mb-0" id="currentName">Chưa chọn khách hàng <br><small class="text-muted">Vui lòng chọn một cuộc hội thoại</small></h6>
+                                </div>
+                            </div>
+                            <div class="chat-content" id="chatContainer">
+                            </div>
+                            <div class="chat-input">
+                                <input type="text" id="messageInput" placeholder="Nhập tin nhắn trả lời...">
+                                <button class="btn btn-primary" id="btnSendMessage">
+                                    <i class="las la-paper-plane"></i> Gửi
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let stompClient = null;
+            let activeCustomerId = null;
+
+            // THÊM MỚI: Biến lưu trữ lịch sử tin nhắn của từng người
+            let messageHistory = {};
+
+            const chatContainer = document.getElementById('chatContainer');
+            const messageInput = document.getElementById('messageInput');
+            const btnSendMessage = document.getElementById('btnSendMessage');
+            const userListContainer = document.getElementById('userListContainer');
+
+            // 1. KẾT NỐI WEBSOCKET
+            function connect() {
+                const socket = new SockJS('/ws-chat');
+                stompClient = Stomp.over(socket);
+                stompClient.connect({}, function (frame) {
+                    console.log('Admin Connected: ' + frame);
+                    stompClient.subscribe('/topic/admin/messages', function (message) {
+                        const msgData = JSON.parse(message.body);
+                        handleIncomingMessage(msgData);
+                    });
+                }, function(error) {
+                    console.error("Lỗi WebSocket: ", error);
+                });
+            }
+
+            // 2. XỬ LÝ TIN NHẮN TỪ KHÁCH TỚI
+            function handleIncomingMessage(msgData) {
+                let senderId = msgData.senderId;
+
+                // Lưu tin nhắn vào bộ nhớ tạm
+                if (!messageHistory[senderId]) {
+                    messageHistory[senderId] = [];
+                }
+                messageHistory[senderId].push({ text: msgData.content, type: 'received' });
+
+                // Thêm người dùng vào sidebar nếu chưa có
+                let userItem = document.getElementById('user-item-' + senderId);
+                if (!userItem) {
+                    addUserToSidebar(senderId, msgData.senderName);
+                }
+
+                // Nếu đang mở đúng khung chat của người này thì in ra luôn
+                if (activeCustomerId === senderId) {
+                    displayMessage(msgData.content, 'received');
+                } else {
+                    // Nếu không, báo đỏ ở sidebar
+                    let userNameTag = document.querySelector('#user-item-' + senderId + ' h6');
+                    if(userNameTag) {
+                        userNameTag.style.color = '#dc3545';
+                        userNameTag.style.fontWeight = 'bold';
+                    }
+                }
+            }
+
+            // 3. THÊM NGƯỜI DÙNG VÀO CỘT TRÁI
+            function addUserToSidebar(id, name) {
+                if(userListContainer.innerHTML.includes('Chưa có cuộc trò chuyện nào')) {
+                    userListContainer.innerHTML = '';
+                }
+
+                const div = document.createElement('div');
+                div.className = 'user-item';
+                div.id = 'user-item-' + id;
+
+                div.addEventListener('click', function() {
+                    selectCustomer(id, name, div);
+                });
+
+                div.innerHTML = `
+                <div class="user-avatar" style="background: #007bff;">${name.substring(0,2).toUpperCase()}</div>
+                <div class="flex-grow-1">
+                    <h6 class="mb-0" style="transition: 0.3s;">${name}</h6>
+                    <small class="text-success fw-bold">Tin nhắn mới</small>
+                </div>
+                `;
+                userListContainer.prepend(div);
+            }
+
+            // 4. CHỌN KHÁCH HÀNG ĐỂ CHAT
+            function selectCustomer(id, name, element) {
+                activeCustomerId = id;
+
+                document.getElementById('currentName').innerHTML = name + '<br><small class="text-success">Đang hoạt động</small>';
+                document.getElementById('currentAvatar').innerText = name.substring(0,2).toUpperCase();
+
+                chatContainer.innerHTML = ''; // Làm sạch khung chat
+
+                // THÊM MỚI: Đổ lại toàn bộ lịch sử tin nhắn của người này ra màn hình
+                if (messageHistory[id]) {
+                    messageHistory[id].forEach(msg => {
+                        displayMessage(msg.text, msg.type);
+                    });
+                }
+
+                element.querySelector('h6').style.color = '#3e4b5b';
+                element.querySelector('h6').style.fontWeight = 'normal';
+
+                document.querySelectorAll('.user-item').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+            }
+
+            // 5. HIỂN THỊ TIN NHẮN LÊN MÀN HÌNH
+            function displayMessage(text, type) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = type === 'sent' ? 'msg msg-sent' : 'msg msg-received';
+                msgDiv.textContent = text;
+                chatContainer.appendChild(msgDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            // 6. HÀM GỬI TIN NHẮN ĐI
+            function sendMessage() {
+                const text = messageInput.value.trim();
+
+                if (!activeCustomerId) {
+                    alert("Vui lòng chọn một khách hàng bên trái trước khi gửi tin nhắn!");
+                    return;
+                }
+
+                if (text !== "" && stompClient) {
+                    const chatMessage = {
+                        senderId: null,
+                        senderName: "Admin",
+                        receiverId: activeCustomerId,
+                        content: text,
+                        type: 'CHAT'
+                    };
+
+                    stompClient.send("/app/chat.sendToUser", {}, JSON.stringify(chatMessage));
+
+                    // THÊM MỚI: Lưu tin nhắn của Admin vào bộ nhớ tạm
+                    if (!messageHistory[activeCustomerId]) {
+                        messageHistory[activeCustomerId] = [];
+                    }
+                    messageHistory[activeCustomerId].push({ text: text, type: 'sent' });
+
+                    displayMessage(text, 'sent');
+                    messageInput.value = '';
+                }
+            }
+
+            // --- RÀNG BUỘC SỰ KIỆN ---
+            if (btnSendMessage) {
+                btnSendMessage.addEventListener('click', function() {
+                    sendMessage();
+                });
+            }
+
+            if (messageInput) {
+                messageInput.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
+            }
+
+            connect();
+        });
+    </script>
+</div>
+</body>
+</html>

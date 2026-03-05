@@ -113,6 +113,30 @@ public class ClientOrderController {
     }
 
     /**
+     * Xác nhận đã nhận hàng
+     */
+    @PostMapping("/{id}/confirm-received")
+    public String confirmReceived(
+            @PathVariable Integer id,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+        Integer userId = getCurrentUserId(session);
+
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+
+        try {
+            orderService.confirmReceived(id, userId);
+            redirectAttributes.addFlashAttribute("successMessage", "Xác nhận đã nhận hàng thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
+        }
+
+        return "redirect:/orders/" + id;
+    }
+
+    /**
      * Xóa đơn hàng đã hủy
      */
     @PostMapping("/{id}/delete")

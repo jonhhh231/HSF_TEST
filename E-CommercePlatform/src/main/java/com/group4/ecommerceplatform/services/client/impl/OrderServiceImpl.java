@@ -172,4 +172,25 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("Order {} has been deleted", orderId);
     }
+
+    @Override
+    @Transactional
+    public void confirmReceived(Integer orderId, Integer userId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+
+        if (!order.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Bạn không có quyền thực hiện hành động này");
+        }
+
+        if (!"DELIVERING".equals(order.getShippingStatus())) {
+            throw new RuntimeException("Chỉ có thể xác nhận nhận hàng khi đơn hàng đang giao");
+        }
+
+        order.setShippingStatus("DELIVERED");
+        order.setUpdatedAt(java.time.LocalDateTime.now());
+        orderRepository.save(order);
+
+        log.info("Order {} confirmed as received by user {}", orderId, userId);
+    }
 }

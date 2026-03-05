@@ -15,4 +15,5 @@ public interface OrderService {
     Order findByOrderCode(String orderCode);
     void cancelOrder(Integer orderId);
     void deleteOrder(Integer orderId);
+    void confirmReceived(Integer orderId, Integer userId);
 }

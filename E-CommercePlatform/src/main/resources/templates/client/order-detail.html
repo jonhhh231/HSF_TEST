@@ -122,6 +122,43 @@
                 </div>
             </div>
 
+            <!-- Confirm Received Banner (only when DELIVERING) -->
+            <div class="confirm-received-banner" th:if="${order.shippingStatus == 'DELIVERING'}">
+                <div class="confirm-received-content">
+                    <span class="material-symbols-outlined confirm-icon">local_shipping</span>
+                    <div class="confirm-received-text">
+                        <strong>Đơn hàng đang trên đường giao đến bạn!</strong>
+                        <span>Nếu bạn đã nhận được hàng, vui lòng xác nhận để hoàn tất đơn hàng.</span>
+                    </div>
+                    <form th:action="@{/orders/{id}/confirm-received(id=${order.id})}" method="post">
+                        <button type="button" class="btn-confirm-received" onclick="showConfirmModal()">
+                            <span class="material-symbols-outlined">check_circle</span>
+                            Đã nhận được hàng
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Confirm Modal -->
+            <div id="confirmReceivedModal" class="confirm-modal-overlay" style="display:none;">
+                <div class="confirm-modal">
+                    <div class="confirm-modal-icon">
+                        <span class="material-symbols-outlined">inventory_2</span>
+                    </div>
+                    <h3>Xác nhận đã nhận hàng?</h3>
+                    <p>Bạn xác nhận đã nhận được đơn hàng <strong th:text="${order.orderCode}"></strong> và hàng hóa đầy đủ, đúng với đơn đặt hàng?</p>
+                    <div class="confirm-modal-actions">
+                        <button class="btn-modal-cancel" onclick="closeConfirmModal()">Chưa nhận được</button>
+                        <form th:action="@{/orders/{id}/confirm-received(id=${order.id})}" method="post">
+                            <button type="submit" class="btn-modal-confirm">
+                                <span class="material-symbols-outlined">check</span>
+                                Xác nhận đã nhận
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <!-- Order Layout -->
             <div class="order-layout">
                 <!-- Main Content -->
@@ -420,6 +457,24 @@
             d.textContent = text;
             return d.innerHTML;
         }
+
+        function showConfirmModal() {
+            document.getElementById('confirmReceivedModal').style.display = 'flex';
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmReceivedModal').style.display = 'none';
+        }
+
+        // Close modal on overlay click
+        document.addEventListener('DOMContentLoaded', function () {
+            const overlay = document.getElementById('confirmReceivedModal');
+            if (overlay) {
+                overlay.addEventListener('click', function (e) {
+                    if (e.target === overlay) closeConfirmModal();
+                });
+            }
+        });
     </script>
 </body>
 </html>

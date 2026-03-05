@@ -7,6 +7,7 @@
     <link rel="stylesheet" th:href="@{/client/global.css}">
     <link rel="stylesheet" th:href="@{/client/products.css}">
     <link rel="stylesheet" th:href="@{/client/chat-ai.css}">
+    <link rel="stylesheet" th:href="@{/client/chat-admin.css}">
 </head>
 <body>
     <!-- Header -->
@@ -152,6 +153,7 @@
         </div>
     </div>
         <div th:replace="~{client/fragments/chat-ai :: chat-widget}"></div>
+        <div th:replace="~{client/fragments/chat-admin :: admin-chat-widget}"></div>
     </main>
 
     <!-- Footer -->
