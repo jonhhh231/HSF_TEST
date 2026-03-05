@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html class="dark" xmlns:th="http://www.thymeleaf.org" lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" th:href="@{/client/global.css}">
     <link rel="stylesheet" th:href="@{/client/checkout.css}">
 </head>
+
 <body>
     <!-- Header -->
     <div th:replace="~{client/fragments/header :: header}"></div>
@@ -44,6 +46,26 @@
                 </div>
             </div>
 
+            <!-- Flash messages -->
+            <div th:if="${errorMessage}" style="
+                background: linear-gradient(135deg,#fff1f2,#ffe4e6);
+                border: 1px solid #fda4af; border-radius: 12px;
+                padding: 14px 20px; margin-bottom: 20px;
+                display: flex; align-items: center; gap: 10px;
+                color: #e11d48; font-weight: 500;">
+                <span class="material-symbols-outlined" style="font-size:20px;">error</span>
+                <span th:text="${errorMessage}"></span>
+            </div>
+            <div th:if="${successMessage}" style="
+                background: linear-gradient(135deg,#f0fdf4,#dcfce7);
+                border: 1px solid #86efac; border-radius: 12px;
+                padding: 14px 20px; margin-bottom: 20px;
+                display: flex; align-items: center; gap: 10px;
+                color: #16a34a; font-weight: 500;">
+                <span class="material-symbols-outlined" style="font-size:20px;">check_circle</span>
+                <span th:text="${successMessage}"></span>
+            </div>
+
             <!-- Checkout Content -->
             <div class="checkout-layout">
                 <!-- Left: Order Items & Form -->
@@ -54,9 +76,8 @@
                         <div class="items-list">
                             <div th:each="item : ${cartItems}" class="checkout-item">
                                 <div class="item-image">
-                                    <img th:if="${item.product.url != null}"
-                                         th:src="${item.product.url}"
-                                         th:alt="${item.product.name}">
+                                    <img th:if="${item.product.url != null}" th:src="${item.product.url}"
+                                        th:alt="${item.product.name}">
                                     <div th:if="${item.product.url == null}" class="no-image">
                                         <span class="material-symbols-outlined">laptop_mac</span>
                                     </div>
@@ -94,7 +115,9 @@
                                     </div>
                                 </div>
                                 <div class="item-price">
-                                    <span class="price" th:text="${#numbers.formatDecimal(item.product.price * item.quantity, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                                    <span class="price"
+                                        th:text="${#numbers.formatDecimal(item.product.price * item.quantity, 0, 'COMMA', 0, 'POINT')} + ' đ'">0
+                                        đ</span>
                                 </div>
                             </div>
                         </div>
@@ -109,11 +132,8 @@
                                     <span class="material-symbols-outlined">location_on</span>
                                     Địa chỉ giao hàng
                                 </label>
-                                <textarea id="address"
-                                          name="address"
-                                          rows="3"
-                                          required
-                                          placeholder="Nhập địa chỉ đầy đủ (số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố)"></textarea>
+                                <textarea id="address" name="address" rows="3" required
+                                    placeholder="Nhập địa chỉ đầy đủ (số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố)"></textarea>
                             </div>
 
                             <div class="form-group">
@@ -121,11 +141,8 @@
                                     <span class="material-symbols-outlined">phone</span>
                                     Số điện thoại
                                 </label>
-                                <input type="tel"
-                                       id="phone"
-                                       name="phone"
-                                       required
-                                       placeholder="Nhập số điện thoại liên hệ">
+                                <input type="tel" id="phone" name="phone" required
+                                    placeholder="Nhập số điện thoại liên hệ">
                             </div>
 
                             <div class="form-group">
@@ -133,10 +150,8 @@
                                     <span class="material-symbols-outlined">note</span>
                                     Ghi chú (tuỳ chọn)
                                 </label>
-                                <textarea id="note"
-                                          name="note"
-                                          rows="2"
-                                          placeholder="Ghi chú thêm về đơn hàng (nếu có)"></textarea>
+                                <textarea id="note" name="note" rows="2"
+                                    placeholder="Ghi chú thêm về đơn hàng (nếu có)"></textarea>
                             </div>
 
                             <div class="payment-methods">
@@ -173,7 +188,8 @@
 
                     <div class="summary-row">
                         <span>Tạm tính (<span th:text="${itemCount}">0</span> sản phẩm)</span>
-                        <span class="summary-price" th:text="${#numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                        <span class="summary-price"
+                            th:text="${#numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
                     </div>
 
                     <div class="summary-row">
@@ -185,7 +201,8 @@
 
                     <div class="summary-row summary-total">
                         <span>Tổng cộng</span>
-                        <span class="total-price" th:text="${#numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                        <span class="total-price"
+                            th:text="${#numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
                     </div>
 
                     <div class="summary-note">
@@ -200,4 +217,5 @@
     <!-- Footer -->
     <div th:replace="~{client/fragments/footer :: footer}"></div>
 </body>
+
 </html>

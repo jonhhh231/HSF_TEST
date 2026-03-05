@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{admin/layouts/default}">
+
+<head>
+    <title>Chi tiết Đơn hàng</title>
+    <style>
+        /* ===== Colors ===== */
+        :root {
+            --c-pending: #ca8a04;
+            --bg-pending: #fefce8;
+            --br-pending: #fde047;
+            --c-processing: #3b82f6;
+            --bg-processing: #eff6ff;
+            --br-processing: #93c5fd;
+            --c-packaging: #d97706;
+            --bg-packaging: #fffbeb;
+            --br-packaging: #fcd34d;
+            --c-delivering: #0284c7;
+            --bg-delivering: #f0f9ff;
+            --br-delivering: #7dd3fc;
+            --c-delivered: #16a34a;
+            --bg-delivered: #f0fdf4;
+            --br-delivered: #86efac;
+            --c-delivery-failed: #e11d48;
+            --bg-delivery-failed: #fff1f2;
+            --br-delivery-failed: #fda4af;
+            --c-cancelled: #737373;
+            --bg-cancelled: #fafafa;
+            --br-cancelled: #d4d4d4;
+            --c-paid: #16a34a;
+            --bg-paid: #f0fdf4;
+            --br-paid: #86efac;
+            --c-refund-pending: #9333ea;
+            --bg-refund-pending: #fdf4ff;
+            --br-refund-pending: #d8b4fe;
+            --c-refunded: #3b82f6;
+            --bg-refunded: #eff6ff;
+            --br-refunded: #93c5fd;
+        }
+
+        /* ===== Badge ===== */
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12.5px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .ss-PENDING {
+            color: var(--c-pending);
+            background: var(--bg-pending);
+            border: 1px solid var(--br-pending);
+        }
+
+        .ss-PROCESSING {
+            color: var(--c-processing);
+            background: var(--bg-processing);
+            border: 1px solid var(--br-processing);
+        }
+
+        .ss-PACKAGING {
+            color: var(--c-packaging);
+            background: var(--bg-packaging);
+            border: 1px solid var(--br-packaging);
+        }
+
+        .ss-DELIVERING {
+            color: var(--c-delivering);
+            background: var(--bg-delivering);
+            border: 1px solid var(--br-delivering);
+        }
+
+        .ss-DELIVERED {
+            color: var(--c-delivered);
+            background: var(--bg-delivered);
+            border: 1px solid var(--br-delivered);
+        }
+
+        .ss-DELIVERY_FAILED {
+            color: var(--c-delivery-failed);
+            background: var(--bg-delivery-failed);
+            border: 1px solid var(--br-delivery-failed);
+        }
+
+        .ss-CANCELLED {
+            color: var(--c-cancelled);
+            background: var(--bg-cancelled);
+            border: 1px solid var(--br-cancelled);
+        }
+
+        .ps-PENDING {
+            color: var(--c-pending);
+            background: var(--bg-pending);
+            border: 1px solid var(--br-pending);
+        }
+
+        .ps-PAID {
+            color: var(--c-paid);
+            background: var(--bg-paid);
+            border: 1px solid var(--br-paid);
+        }
+
+        .ps-CANCELLED {
+            color: var(--c-cancelled);
+            background: var(--bg-cancelled);
+            border: 1px solid var(--br-cancelled);
+        }
+
+        .ps-REFUND_PENDING {
+            color: var(--c-refund-pending);
+            background: var(--bg-refund-pending);
+            border: 1px solid var(--br-refund-pending);
+        }
+
+        .ps-REFUNDED {
+            color: var(--c-refunded);
+            background: var(--bg-refunded);
+            border: 1px solid var(--br-refunded);
+        }
+
+        /* ===== Progress bar ===== */
+        .shipping-progress {
+            display: flex;
+            align-items: flex-start;
+            gap: 0;
+            margin: 20px 0 10px;
+        }
+
+        .progress-step {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .step-line-wrap {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .step-connector {
+            flex: 1;
+            height: 3px;
+            background: #e2e8f0;
+        }
+
+        .step-connector.filled {
+            background: #3b82f6;
+        }
+
+        .step-connector.invisible {
+            background: transparent;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e2e8f0;
+            color: #94a3b8;
+            font-size: 18px;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .step-circle.done {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .step-circle.active {
+            background: #0284c7;
+            color: #fff;
+            box-shadow: 0 0 0 4px rgba(2, 132, 199, .2);
+        }
+
+        .step-circle.failed {
+            background: #e11d48;
+            color: #fff;
+        }
+
+        .step-label {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .step-label .step-name {
+            display: block;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .step-label .step-sub {
+            display: block;
+            font-size: 10px;
+            color: #9ca3af;
+        }
+
+        /* ===== Action panel ===== */
+        .action-panel {
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-top: 20px;
+        }
+
+        .action-panel.panel-blue {
+            background: #eff6ff;
+            border: 1px solid #93c5fd;
+        }
+
+        .action-panel.panel-red {
+            background: #fff1f2;
+            border: 1px solid #fda4af;
+        }
+
+        .action-panel.panel-purple {
+            background: #fdf4ff;
+            border: 1px solid #d8b4fe;
+        }
+
+        .action-panel.panel-green {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+        }
+
+        .action-panel.panel-gray {
+            background: #fafafa;
+            border: 1px solid #e5e7eb;
+        }
+
+        .action-panel h5 {
+            margin: 0 0 6px;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .action-panel p {
+            margin: 0 0 14px;
+            font-size: 13.5px;
+            color: #4b5563;
+        }
+
+        .action-panel-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* ===== Buttons ===== */
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: filter .15s;
+        }
+
+        .btn-action:hover {
+            filter: brightness(.93);
+        }
+
+        .btn-action.blue {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .btn-action.green {
+            background: #16a34a;
+            color: #fff;
+        }
+
+        .btn-action.red {
+            background: #e11d48;
+            color: #fff;
+        }
+
+        .btn-action.purple {
+            background: #9333ea;
+            color: #fff;
+        }
+
+        .btn-action.gray {
+            background: #e2e8f0;
+            color: #374151;
+        }
+
+        /* ===== Info card ===== */
+        .info-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .info-box {
+            flex: 1;
+            min-width: 160px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px 18px;
+        }
+
+        .info-box .ib-label {
+            font-size: 11px;
+            color: #9ca3af;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .info-box .ib-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-top: 4px;
+        }
+
+        /* ===== Table items ===== */
+        .items-table th {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6b7280;
+            background: #f9fafb;
+        }
+
+        .items-table td {
+            vertical-align: middle;
+        }
+
+        /* ===== Flash ===== */
+        .flash-success {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #86efac;
+            padding: 10px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .flash-error {
+            background: #fff1f2;
+            color: #e11d48;
+            border: 1px solid #fda4af;
+            padding: 10px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div layout:fragment="main">
+
+        <!-- Back + Flash -->
+        <div class="d-flex align-items-center gap-3 mb-3">
+            <a href="/admin/orders" class="btn btn-sm btn-outline-secondary">
+                <i class="las la-arrow-left"></i> Quay lại danh sách
+            </a>
+            <h4 class="mb-0">Chi tiết Đơn hàng</h4>
+        </div>
+
+        <div th:if="${successMessage}" class="flash-success">
+            <i class="las la-check-circle me-1"></i> <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="flash-error">
+            <i class="las la-exclamation-circle me-1"></i> <span th:text="${errorMessage}"></span>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- Info boxes                                -->
+        <!-- ========================================= -->
+        <div class="info-row">
+            <div class="info-box">
+                <div class="ib-label">Mã đơn hàng</div>
+                <div class="ib-value" th:text="${order.orderCode}">ORD-000</div>
+            </div>
+            <div class="info-box">
+                <div class="ib-label">Khách hàng</div>
+                <div class="ib-value" th:text="${order.user.fullName}">—</div>
+            </div>
+            <div class="info-box">
+                <div class="ib-label">Địa chỉ</div>
+                <div class="ib-value" th:text="${order.address}">—</div>
+            </div>
+            <div class="info-box">
+                <div class="ib-label">Phương thức TT</div>
+                <div class="ib-value"
+                    th:text="${order.paymentMethod == 'CASH' ? 'Thanh toán COD' : order.paymentMethod}">—</div>
+            </div>
+            <div class="info-box">
+                <div class="ib-label">Tổng tiền</div>
+                <div class="ib-value"
+                    th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</div>
+            </div>
+            <div class="info-box">
+                <div class="ib-label">Ngày đặt</div>
+                <div class="ib-value" th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">—</div>
+            </div>
+        </div>
+
+        <!-- Status badges -->
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <div>
+                <span class="text-muted me-1" style="font-size:12px; font-weight:600;">VẬN CHUYỂN:</span>
+                <span th:class="'badge-status ss-' + ${order.shippingStatus}" th:text="
+                    ${order.shippingStatus == 'PENDING'}          ? 'Chờ xử lý' :
+                    (${order.shippingStatus == 'PROCESSING'}      ? 'Đang xử lý' :
+                    (${order.shippingStatus == 'PACKAGING'}       ? 'Đóng gói' :
+                    (${order.shippingStatus == 'DELIVERING'}      ? 'Đang giao hàng' :
+                    (${order.shippingStatus == 'DELIVERED'}       ? 'Đã giao hàng' :
+                    (${order.shippingStatus == 'DELIVERY_FAILED'} ? 'Giao thất bại' :
+                    'Đã hủy')))))">
+                </span>
+            </div>
+            <div>
+                <span class="text-muted me-1" style="font-size:12px; font-weight:600;">THANH TOÁN:</span>
+                <span th:class="'badge-status ps-' + ${order.paymentStatus}" th:text="
+                    ${order.paymentStatus == 'PENDING'}        ? 'Chờ thanh toán' :
+                    (${order.paymentStatus == 'PAID'}          ? 'Đã thanh toán' :
+                    (${order.paymentStatus == 'CANCELLED'}     ? 'Đã hủy' :
+                    (${order.paymentStatus == 'REFUND_PENDING'}? 'Chờ hoàn tiền' :
+                    'Đã hoàn tiền')))">
+                </span>
+            </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- Progress bar vận chuyển                   -->
+        <!-- ========================================= -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="las la-route me-2"></i>Tiến trình vận chuyển</h5>
+            </div>
+            <div class="card-body">
+                <div th:with="
+                ss=${order.shippingStatus},
+                idx=${
+                    ss == 'PENDING'         ? 0 :
+                    (ss == 'PROCESSING'     ? 1 :
+                    (ss == 'PACKAGING'      ? 2 :
+                    (ss == 'DELIVERING'     ? 3 :
+                    (ss == 'DELIVERED'      ? 4 : -1))))
+                },
+                failed=${ss == 'DELIVERY_FAILED'},
+                cancelled=${ss == 'CANCELLED'}" class="shipping-progress">
+
+                    <!-- PENDING -->
+                    <div class="progress-step">
+                        <div class="step-line-wrap">
+                            <div class="step-connector invisible"></div>
+                            <div th:class="'step-circle ' + (${idx > 0} ? 'done' : (${idx == 0} ? 'active' : ''))">
+                                <i class="las" th:classappend="${idx > 0} ? 'la-check' : 'la-clock'"></i>
+                            </div>
+                            <div th:class="'step-connector ' + (${idx >= 1} ? 'filled' : '')"></div>
+                        </div>
+                        <div class="step-label">
+                            <span class="step-name">Chờ xử lý</span>
+                            <span class="step-sub">PENDING</span>
+                        </div>
+                    </div>
+
+                    <!-- PROCESSING -->
+                    <div class="progress-step">
+                        <div class="step-line-wrap">
+                            <div th:class="'step-connector ' + (${idx >= 1} ? 'filled' : '')"></div>
+                            <div th:class="'step-circle ' + (${idx > 1} ? 'done' : (${idx == 1} ? 'active' : ''))">
+                                <i class="las" th:classappend="${idx > 1} ? 'la-check' : 'la-sync'"></i>
+                            </div>
+                            <div th:class="'step-connector ' + (${idx >= 2} ? 'filled' : '')"></div>
+                        </div>
+                        <div class="step-label">
+                            <span class="step-name">Đang xử lý</span>
+                            <span class="step-sub">PROCESSING</span>
+                        </div>
+                    </div>
+
+                    <!-- PACKAGING -->
+                    <div class="progress-step">
+                        <div class="step-line-wrap">
+                            <div th:class="'step-connector ' + (${idx >= 2} ? 'filled' : '')"></div>
+                            <div th:class="'step-circle ' + (${idx > 2} ? 'done' : (${idx == 2} ? 'active' : ''))">
+                                <i class="las" th:classappend="${idx > 2} ? 'la-check' : 'la-box'"></i>
+                            </div>
+                            <div th:class="'step-connector ' + (${idx >= 3} ? 'filled' : '')"></div>
+                        </div>
+                        <div class="step-label">
+                            <span class="step-name">Đóng gói</span>
+                            <span class="step-sub">PACKAGING</span>
+                        </div>
+                    </div>
+
+                    <!-- DELIVERING -->
+                    <div class="progress-step">
+                        <div class="step-line-wrap">
+                            <div th:class="'step-connector ' + (${idx >= 3} ? 'filled' : '')"></div>
+                            <div
+                                th:class="'step-circle ' + (${failed} ? 'failed' : (${idx > 3} ? 'done' : (${idx == 3} ? 'active' : '')))">
+                                <i class="las"
+                                    th:classappend="${failed} ? 'la-times' : (${idx > 3} ? 'la-check' : 'la-truck')"></i>
+                            </div>
+                            <div th:class="'step-connector ' + (${idx >= 4} ? 'filled' : '')"></div>
+                        </div>
+                        <div class="step-label">
+                            <span class="step-name" th:text="${failed} ? 'Giao thất bại' : 'Đang giao'"></span>
+                            <span class="step-sub" th:text="${failed} ? 'FAILED' : 'DELIVERING'"></span>
+                        </div>
+                    </div>
+
+                    <!-- DELIVERED / END -->
+                    <div class="progress-step">
+                        <div class="step-line-wrap">
+                            <div th:class="'step-connector ' + (${idx >= 4} ? 'filled' : '')"></div>
+                            <div th:class="'step-circle ' + (${idx == 4} ? 'done' : '')">
+                                <i class="las la-home"></i>
+                            </div>
+                            <div class="step-connector invisible"></div>
+                        </div>
+                        <div class="step-label">
+                            <span class="step-name">Hoàn thành</span>
+                            <span class="step-sub">DELIVERED</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- ACTION PANEL – Hiển thị theo trạng thái  -->
+        <!-- ========================================= -->
+
+        <!-- 1. Đang ở PENDING / PROCESSING / PACKAGING → Tiến trạng thái tiếp -->
+        <div class="action-panel panel-blue"
+            th:if="${order.shippingStatus == 'PENDING' or order.shippingStatus == 'PROCESSING' or order.shippingStatus == 'PACKAGING'}">
+            <h5><i class="las la-arrow-circle-right me-1"></i>Cập nhật trạng thái vận chuyển</h5>
+            <p>
+                Trạng thái hiện tại:
+                <strong th:text="
+                ${order.shippingStatus == 'PENDING'}    ? 'Chờ xử lý' :
+                (${order.shippingStatus == 'PROCESSING'}? 'Đang xử lý' :
+                'Đóng gói')"></strong>
+                → Chuyển sang
+                <strong th:text="
+                ${order.shippingStatus == 'PENDING'}    ? 'Đang xử lý' :
+                (${order.shippingStatus == 'PROCESSING'}? 'Đóng gói' :
+                'Đang giao hàng')"></strong>
+            </p>
+            <div class="action-panel-btns">
+                <form th:action="@{/admin/orders/to-next-handle-status/{id}(id=${order.id})}" method="POST">
+                    <button type="submit" class="btn-action blue">
+                        <i class="las la-arrow-right"></i>
+                        Tiến trạng thái tiếp theo
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 2. Đang DELIVERING → Có thể: xác nhận đã giao HOẶC đánh dấu thất bại -->
+        <div class="action-panel panel-blue" th:if="${order.shippingStatus == 'DELIVERING'}">
+            <h5><i class="las la-truck me-1"></i>Đơn hàng đang trên đường giao</h5>
+            <p>Chọn kết quả giao hàng sau khi shipper phản hồi:</p>
+            <div class="action-panel-btns">
+                <!-- Giao thành công: chuyển sang DELIVERED (thường do user xác nhận, nhưng admin cũng có thể) -->
+                <form th:action="@{/admin/orders/to-next-handle-status/{id}(id=${order.id})}" method="POST">
+                    <button type="submit" class="btn-action green">
+                        <i class="las la-check-circle"></i>
+                        Xác nhận đã giao thành công
+                    </button>
+                </form>
+                <!-- Giao thất bại -->
+                <button type="button" class="btn-action red"
+                    onclick="document.getElementById('modal-fail').style.display='flex'">
+                    <i class="las la-times-circle"></i>
+                    Đánh dấu giao thất bại
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. DELIVERY_FAILED + COD → thông báo đã hủy -->
+        <div class="action-panel panel-gray"
+            th:if="${order.shippingStatus == 'DELIVERY_FAILED' and order.paymentStatus == 'CANCELLED'}">
+            <h5><i class="las la-ban me-1"></i>Đơn hàng đã hủy (COD)</h5>
+            <p>Đơn hàng giao thất bại và đã được hủy. Khách hàng chưa thanh toán – không cần hoàn tiền.</p>
+        </div>
+
+        <!-- 4. DELIVERY_FAILED + REFUND_PENDING → đang chờ hoàn tiền -->
+        <div class="action-panel panel-purple" th:if="${order.paymentStatus == 'REFUND_PENDING'}">
+            <h5><i class="las la-undo me-1"></i>Cần hoàn tiền cho khách</h5>
+            <p>
+                Đơn hàng đã thanh toán qua <strong th:text="${order.paymentMethod}"></strong>
+                nhưng giao không thành công.<br>
+                Số tiền cần hoàn: <strong
+                    th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></strong><br>
+                Vui lòng thực hiện hoàn tiền thủ công qua cổng thanh toán, sau đó nhấn xác nhận bên dưới.
+            </p>
+            <div class="action-panel-btns">
+                <button type="button" class="btn-action purple"
+                    onclick="document.getElementById('modal-refund').style.display='flex'">
+                    <i class="las la-check-circle"></i>
+                    Xác nhận đã hoàn tiền xong
+                </button>
+            </div>
+        </div>
+
+        <!-- 5. COD + đang DELIVERING hoặc đã DELIVERED → Toggle thu tiền -->
+        <div class="action-panel panel-green" th:if="${order.paymentMethod == 'CASH' and
+                 (order.shippingStatus == 'DELIVERING' or order.shippingStatus == 'DELIVERED') and
+                 (order.paymentStatus == 'PENDING' or order.paymentStatus == 'PAID')}">
+            <h5><i class="las la-money-bill me-1"></i>Trạng thái thu tiền COD</h5>
+            <p th:if="${order.paymentStatus == 'PENDING'}">Shipper chưa thu tiền. Bấm để xác nhận đã thu tiền mặt từ
+                khách.</p>
+            <p th:if="${order.paymentStatus == 'PAID'}">Đã ghi nhận thu tiền. Bấm để hoàn tác nếu cần.</p>
+            <div class="action-panel-btns">
+                <form th:if="${order.paymentStatus == 'PENDING'}"
+                    th:action="@{/admin/orders/change-cod-payment/{id}/PAID(id=${order.id})}" method="POST">
+                    <button type="submit" class="btn-action green">
+                        <i class="las la-check"></i> Đánh dấu đã thu tiền
+                    </button>
+                </form>
+                <form th:if="${order.paymentStatus == 'PAID'}"
+                    th:action="@{/admin/orders/change-cod-payment/{id}/PENDING(id=${order.id})}" method="POST">
+                    <button type="submit" class="btn-action gray">
+                        <i class="las la-undo"></i> Hoàn tác (chưa thu)
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 6. Đã kết thúc (DELIVERED hoặc REFUNDED) -->
+        <div class="action-panel panel-green"
+            th:if="${order.shippingStatus == 'DELIVERED' and order.paymentStatus != 'PENDING'}">
+            <h5><i class="las la-check-double me-1"></i>Đơn hàng hoàn thành</h5>
+            <p>Đơn hàng đã giao thành công và kết thúc.</p>
+        </div>
+        <div class="action-panel panel-blue" th:if="${order.paymentStatus == 'REFUNDED'}">
+            <h5><i class="las la-check-double me-1"></i>Đã hoàn tiền – Đơn hàng kết thúc</h5>
+            <p>Tiền đã được hoàn về ví / tài khoản của khách hàng. Đơn hàng đã đóng.</p>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- Sản phẩm trong đơn                        -->
+        <!-- ========================================= -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="las la-boxes me-2"></i>Sản phẩm trong đơn</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table items-table mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-3">Sản phẩm</th>
+                            <th>Đơn giá</th>
+                            <th>Số lượng</th>
+                            <th class="text-end pe-3">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="detail : ${order.orderDetails}">
+                            <td class="ps-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <img th:if="${detail.product.url != null}" th:src="${detail.product.url}"
+                                        th:alt="${detail.product.name}"
+                                        style="width:44px;height:44px;object-fit:contain;border-radius:6px;border:1px solid #e2e8f0;">
+                                    <span th:text="${detail.product.name}" style="font-weight:600;"></span>
+                                </div>
+                            </td>
+                            <td th:text="${#numbers.formatDecimal(detail.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                            <td th:text="${detail.quantity}"></td>
+                            <td class="text-end pe-3 fw-bold"
+                                th:text="${#numbers.formatDecimal(detail.price * detail.quantity, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold ps-3">Tổng cộng:</td>
+                            <td class="text-end pe-3 fw-bold text-primary"
+                                th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- MODAL: Xác nhận giao thất bại            -->
+        <!-- ========================================= -->
+        <div id="modal-fail"
+            style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:9999; align-items:center; justify-content:center;">
+            <div
+                style="background:#fff; border-radius:16px; padding:32px; max-width:440px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.3);">
+                <div
+                    style="width:60px;height:60px;border-radius:50%;background:#fff1f2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <i class="las la-times-circle" style="font-size:32px;color:#e11d48;"></i>
+                </div>
+                <h5 style="margin:0 0 8px;font-size:18px;">Xác nhận giao hàng thất bại?</h5>
+                <p style="font-size:13.5px;color:#6b7280;margin:0 0 20px;">
+                    Hành động này sẽ đánh dấu đơn hàng là <strong>Giao thất bại</strong>.<br>
+                    <span th:if="${order.paymentMethod != 'CASH'}" style="color:#9333ea;">
+                        Vì đơn đã thanh toán online → hệ thống sẽ chuyển sang trạng thái <strong>Chờ hoàn tiền</strong>.
+                    </span>
+                    <span th:if="${order.paymentMethod == 'CASH'}" style="color:#64748b;">
+                        Vì đơn COD chưa thu tiền → đơn hàng sẽ bị <strong>Hủy</strong>.
+                    </span>
+                </p>
+                <div style="display:flex;gap:12px;justify-content:center;">
+                    <button onclick="document.getElementById('modal-fail').style.display='none'"
+                        style="padding:9px 22px;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;font-weight:600;cursor:pointer;">
+                        Hủy bỏ
+                    </button>
+                    <form th:action="@{/admin/orders/delivery-failed/{id}(id=${order.id})}" method="POST">
+                        <button type="submit"
+                            style="padding:9px 22px;border-radius:8px;border:none;background:#e11d48;color:#fff;font-weight:600;cursor:pointer;">
+                            <i class="las la-check me-1"></i> Xác nhận thất bại
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- MODAL: Xác nhận đã hoàn tiền             -->
+        <!-- ========================================= -->
+        <div id="modal-refund"
+            style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:9999; align-items:center; justify-content:center;">
+            <div
+                style="background:#fff; border-radius:16px; padding:32px; max-width:440px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.3);">
+                <div
+                    style="width:60px;height:60px;border-radius:50%;background:#fdf4ff;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <i class="las la-undo" style="font-size:32px;color:#9333ea;"></i>
+                </div>
+                <h5 style="margin:0 0 8px;font-size:18px;">Xác nhận đã hoàn tiền?</h5>
+                <p style="font-size:13.5px;color:#6b7280;margin:0 0 20px;">
+                    Bạn xác nhận đã hoàn
+                    <strong
+                        th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></strong>
+                    về ví / tài khoản của khách hàng qua cổng <strong th:text="${order.paymentMethod}"></strong>?<br>
+                    Hành động này không thể hoàn tác.
+                </p>
+                <div style="display:flex;gap:12px;justify-content:center;">
+                    <button onclick="document.getElementById('modal-refund').style.display='none'"
+                        style="padding:9px 22px;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;font-weight:600;cursor:pointer;">
+                        Chưa hoàn
+                    </button>
+                    <form th:action="@{/admin/orders/confirm-refunded/{id}(id=${order.id})}" method="POST">
+                        <button type="submit"
+                            style="padding:9px 22px;border-radius:8px;border:none;background:#9333ea;color:#fff;font-weight:600;cursor:pointer;">
+                            <i class="las la-check me-1"></i> Đã hoàn tiền xong
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Close modal on overlay click -->
+        <script>
+            ['modal-fail', 'modal-refund'].forEach(id => {
+                document.getElementById(id).addEventListener('click', function (e) {
+                    if (e.target === this) this.style.display = 'none';
+                });
+            });
+        </script>
+
+    </div>
+</body>
+
+</html>
