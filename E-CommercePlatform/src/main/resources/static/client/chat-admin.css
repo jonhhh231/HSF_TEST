@@ -1,0 +1,22 @@
+
+.chat-admin-container {
+    position: fixed;
+    bottom: 30px;
+    right: 100px;
+    z-index: 999;
+}
+
+.admin-theme-btn {
+    background-color: #007bff !important;
+    color: white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.admin-header-bg {
+    background: linear-gradient(135deg, #0056b3, #007bff) !important;
+}
