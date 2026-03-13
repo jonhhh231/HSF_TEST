@@ -3,7 +3,39 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{admin/layouts/default}">
 <head>
-    <title>Danh sách danh mục</title>
+    <title>Quản lý Đơn hàng</title>
+    <style>
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .badge-status i { font-size: 13px; }
+
+        /* shippingStatus */
+        .ss-PENDING        { background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1; }
+        .ss-PROCESSING     { background:#eff6ff; color:#3b82f6; border:1px solid #93c5fd; }
+        .ss-PACKAGING      { background:#fefce8; color:#ca8a04; border:1px solid #fde047; }
+        .ss-DELIVERING     { background:#f0f9ff; color:#0284c7; border:1px solid #7dd3fc; }
+        .ss-DELIVERED      { background:#f0fdf4; color:#16a34a; border:1px solid #86efac; }
+        .ss-DELIVERY_FAILED{ background:#fff1f2; color:#e11d48; border:1px solid #fda4af; }
+        .ss-CANCELLED      { background:#fafafa; color:#737373; border:1px solid #d4d4d4; }
+
+        /* paymentStatus */
+        .ps-PENDING        { background:#fefce8; color:#ca8a04; border:1px solid #fde047; }
+        .ps-PAID           { background:#f0fdf4; color:#16a34a; border:1px solid #86efac; }
+        .ps-CANCELLED      { background:#fafafa; color:#737373; border:1px solid #d4d4d4; }
+        .ps-REFUND_PENDING { background:#fdf4ff; color:#9333ea; border:1px solid #d8b4fe; }
+        .ps-REFUNDED       { background:#eff6ff; color:#3b82f6; border:1px solid #93c5fd; }
+
+        .flash-success { background:#f0fdf4; color:#16a34a; border:1px solid #86efac; padding:10px 14px; border-radius:8px; margin-bottom:12px; }
+        .flash-error   { background:#fff1f2; color:#e11d48; border:1px solid #fda4af; padding:10px 14px; border-radius:8px; margin-bottom:12px; }
+    </style>
 </head>
 <body>
 
@@ -14,109 +46,121 @@
                 <div class="card-header">
                     <div class="row align-items-center">
                         <div class="col">
-                            <h4 class="card-title">Quản lý Đơn hàng</h4>
+                            <h4 class="card-title mb-0">Quản lý Đơn hàng</h4>
                         </div>
                     </div>
                 </div>
                 <div class="card-body pt-0">
 
-                    <div class="table-responsive">
-                        <div class="dataTable-wrapper dataTable-loading no-footer sortable searchable fixed-columns">
-                            <div class="row">
-                                <div class="col-lg-12 mb-3">
-                                    <form class="input-group" id="form-search">
-                                        <button id="button-addon1" class="btn btn-secondary" type="submit">
-                                            Tìm kiếm
-                                        </button>
-                                        <input class="form-control"
-                                               name="keyword"
-                                               placeholder="Nhập mã đơn hàng..."
-                                               type="text"
-                                               th:value="${keyword != null ? keyword : ''}"
-                                        />
-                                    </form>
-                                </div>
-                            </div>
-
-                            <div class="dataTable-container">
-                                <table class="table mb-0 checkbox-all dataTable-table" id="datatable_orders">
-                                    <thead class="table-light">
-                                    <tr>
-                                        <th style="width: 15%;">Mã đơn hàng</th>
-                                        <th style="width: 20%;">Khách hàng</th>
-                                        <th style="width: 15%;">Tổng tiền</th>
-                                        <th style="width: 15%;">Thanh toán</th>
-                                        <th style="width: 15%;">Ngày đặt</th>
-                                        <th style="width: 10%;">Trạng thái Đơn hàng</th>
-                                        <th style="width: 10%;">Trạng thái Thanh toán</th>
-                                        <th class="text-end" style="width: 10%;">Hành động</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr th:each="order : ${orderList}">
-                                        <td>
-                                            <a th:href="@{/admin/orders/detail/{id}(id=${order.id})}"
-                                               th:text="${order.orderCode}" class="fw-bold text-primary"></a>
-                                        </td>
-                                        <td>
-                                            <p class="mb-0" th:text="${order.user.fullName}"></p>
-                                            <small class="text-muted" th:text="${order.address}"></small>
-                                        </td>
-                                        <td th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
-                                        <td th:text="${order.paymentMethod}"></td>
-                                        <td th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
-                                        <td>
-                                            <form th:action="'/admin/orders/to-next-handle-status/' + ${order.id}" method="POST">
-
-                                                <button type="submit" th:if="${order.shippingStatus == 'PENDING'}"
-                                                        class="btn badge bg-secondary-subtle text-secondary border-secondary">
-                                                    <i class="las la-clock me-1"></i> Chờ xử lý
-                                                </button>
-
-                                                <button type="submit" th:if="${order.shippingStatus == 'PROCESSING'}"
-                                                        class="btn badge bg-info-subtle text-info border-info">
-                                                    <i class="las la-sync la-spin me-1"></i> Đang xử lý
-                                                </button>
-
-                                                <button type="submit" th:if="${order.shippingStatus == 'PACKAGING'}"
-                                                        class="btn badge bg-warning-subtle text-warning border-warning">
-                                                    <i class="las la-box me-1"></i> Đang đóng gói
-                                                </button>
-
-                                                <button type="submit" th:if="${order.shippingStatus == 'DELIVERING'}"
-                                                        class="btn badge bg-primary-subtle text-primary border-primary">
-                                                    <i class="las la-truck me-1"></i> Đang vận chuyển
-                                                </button>
-
-                                                <button type="submit" th:if="${order.shippingStatus == 'DELIVERED'}"
-                                                        class="btn badge bg-success-subtle text-success border-success">
-                                                    <i class="las la-check-double me-1"></i> Đã giao hàng
-                                                </button>
-                                            </form>
-                                        </td>
-                                        <td>
-                                            <form th:action="'/admin/orders/change-status/' + ${order.id} + '/' + ${order.paymentStatus == 'PAID' ? 'UNPAID' : 'PAID'}" method="POST">
-                                                <button type="submit" th:if="${order.paymentStatus == 'PAID'}" class="btn badge bg-success-subtle text-success">
-                                                    Đã thanh toán
-                                                </button>
-                                                <button type="submit" th:unless="${order.paymentStatus == 'PAID'}" class="btn badge bg-warning-subtle text-warning">
-                                                    Chờ thanh toán
-                                                </button>
-                                            </form>
-                                        </td>
-                                        <td class="text-end">
-                                            <a th:href="@{/admin/orders/detail/{id}(id=${order.id})}" title="Xem chi tiết">
-                                                <i class="las la-eye text-secondary fs-18"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                    <!-- Flash messages -->
+                    <div th:if="${successMessage}" class="flash-success mt-3">
+                        <i class="las la-check-circle me-1"></i> <span th:text="${successMessage}"></span>
+                    </div>
+                    <div th:if="${errorMessage}" class="flash-error mt-3">
+                        <i class="las la-exclamation-circle me-1"></i> <span th:text="${errorMessage}"></span>
                     </div>
 
-                    <div class="row mt-3">
+                    <div class="table-responsive mt-3">
+                        <!-- Search -->
+                        <div class="row mb-3">
+                            <div class="col-lg-5">
+                                <form class="input-group" id="form-search">
+                                    <button id="button-addon1" class="btn btn-secondary" type="submit">
+                                        <i class="las la-search"></i> Tìm kiếm
+                                    </button>
+                                    <input class="form-control"
+                                           name="keyword"
+                                           placeholder="Nhập mã đơn hàng..."
+                                           type="text"
+                                           th:value="${keyword != null ? keyword : ''}"
+                                    />
+                                </form>
+                            </div>
+                        </div>
+
+                        <table class="table mb-0 checkbox-all">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Mã đơn hàng</th>
+                                <th>Khách hàng</th>
+                                <th>Tổng tiền</th>
+                                <th>Thanh toán</th>
+                                <th>Ngày đặt</th>
+                                <th>Trạng thái vận chuyển</th>
+                                <th>Trạng thái TT</th>
+                                <th class="text-end">Hành động</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="order : ${orderList}">
+                                <td>
+                                    <a th:href="@{/admin/orders/detail/{id}(id=${order.id})}"
+                                       th:text="${order.orderCode}" class="fw-bold text-primary"></a>
+                                </td>
+                                <td>
+                                    <p class="mb-0" th:text="${order.user.fullName}"></p>
+                                    <small class="text-muted" th:text="${order.address}"></small>
+                                </td>
+                                <td th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                                <td>
+                                    <span th:text="${order.paymentMethod == 'CASH' ? 'COD' : order.paymentMethod}"
+                                          th:class="${order.paymentMethod == 'CASH' ? 'badge bg-secondary' : 'badge bg-info'}">
+                                    </span>
+                                </td>
+                                <td th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+
+                                <!-- Trạng thái vận chuyển -->
+                                <td>
+                                    <span th:class="'badge-status ss-' + ${order.shippingStatus}">
+                                        <i class="las" th:classappend="
+                                            ${order.shippingStatus == 'PENDING'}         ? 'la-clock' :
+                                            (${order.shippingStatus == 'PROCESSING'}     ? 'la-sync la-spin' :
+                                            (${order.shippingStatus == 'PACKAGING'}      ? 'la-box' :
+                                            (${order.shippingStatus == 'DELIVERING'}     ? 'la-truck' :
+                                            (${order.shippingStatus == 'DELIVERED'}      ? 'la-check-double' :
+                                            (${order.shippingStatus == 'DELIVERY_FAILED'}? 'la-times-circle' :
+                                            'la-ban')))))"></i>
+                                        <span th:text="
+                                            ${order.shippingStatus == 'PENDING'}          ? 'Chờ xử lý' :
+                                            (${order.shippingStatus == 'PROCESSING'}      ? 'Đang xử lý' :
+                                            (${order.shippingStatus == 'PACKAGING'}       ? 'Đóng gói' :
+                                            (${order.shippingStatus == 'DELIVERING'}      ? 'Đang giao' :
+                                            (${order.shippingStatus == 'DELIVERED'}       ? 'Đã giao' :
+                                            (${order.shippingStatus == 'DELIVERY_FAILED'} ? 'Giao thất bại' :
+                                            'Đã hủy')))))">
+                                        </span>
+                                    </span>
+                                </td>
+
+                                <!-- Trạng thái thanh toán -->
+                                <td>
+                                    <span th:class="'badge-status ps-' + ${order.paymentStatus}">
+                                        <span th:text="
+                                            ${order.paymentStatus == 'PENDING'}        ? 'Chờ TT' :
+                                            (${order.paymentStatus == 'PAID'}          ? 'Đã TT' :
+                                            (${order.paymentStatus == 'CANCELLED'}     ? 'Đã hủy' :
+                                            (${order.paymentStatus == 'REFUND_PENDING'}? 'Chờ hoàn tiền' :
+                                            'Đã hoàn tiền')))">
+                                        </span>
+                                    </span>
+                                </td>
+
+                                <td class="text-end">
+                                    <a th:href="@{/admin/orders/detail/{id}(id=${order.id})}"
+                                       title="Xem chi tiết & thao tác">
+                                        <i class="las la-eye text-secondary fs-18"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(orderList)}">
+                                <td colspan="8" class="text-center text-muted py-4">Không có đơn hàng nào</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="row mt-3" th:if="${totalPages > 1}">
                         <div class="col-lg-2 col-md-3 col-6">
                             <select class="form-select" onchange="window.location.href=this.value">
                                 <option th:each="i : ${#numbers.sequence(1, totalPages)}"

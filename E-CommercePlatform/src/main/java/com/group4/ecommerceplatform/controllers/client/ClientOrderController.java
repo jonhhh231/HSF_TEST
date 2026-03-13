@@ -47,7 +47,8 @@ public class ClientOrderController {
             model.addAttribute("orderCode", orderCode);
         }
 
-        // Flash attributes from redirectAttributes (like cancel success) will be automatically added to model
+        // Flash attributes from redirectAttributes (like cancel success) will be
+        // automatically added to model
 
         return "client/orders";
     }
@@ -98,12 +99,12 @@ public class ClientOrderController {
             // Kiểm tra đơn hàng có thuộc về user này không
             Order order = orderService.getOrderDetail(id, userId);
 
-            // Chỉ cho phép hủy đơn hàng đang chờ thanh toán
-            if ("PENDING".equals(order.getPaymentStatus())) {
+            // Chỉ cho phép hủy khi đơn hàng chưa được xử lý (shippingStatus = PENDING)
+            if ("PENDING".equals(order.getShippingStatus())) {
                 orderService.cancelOrder(id);
                 redirectAttributes.addFlashAttribute("successMessage", "Đã hủy đơn hàng thành công");
             } else {
-                redirectAttributes.addFlashAttribute("errorMessage", "Không thể hủy đơn hàng này");
+                redirectAttributes.addFlashAttribute("errorMessage", "Không thể hủy đơn hàng đã được xử lý");
             }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
@@ -154,12 +155,13 @@ public class ClientOrderController {
             // Kiểm tra đơn hàng có thuộc về user này không
             Order order = orderService.getOrderDetail(id, userId);
 
-            // Chỉ cho phép xóa đơn hàng đã bị hủy
-            if ("CANCELLED".equals(order.getPaymentStatus())) {
+            // Chỉ cho phép xóa đơn hàng đã hủy hoặc đã hoàn tiền
+            if ("CANCELLED".equals(order.getPaymentStatus()) || "REFUNDED".equals(order.getPaymentStatus())) {
                 orderService.deleteOrder(id);
                 redirectAttributes.addFlashAttribute("successMessage", "Đã xóa đơn hàng thành công");
             } else {
-                redirectAttributes.addFlashAttribute("errorMessage", "Chỉ có thể xóa đơn hàng đã bị hủy");
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Chỉ có thể xóa đơn hàng đã hủy hoặc đã hoàn tiền");
             }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());

@@ -7,6 +7,7 @@ import com.group4.ecommerceplatform.services.client.CartService;
 import com.group4.ecommerceplatform.services.client.OrderService;
 import com.group4.ecommerceplatform.services.payment.MomoPaymentService;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
+@Slf4j
 @RequestMapping("/cart")
 public class ClientCartController {
 
@@ -244,9 +246,8 @@ public class ClientCartController {
         System.out.println("User ID: " + userId);
 
         // Validate address
-        if (address == null || address.trim().length() < 10) {
-            System.out.println("Address validation failed: " + (address != null ? address.length() : "null"));
-            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng nhập địa chỉ giao hàng đầy đủ");
+        if (address == null || address.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng nhập địa chỉ giao hàng");
             return "redirect:/cart/checkout";
         }
 
@@ -280,7 +281,7 @@ public class ClientCartController {
             if ("CASH".equalsIgnoreCase(paymentMethod)) {
                 // Thanh toán tiền mặt - tạo đơn hàng ngay
                 return processCODOrder(session, redirectAttributes, userId, cartItems, cartTotal,
-                                      address.trim(), phone, note, tempOrderCode);
+                        address.trim(), phone, note, tempOrderCode);
             } else {
                 // Thanh toán MoMo
                 Order tempOrder = new Order();
@@ -305,10 +306,13 @@ public class ClientCartController {
      * Xử lý đơn hàng thanh toán tiền mặt (COD)
      */
     private String processCODOrder(HttpSession session, RedirectAttributes redirectAttributes,
-                                   Integer userId, List<CartProduct> cartItems, Long cartTotal,
-                                   String address, String phone, String note, String orderCode) {
+            Integer userId, List<CartProduct> cartItems, Long cartTotal,
+            String address, String phone, String note, String orderCode) {
         try {
-            User user = (User) session.getAttribute("user");
+            // Luôn load User từ DB thay vì session để tránh Hibernate detached entity
+            // (lazy collections trên User session object sẽ gây
+            // LazyInitializationException)
+            User user = orderService.findUserById(userId);
             if (user == null) {
                 return "redirect:/auth/login";
             }
@@ -347,6 +351,7 @@ public class ClientCartController {
             return "redirect:/orders?success=true&orderCode=" + orderCode;
 
         } catch (Exception e) {
+            log.error("Error creating COD order for user {}: {}", userId, e.getMessage(), e);
             redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra khi tạo đơn hàng: " + e.getMessage());
             return "redirect:/cart/checkout";
         }
@@ -406,7 +411,7 @@ public class ClientCartController {
     private Integer getCurrentUserId(HttpSession session) {
         return (Integer) session.getAttribute("userId");
     }
-    
+
     private void updateCartCountInSession(HttpSession session, Integer userId) {
         if (userId != null) {
             int count = cartService.getCartItemCount(userId);

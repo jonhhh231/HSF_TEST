@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html class="dark" xmlns:th="http://www.thymeleaf.org" lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" th:href="@{/client/global.css}">
     <link rel="stylesheet" th:href="@{/client/orders.css}">
 </head>
+
 <body>
     <!-- Header -->
     <div th:replace="~{client/fragments/header :: header}"></div>
@@ -22,11 +24,13 @@
             </nav>
 
             <!-- Flash Messages -->
-            <div th:if="${errorMessage}" class="alert alert-error" style="background-color: #dc2626; color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <div th:if="${errorMessage}" class="alert alert-error"
+                style="background-color: #dc2626; color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
                 <span class="material-symbols-outlined">error</span>
                 <span th:text="${errorMessage}">Error message</span>
             </div>
-            <div th:if="${successMessage}" class="alert alert-success" style="background-color: #16a34a; color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <div th:if="${successMessage}" class="alert alert-success"
+                style="background-color: #16a34a; color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
                 <span class="material-symbols-outlined">check_circle</span>
                 <span th:text="${successMessage}">Success message</span>
             </div>
@@ -62,29 +66,74 @@
                             </div>
                             <div class="order-date">
                                 <span class="material-symbols-outlined">schedule</span>
-                                <span th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</span>
+                                <span th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024
+                                    10:00</span>
                             </div>
                         </div>
-                        <div class="order-status" th:classappend="${order.paymentStatus}">
-                            <span class="status-icon material-symbols-outlined"
-                                  th:text="${order.paymentStatus == 'PAID' ? 'check_circle' :
-                                           (order.paymentStatus == 'PENDING' ? 'schedule' : 'cancel')}">
-                                schedule
-                            </span>
-                            <span class="status-text"
-                                  th:text="${order.paymentStatus == 'PAID' ? 'Đã thanh toán' :
-                                           (order.paymentStatus == 'PENDING' ? 'Chờ thanh toán' : 'Đã hủy')}">
-                                Trạng thái
-                            </span>
+
+                        <!-- Badges trạng thái -->
+                        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+
+                            <!-- Trạng thái VẬN CHUYỂN (do admin cập nhật) -->
+                            <div class="order-status" th:style="
+                                    ${order.shippingStatus == 'PENDING'}          ? 'background:rgba(100,116,139,.15); color:#94a3b8; border-color:#475569;' :
+                                    (${order.shippingStatus == 'PROCESSING'}      ? 'background:rgba(59,130,246,.15); color:#60a5fa; border-color:#3b82f6;' :
+                                    (${order.shippingStatus == 'PACKAGING'}       ? 'background:rgba(234,179,8,.15);  color:#facc15; border-color:#eab308;' :
+                                    (${order.shippingStatus == 'DELIVERING'}      ? 'background:rgba(2,132,199,.15);  color:#38bdf8; border-color:#0284c7;' :
+                                    (${order.shippingStatus == 'DELIVERED'}       ? 'background:rgba(22,163,74,.15);  color:#4ade80; border-color:#16a34a;' :
+                                    (${order.shippingStatus == 'DELIVERY_FAILED'} ? 'background:rgba(225,29,72,.15);  color:#f87171; border-color:#e11d48;' :
+                                    'background:rgba(115,115,115,.15); color:#a3a3a3; border-color:#737373;')))))">
+                                <span class="status-icon material-symbols-outlined" th:text="
+                                        ${order.shippingStatus == 'PENDING'}          ? 'hourglass_empty' :
+                                        (${order.shippingStatus == 'PROCESSING'}      ? 'settings'        :
+                                        (${order.shippingStatus == 'PACKAGING'}       ? 'inventory_2'     :
+                                        (${order.shippingStatus == 'DELIVERING'}      ? 'local_shipping'  :
+                                        (${order.shippingStatus == 'DELIVERED'}       ? 'check_circle'    :
+                                        (${order.shippingStatus == 'DELIVERY_FAILED'} ? 'cancel'          :
+                                        'block')))))">
+                                </span>
+                                <span class="status-text" th:text="
+                                        ${order.shippingStatus == 'PENDING'}          ? 'Chờ xử lý'      :
+                                        (${order.shippingStatus == 'PROCESSING'}      ? 'Đang xử lý'     :
+                                        (${order.shippingStatus == 'PACKAGING'}       ? 'Đóng gói'       :
+                                        (${order.shippingStatus == 'DELIVERING'}      ? 'Đang giao'      :
+                                        (${order.shippingStatus == 'DELIVERED'}       ? 'Đã giao'        :
+                                        (${order.shippingStatus == 'DELIVERY_FAILED'} ? 'Giao thất bại'  :
+                                        'Đã hủy')))))">
+                                </span>
+                            </div>
+
+                            <!-- Trạng thái THANH TOÁN -->
+                            <div class="order-status" th:style="
+                                    ${order.paymentStatus == 'PAID'}           ? 'background:rgba(22,163,74,.15);  color:#4ade80; border-color:#16a34a;' :
+                                    (${order.paymentStatus == 'PENDING'}       ? 'background:rgba(234,179,8,.15);  color:#facc15; border-color:#eab308;' :
+                                    (${order.paymentStatus == 'REFUND_PENDING'}? 'background:rgba(147,51,234,.15); color:#c084fc; border-color:#9333ea;' :
+                                    (${order.paymentStatus == 'REFUNDED'}      ? 'background:rgba(59,130,246,.15); color:#60a5fa; border-color:#3b82f6;' :
+                                    'background:rgba(115,115,115,.15); color:#a3a3a3; border-color:#737373;')))">
+                                <span class="status-icon material-symbols-outlined" th:text="
+                                        ${order.paymentStatus == 'PAID'}           ? 'check_circle'      :
+                                        (${order.paymentStatus == 'PENDING'}       ? 'schedule'          :
+                                        (${order.paymentStatus == 'REFUND_PENDING'}? 'currency_exchange' :
+                                        (${order.paymentStatus == 'REFUNDED'}      ? 'payments'          :
+                                        'cancel')))">
+                                </span>
+                                <span class="status-text" th:text="
+                                        ${order.paymentStatus == 'PAID'}           ? 'Đã thanh toán'  :
+                                        (${order.paymentStatus == 'PENDING'}       ? 'Chờ thanh toán' :
+                                        (${order.paymentStatus == 'REFUND_PENDING'}? 'Chờ hoàn tiền'  :
+                                        (${order.paymentStatus == 'REFUNDED'}      ? 'Đã hoàn tiền'   :
+                                        'Đã hủy')))">
+                                </span>
+                            </div>
                         </div>
                     </div>
+
 
                     <div class="order-items">
                         <div th:each="detail : ${order.orderDetails}" class="order-item">
                             <div class="item-image">
-                                <img th:if="${detail.product.url != null}"
-                                     th:src="${detail.product.url}"
-                                     th:alt="${detail.product.name}">
+                                <img th:if="${detail.product.url != null}" th:src="${detail.product.url}"
+                                    th:alt="${detail.product.name}">
                                 <div th:if="${detail.product.url == null}" class="no-image">
                                     <span class="material-symbols-outlined">laptop_mac</span>
                                 </div>
@@ -122,7 +171,9 @@
                                 </div>
                             </div>
                             <div class="item-price">
-                                <span class="price" th:text="${#numbers.formatDecimal(detail.price * detail.quantity, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                                <span class="price"
+                                    th:text="${#numbers.formatDecimal(detail.price * detail.quantity, 0, 'COMMA', 0, 'POINT')} + ' đ'">0
+                                    đ</span>
                             </div>
                         </div>
                     </div>
@@ -130,38 +181,42 @@
                     <div class="order-footer">
                         <div class="order-total">
                             <span>Tổng tiền:</span>
-                            <span class="total-price" th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                            <span class="total-price"
+                                th:text="${#numbers.formatDecimal(order.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">0
+                                đ</span>
                         </div>
                         <div class="order-actions">
                             <a th:href="@{/orders/{id}(id=${order.id})}" class="btn btn-detail">
                                 <span class="material-symbols-outlined">visibility</span>
                                 Chi tiết
                             </a>
-                            <button th:if="${order.paymentStatus == 'PENDING'}"
-                                    type="button"
-                                    class="btn btn-cancel"
-                                    th:onclick="'if(confirm(\'Bạn có chắc muốn hủy đơn hàng này?\')) { document.getElementById(\'cancelForm' + ${order.id} + '\').submit(); }'">
+                            <button th:if="${order.shippingStatus == 'PENDING'}" type="button" class="btn btn-cancel"
+                                th:onclick="'if(confirm(\'Bạn có chắc muốn hủy đơn hàng này?\')) { document.getElementById(\'cancelForm' + ${order.id} + '\').submit(); }'">
                                 <span class="material-symbols-outlined">cancel</span>
                                 Hủy đơn
                             </button>
-                            <button th:if="${order.paymentStatus == 'CANCELLED'}"
-                                    type="button"
-                                    class="btn btn-delete"
-                                    th:onclick="'if(confirm(\'Bạn có chắc muốn xóa đơn hàng này?\')) { document.getElementById(\'deleteForm' + ${order.id} + '\').submit(); }'">
+                            <button th:if="${order.shippingStatus == 'DELIVERING'}" type="button" class="btn btn-detail"
+                                style="background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border-color:#16a34a;"
+                                th:onclick="'if(confirm(\'Xác nhận đã nhận được hàng?\')) { document.getElementById(\'receivedForm' + ${order.id} + '\').submit(); }'">
+                                <span class="material-symbols-outlined">check_circle</span>
+                                Đã nhận hàng
+                            </button>
+                            <button th:if="${order.paymentStatus == 'CANCELLED' or order.paymentStatus == 'REFUNDED'}"
+                                type="button" class="btn btn-delete"
+                                th:onclick="'if(confirm(\'Bạn có chắc muốn xóa đơn hàng này?\')) { document.getElementById(\'deleteForm' + ${order.id} + '\').submit(); }'">
                                 <span class="material-symbols-outlined">delete</span>
                                 Xóa đơn
                             </button>
-                            <form th:if="${order.paymentStatus == 'PENDING'}"
-                                  th:id="'cancelForm' + ${order.id}"
-                                  th:action="@{/orders/{id}/cancel(id=${order.id})}"
-                                  method="post"
-                                  style="display: none;">
+                            <form th:if="${order.shippingStatus == 'PENDING'}" th:id="'cancelForm' + ${order.id}"
+                                th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post" style="display: none;">
                             </form>
-                            <form th:if="${order.paymentStatus == 'CANCELLED'}"
-                                  th:id="'deleteForm' + ${order.id}"
-                                  th:action="@{/orders/{id}/delete(id=${order.id})}"
-                                  method="post"
-                                  style="display: none;">
+                            <form th:if="${order.shippingStatus == 'DELIVERING'}" th:id="'receivedForm' + ${order.id}"
+                                th:action="@{/orders/{id}/confirm-received(id=${order.id})}" method="post"
+                                style="display: none;">
+                            </form>
+                            <form th:if="${order.paymentStatus == 'CANCELLED' or order.paymentStatus == 'REFUNDED'}"
+                                th:id="'deleteForm' + ${order.id}" th:action="@{/orders/{id}/delete(id=${order.id})}"
+                                method="post" style="display: none;">
                             </form>
                         </div>
                     </div>
@@ -173,4 +228,5 @@
     <!-- Footer -->
     <div th:replace="~{client/fragments/footer :: footer}"></div>
 </body>
+
 </html>
